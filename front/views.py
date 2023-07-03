@@ -35,7 +35,7 @@ def index(request):
             tmpname = str(datetime.now().microsecond) + \
                 os.path.splitext(str(file))[1]
             fs = FileSystemStorage(
-                settings.MEDIA_ROOT + "csv/", settings.MEDIA_ROOT + "/csv/")
+                settings.MEDIA_ROOT + "csv/", settings.MEDIA_ROOT + "csv/")
             fs.save(tmpname, file)
             file_name = "csv/" + tmpname
 
