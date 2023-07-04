@@ -252,7 +252,7 @@ def multipleLineChart(request):
 def getMultipleLineChartData(request):
     if request.method == "POST":
         csv_data = models.CsvData.objects.filter(
-            hour_slab__gte=request.POST['from_hour'], hour_slab__lte=request.POST['to_hour']).order_by('id')[:200]
+            hour_slab__gte=request.POST['from_hour'], hour_slab__lte=request.POST['to_hour']).order_by('id')
         categories = []
         series = []
         method_1_data = []
