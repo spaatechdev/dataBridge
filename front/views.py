@@ -245,9 +245,11 @@ def getLineChartData(request):
 
 def multipleLineChart(request):
     total_hours = models.CsvData.objects.values('hour_slab').distinct().order_by('hour_slab')
-    min_hour = total_hours[0]['hour_slab']
-    max_hour = total_hours[len(total_hours) - 1]['hour_slab']
-    context.update({'total_hours': total_hours, 'min_hour': min_hour, 'max_hour': max_hour})
+    from_min_hour = "{:02d}".format(total_hours[0]['hour_slab'])
+    from_max_hour = "{:02d}".format(total_hours[len(total_hours) - 1]['hour_slab'])
+    to_min_hour = "{:02d}".format(total_hours[0]['hour_slab'] + 1)
+    to_max_hour = "{:02d}".format(total_hours[len(total_hours) - 1]['hour_slab'] + 1)
+    context.update({'total_hours': total_hours, 'from_min_hour': from_min_hour, 'from_max_hour': from_max_hour, 'to_min_hour': to_min_hour, 'to_max_hour': to_max_hour})
     return render(request, 'front/multipleLineChart.html', context)
 
 
