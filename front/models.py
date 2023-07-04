@@ -13,6 +13,7 @@ class CsvData(models.Model):
     method_8 = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     method_9 = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     method_10 = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    calculated_miliseconds = models.BigIntegerField(blank=True, null=True)
     calculated_time = models.TimeField(blank=True, null=True)
     hour_slab = models.IntegerField(blank=True, null=True)
 

@@ -1,0 +1,205 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <title>Measurement Data</title>
+    <style>
+        #container {
+            max-width: 800px;
+            margin: auto;
+        }
+
+        .highcharts-figure,
+        .highcharts-data-table table {
+            min-width: 360px;
+            max-width: 800px;
+            margin: 1em auto;
+        }
+
+        .highcharts-data-table table {
+            font-family: Verdana, sans-serif;
+            border-collapse: collapse;
+            border: 1px solid #ebebeb;
+            margin: 10px auto;
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .highcharts-data-table caption {
+            padding: 1em 0;
+            font-size: 1.2em;
+            color: #555;
+        }
+
+        .highcharts-data-table th {
+            font-weight: 600;
+            padding: 0.5em;
+        }
+
+        .highcharts-data-table td,
+        .highcharts-data-table th,
+        .highcharts-data-table caption {
+            padding: 0.5em;
+        }
+
+        .highcharts-data-table thead tr,
+        .highcharts-data-table tr:nth-child(even) {
+            background: #f8f8f8;
+        }
+
+        .highcharts-data-table tr:hover {
+            background: #f1f7ff;
+        }
+    </style>
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+</head>
+
+<body>
+    <div class="container">
+        <form action="#" id="chart_details_form">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>Method</label>
+                        <select name="method" id="method" class="form-control" required>
+                            <option value="">Select One</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>From Hour</label>
+                        <!-- <input name="from_hour" type="text" class="form-control" required
+                            onkeypress="return event.charCode >= 48 && event.charCode <= 57" max=""> -->
+                        <select name="from_hour" id="from_hour" class="form-control" required>
+                            <option value="">Select One</option>
+                            {% for each in total_hours %}
+                            <option value="{{each.hour_slab}}">{{each.hour_slab|add:"1"}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>To Hour</label>
+                        <!-- <input name="to_hour" type="text" class="form-control" required
+                            onkeypress="return event.charCode >= 48 && event.charCode <= 57" max=""> -->
+                        <select name="to_hour" id="to_hour" class="form-control" required>
+                            <option value="">Select One</option>
+                            {% for each in total_hours %}
+                            <option value="{{each.hour_slab}}">{{each.hour_slab|add:"1"}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <button type="submit" style="margin-top: 3rem;">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <figure class="highcharts-figure">
+        <div id="chartContainer"></div>
+    </figure>
+
+
+    <script src="{% static 'js/highcharts/js/highcharts.js' %}"></script>
+
+    <script src="{% static 'js/highcharts/js/highcharts-more.js' %}"></script>
+    <script src="{% static 'js/highcharts/js/dumbbell.js' %}"></script>
+    <script src="{% static 'js/highcharts/js/lollipop.js' %}"></script>
+
+    <script src="{% static 'js/highcharts/js/exporting.js' %}"></script>
+    <script src="{% static 'js/highcharts/js/export-data.js' %}"></script>
+    <script src="{% static 'js/highcharts/js/accessibility.js' %}"></script>
+
+    <script>
+        $(document).on('submit', '#chart_details_form', async function (e) {
+            e.preventDefault();
+            if (parseInt($('#from_hour').val()) > parseInt($('#to_hour').val())) {
+                alert("Please select From and To perfectly");
+            } else {
+                var formData = new FormData(this);
+                await $.ajax({
+                    type: "POST",
+                    evalScripts: true,
+                    contentType: false,
+                    processData: false,
+                    url: "{% url 'getLineChartData' %}",
+                    data: formData,
+                    success: function (response) {
+                        result = response.result.series;
+                        renderChartData(result);
+                    }
+                });
+            }
+        });
+
+        function renderChartData(result) {
+            // Sample data
+            const data = result;
+
+            // Create the chart
+            Highcharts.chart('chartContainer', {
+                chart: {
+                    type: 'line'
+                },
+                credits: {
+                    enabled: false
+                },
+                title: {
+                    text: 'Strain Data Analysis'
+                },
+                xAxis: {
+                    type: 'datetime',
+                    labels: {
+                        formatter: function () {
+                            return Highcharts.dateFormat('%H:%M:%S', this.value);
+                        }
+                    }
+                },
+                plotOptions: {
+                    scatter: {
+                        showInLegend: false,
+                        marker: {
+                            radius: 2,
+                            symbol: 'circle'
+                        },
+                    }
+                },
+                tooltip: {
+                    formatter: function () {
+                        return Highcharts.dateFormat('%H:%M:%S', this.x) + '<br>' + 'Value: ' + this.y;
+                    }
+                },
+                series: [{
+                    name: 'Time',
+                    data: data
+                }]
+            });
+        }
+    </script>
+</body>
+
+</html>

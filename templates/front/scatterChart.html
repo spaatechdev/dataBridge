@@ -16,7 +16,7 @@
         <ul class="nav nav-tabs">
             {% for i in total_hours %}
             <li class="{% if forloop.counter == 1 %}active{% endif %}"><a data-toggle="tab" class="_get_tab"
-                    data-hour="{{i.hour_slab}}" href="#hour_slab{{i.hour_slab}}">Hour {{i.hour_slab}}</a></li>
+                    data-hour="{{i.hour_slab}}" href="#hour_slab{{i.hour_slab}}">Hour {{i.hour_slab|add:"1"}}</a></li>
             {% endfor %}
         </ul>
 
@@ -54,11 +54,11 @@
 
 
     <script>
-        var hour = 1;
+        var hour = 0;
 
         $(document).ready(function () {
             $.ajax({
-                url: "{% url 'getChartData' %}",
+                url: "{% url 'getScatterChartData' %}",
                 type: 'post',
                 data: ({ hour: hour, csrfmiddlewaretoken: '{{csrf_token}}' }),
                 success: function (response) {
@@ -70,9 +70,9 @@
         $(document).on('click', '._get_tab', function () {
             elem = $(this);
             hour = elem.attr('data-hour');
-            $('._show_hour').text(hour);
+            $('._show_hour').text(parseInt(hour) + 1);
             $.ajax({
-                url: "{% url 'getChartData' %}",
+                url: "{% url 'getScatterChartData' %}",
                 type: 'post',
                 data: ({ hour: hour, csrfmiddlewaretoken: '{{csrf_token}}' }),
                 success: function (response) {

@@ -3,8 +3,12 @@ from . import views
 from django.views.decorators.csrf import csrf_exempt
 
 urlpatterns = [
-    path('', views.index, name='index'),
-    path('chart', views.chart, name='chart'),
-    # path('getChartData', csrf_exempt(views.getChartData), name='getChartData')
-    path('getChartData', views.getChartData, name='getChartData')
+    path('import-csv', views.importCsv, name='importCsv'),
+    
+    path('', views.lineChart, name='lineChart'),
+    path('scatter-chart', views.scatterChart, name='scatterChart'),
+    path('getScatterChartData', views.getScatterChartData, name='getScatterChartData'),
+
+    path('line-chart', views.lineChart, name='lineChart'),
+    path('getLineChartData', csrf_exempt(views.getLineChartData), name='getLineChartData')
 ]

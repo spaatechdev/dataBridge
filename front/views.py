@@ -27,7 +27,7 @@ def millisToMinutesAndSeconds(millis=None):
     return str(minutes) + ":" + str('0' if float(seconds) < 10 else '') + str(round(float(seconds)))
 
 
-def index(request):
+def importCsv(request):
     if request.method == "POST":
         csv_list = []
         if request.FILES.get('csv_data', None):
@@ -35,21 +35,21 @@ def index(request):
             tmpname = str(datetime.now().microsecond) + \
                 os.path.splitext(str(file))[1]
             fs = FileSystemStorage(
-                settings.MEDIA_ROOT + "csv/", settings.MEDIA_ROOT + "csv/")
+                settings.MEDIA_ROOT + "csv/", settings.MEDIA_ROOT + "/csv/")
             fs.save(tmpname, file)
             file_name = "csv/" + tmpname
 
             with open(settings.MEDIA_ROOT + file_name, newline='', mode='r', encoding='ISO-8859-1') as csvfile:
                 # reader = csv.DictReader(csvfile)
                 reader = csv.reader(csvfile)
-                hour_slab = 1
+                hour_slab = 0
                 flag = 0
                 for row in reader:
                     if not row[0]:
                         break
                     splitted = row[0].split(":")
-                    calculated_time = millisToMinutesAndSeconds(int(splitted[0]) * 60000 + int(
-                        splitted[1].split(".")[0]) * 1000 + int(splitted[1].split(".")[1]))
+                    totalMiliSeconds = int(splitted[0]) * 60000 + int(splitted[1].split(".")[0]) * 1000 + int(splitted[1].split(".")[1])
+                    calculated_time = millisToMinutesAndSeconds(totalMiliSeconds)
                     if int(calculated_time.split(":")[0]) == 59:
                         flag = 1
                         # if len(csv_list) > 1000:
@@ -88,10 +88,10 @@ def index(request):
                         models.CsvData.objects.bulk_create(csv_list)
                         csv_list = []
                         csv_list.append(models.CsvData(time=row[0], method_1=row[1], method_2=row[2], method_3=row[3], method_4=row[4], method_5=row[5], method_6=row[6],
-                                        method_7=row[7], method_8=row[8], method_9=row[9], method_10=row[10], calculated_time="00:"+calculated_time, hour_slab=hour_slab))
+                                        method_7=row[7], method_8=row[8], method_9=row[9], method_10=row[10], calculated_miliseconds=(hour_slab * 60 * 60 * 1000) + totalMiliSeconds, calculated_time="00:"+calculated_time, hour_slab=hour_slab))
                     else:
                         csv_list.append(models.CsvData(time=row[0], method_1=row[1], method_2=row[2], method_3=row[3], method_4=row[4], method_5=row[5], method_6=row[6],
-                                        method_7=row[7], method_8=row[8], method_9=row[9], method_10=row[10], calculated_time="00:"+calculated_time, hour_slab=hour_slab))
+                                        method_7=row[7], method_8=row[8], method_9=row[9], method_10=row[10], calculated_miliseconds=(hour_slab * 60 * 60 * 1000) + totalMiliSeconds, calculated_time="00:"+calculated_time, hour_slab=hour_slab))
 
                 models.CsvData.objects.bulk_create(csv_list)
                 csvfile.close()
@@ -101,17 +101,18 @@ def index(request):
     return render(request, 'front/index.html', context)
 
 
-def chart(request):
+def scatterChart(request):
     total_hours = models.CsvData.objects.values('hour_slab').distinct()
     context.update({'total_hours': total_hours})
-    return render(request, 'front/chart.html', context)
+    return render(request, 'front/scatterChart.html', context)
 
 
-def getChartData(request):
+def getScatterChartData(request):
     if request.method == "POST":
         hour = request.POST['hour']
-        csv_data = models.CsvData.objects.filter(hour_slab=int(hour)).order_by('time')
-        categories = [field.name for field in csv_data.model._meta.fields if field.name.startswith('method_')]
+        csv_data = models.CsvData.objects.filter(hour_slab=int(hour))
+        categories = [
+            field.name for field in csv_data.model._meta.fields if field.name.startswith('method_')]
         method_1_single_data = []
         method_2_single_data = []
         method_3_single_data = []
@@ -122,7 +123,7 @@ def getChartData(request):
         method_8_single_data = []
         method_9_single_data = []
         method_10_single_data = []
-        for row_data in csv_data:    
+        for row_data in csv_data:
             method_1_single_data.append([0, float(row_data.method_1)])
             method_2_single_data.append([1, float(row_data.method_2)])
             method_3_single_data.append([2, float(row_data.method_3)])
@@ -150,3 +151,61 @@ def getChartData(request):
             'status': "ERROR",
             'message': "There should be ajax method."
         })
+
+
+def getLineChartData(request):
+    if request.method == "POST":
+        csv_data = models.CsvData.objects.filter(hour_slab__gte=request.POST['from_hour'], hour_slab__lte=request.POST['to_hour']).order_by('id')
+        series = []
+        # method_2_data = []
+        # method_3_data = []
+        for row_data in csv_data:
+            series.append([row_data.calculated_miliseconds, float(row_data.method_1)])
+            # method_2_data.append(float(row_data.method_2))
+            # method_2_data.append("{:02d}".format(row_data.hour_slab) + ":" + row_data.calculated_time.strftime("%M") + ":" + row_data.calculated_time.strftime("%S"))
+            # method_3_data.append(float(row_data.method_3))
+            # method_3_data.append("{:02d}".format(row_data.hour_slab) + ":" + row_data.calculated_time.strftime("%M") + ":" + row_data.calculated_time.strftime("%S"))
+        # series.append(
+        #     {
+        #         'name': 'method_1',
+        #         'id': 'method_1',
+        #         'marker': {
+        #             'symbol': 'circle'
+        #         },
+        #         'data': method_1_data
+        #     })
+        # series.append(
+        #     {
+        #         'name': 'method_2',
+        #         'id': 'method_2',
+        #         'marker': {
+        #             'symbol': 'circle'
+        #         },
+        #         'data': method_2_data
+        #     })
+        # series.append(
+        #     {
+        #         'name': 'method_3',
+        #         'id': 'method_3',
+        #         'marker': {
+        #             'symbol': 'circle'
+        #         },
+        #         'data': method_3_data
+        #     })
+        return JsonResponse({
+            'code': 200,
+            'status': "SUCCESS",
+            'result': {'series': series},
+        })
+    else:
+        return JsonResponse({
+            'code': 502,
+            'status': "ERROR",
+            'message': "There should be ajax method."
+        })
+
+
+def lineChart(request):
+    total_hours = models.CsvData.objects.values('hour_slab').distinct()
+    context.update({'total_hours': total_hours})
+    return render(request, 'front/lineChart.html', context)
