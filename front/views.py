@@ -160,7 +160,26 @@ def getLineChartData(request):
         # method_2_data = []
         # method_3_data = []
         for row_data in csv_data:
-            series.append([row_data.calculated_miliseconds, float(row_data.method_1)])
+            if int(request.POST['method']) == 1:
+                series.append([row_data.calculated_miliseconds, float(row_data.method_1)])
+            elif int(request.POST['method']) == 2:
+                series.append([row_data.calculated_miliseconds, float(row_data.method_2)])
+            elif int(request.POST['method']) == 3:
+                series.append([row_data.calculated_miliseconds, float(row_data.method_3)])
+            elif int(request.POST['method']) == 4:
+                series.append([row_data.calculated_miliseconds, float(row_data.method_4)])
+            elif int(request.POST['method']) == 5:
+                series.append([row_data.calculated_miliseconds, float(row_data.method_5)])
+            elif int(request.POST['method']) == 6:
+                series.append([row_data.calculated_miliseconds, float(row_data.method_6)])
+            elif int(request.POST['method']) == 7:
+                series.append([row_data.calculated_miliseconds, float(row_data.method_7)])
+            elif int(request.POST['method']) == 8:
+                series.append([row_data.calculated_miliseconds, float(row_data.method_8)])
+            elif int(request.POST['method']) == 9:
+                series.append([row_data.calculated_miliseconds, float(row_data.method_9)])
+            elif int(request.POST['method']) == 10:
+                series.append([row_data.calculated_miliseconds, float(row_data.method_10)])
             # method_2_data.append(float(row_data.method_2))
             # method_2_data.append("{:02d}".format(row_data.hour_slab) + ":" + row_data.calculated_time.strftime("%M") + ":" + row_data.calculated_time.strftime("%S"))
             # method_3_data.append(float(row_data.method_3))
