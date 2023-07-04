@@ -88,7 +88,8 @@
                 <div class="col-md-3">
                     <div class="form-group">
                         <label>From Time</label>
-                        <input name="from_time" type="time" class="form-control" required min="{{min_hour}}:00" max="{{max_hour}}:00">
+                        <input name="from_time" type="time" class="form-control" required min="{{min_hour}}:00"
+                            max="{{max_hour}}:00">
                         <!-- <select name="from_hour" id="from_hour" class="form-control" required>
                             <option value="">Select One</option>
                             {% for each in total_hours %}
@@ -100,7 +101,8 @@
                 <div class="col-md-3">
                     <div class="form-group">
                         <label>To Time</label>
-                        <input name="to_time" type="time" class="form-control" required min="{{min_hour}}:00" max="{{max_hour}}:00">
+                        <input name="to_time" type="time" class="form-control" required min="{{min_hour}}:00"
+                            max="{{max_hour}}:00">
                         <!-- <select name="to_hour" id="to_hour" class="form-control" required>
                             <option value="">Select One</option>
                             {% for each in total_hours %}
@@ -111,7 +113,8 @@
                 </div>
                 <div class="col-md-3">
                     <div class="form-group">
-                        <button type="submit" style="margin-top: 3rem;">Submit</button>
+                        <button type="submit" class="btn btn-sm btn-success submit_btn"
+                            style="margin-top: 3rem;">Submit</button>
                     </div>
                 </div>
             </div>
@@ -140,26 +143,30 @@
 
         $(document).on('submit', '#chart_details_form', async function (e) {
             e.preventDefault();
+            $('.submit_btn').text('Submitting...');
+            $('.submit_btn').prop('disabled', true);
             // if (parseInt($('#from_hour').val()) > parseInt($('#to_hour').val())) {
             //     alert("From hour should not exceeds To hour");
             // } else {
-                var formData = new FormData(this);
-                await $.ajax({
-                    type: "POST",
-                    evalScripts: true,
-                    contentType: false,
-                    processData: false,
-                    url: "{% url 'getMultipleLineChartData' %}",
-                    data: formData,
-                    success: function (response) {
-                        if (response.code == 200) {
-                            result = response.result;
-                            renderChartData(result);
-                        } else {
-                            alert(response.message)
-                        }
+            var formData = new FormData(this);
+            await $.ajax({
+                type: "POST",
+                evalScripts: true,
+                contentType: false,
+                processData: false,
+                url: "{% url 'getMultipleLineChartData' %}",
+                data: formData,
+                success: function (response) {
+                    $('.submit_btn').text('Submit');
+                    $('.submit_btn').prop('disabled', false);
+                    if (response.code == 200) {
+                        result = response.result;
+                        renderChartData(result);
+                    } else {
+                        alert(response.message)
                     }
-                });
+                }
+            });
             // }
         });
 
