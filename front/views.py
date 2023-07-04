@@ -244,15 +244,31 @@ def getLineChartData(request):
 
 
 def multipleLineChart(request):
-    total_hours = models.CsvData.objects.values('hour_slab').distinct()
-    context.update({'total_hours': total_hours})
+    total_hours = models.CsvData.objects.values('hour_slab').distinct().order_by('hour_slab')
+    min_hour = total_hours[0]['hour_slab']
+    max_hour = total_hours[len(total_hours) - 1]['hour_slab']
+    context.update({'total_hours': total_hours, 'min_hour': min_hour, 'max_hour': max_hour})
     return render(request, 'front/multipleLineChart.html', context)
 
 
 def getMultipleLineChartData(request):
     if request.method == "POST":
-        csv_data = models.CsvData.objects.filter(
-            hour_slab__gte=request.POST['from_hour'], hour_slab__lte=request.POST['to_hour']).order_by('id')
+        from_time = request.POST['from_time']
+        to_time = request.POST['to_time']
+
+        from_miliseconds = int(from_time.split(':')[0]) * 3600 * 1000 + int(from_time.split(':')[1]) * 60 * 1000
+        to_miliseconds = int(to_time.split(':')[0]) * 3600 * 1000 + int(to_time.split(':')[1]) * 60 * 1000
+
+        if from_miliseconds > to_miliseconds:
+            return JsonResponse({
+                'code': 503,
+                'status': "ERROR",
+                'message': "From time should not exceeds To time "
+            })
+
+        # csv_data = models.CsvData.objects.filter(
+        #     hour_slab__gte=request.POST['from_time'], hour_slab__lte=request.POST['to_time']).order_by('id')
+        csv_data = models.CsvData.objects.filter(calculated_miliseconds__gte=from_miliseconds, calculated_miliseconds__lte=to_miliseconds).order_by('id')
         categories = []
         series = []
         method_1_data = []

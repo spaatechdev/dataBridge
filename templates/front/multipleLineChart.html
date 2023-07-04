@@ -69,7 +69,7 @@
             <div class="row">
                 <div class="col-md-3">
                     <div class="form-group">
-                        <label>Strain</label>
+                        <label>Select Strains (Multiple)</label>
                         <select name="method" id="method" class="form-control selectpicker" required multiple>
                             <option value="">Select One</option>
                             <option value="1">1</option>
@@ -87,28 +87,26 @@
                 </div>
                 <div class="col-md-3">
                     <div class="form-group">
-                        <label>From Hour</label>
-                        <!-- <input name="from_hour" type="text" class="form-control" required
-                            onkeypress="return event.charCode >= 48 && event.charCode <= 57" max=""> -->
-                        <select name="from_hour" id="from_hour" class="form-control" required>
+                        <label>From Time</label>
+                        <input name="from_time" type="time" class="form-control" required min="{{min_hour}}:00" max="{{max_hour}}:00">
+                        <!-- <select name="from_hour" id="from_hour" class="form-control" required>
                             <option value="">Select One</option>
                             {% for each in total_hours %}
-                            <option value="{{each.hour_slab}}">{{each.hour_slab|add:"1"}}</option>
+                            <option value="{{each.hour_slab}}">{{each.hour_slab}}</option>
                             {% endfor %}
-                        </select>
+                        </select> -->
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-group">
-                        <label>To Hour</label>
-                        <!-- <input name="to_hour" type="text" class="form-control" required
-                            onkeypress="return event.charCode >= 48 && event.charCode <= 57" max=""> -->
-                        <select name="to_hour" id="to_hour" class="form-control" required>
+                        <label>To Time</label>
+                        <input name="to_time" type="time" class="form-control" required min="{{min_hour|add:'1'}}:00" max="{{max_hour|add:'1'}}:00">
+                        <!-- <select name="to_hour" id="to_hour" class="form-control" required>
                             <option value="">Select One</option>
                             {% for each in total_hours %}
                             <option value="{{each.hour_slab}}">{{each.hour_slab|add:"1"}}</option>
                             {% endfor %}
-                        </select>
+                        </select> -->
                     </div>
                 </div>
                 <div class="col-md-3">
@@ -142,9 +140,9 @@
 
         $(document).on('submit', '#chart_details_form', async function (e) {
             e.preventDefault();
-            if (parseInt($('#from_hour').val()) > parseInt($('#to_hour').val())) {
-                alert("From hour should not exceeds To hour");
-            } else {
+            // if (parseInt($('#from_hour').val()) > parseInt($('#to_hour').val())) {
+            //     alert("From hour should not exceeds To hour");
+            // } else {
                 var formData = new FormData(this);
                 await $.ajax({
                     type: "POST",
@@ -154,11 +152,15 @@
                     url: "{% url 'getMultipleLineChartData' %}",
                     data: formData,
                     success: function (response) {
-                        result = response.result;
-                        renderChartData(result);
+                        if (response.code == 200) {
+                            result = response.result;
+                            renderChartData(result);
+                        } else {
+                            alert(response.message)
+                        }
                     }
                 });
-            }
+            // }
         });
 
         function renderChartData(result) {
