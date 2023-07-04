@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-    <title>Measurement Data</title>
+    <title>Multiple Measurement Data</title>
     <style>
         #container {
             max-width: 800px;
@@ -70,7 +70,7 @@
                 <div class="col-md-3">
                     <div class="form-group">
                         <label>Strain</label>
-                        <select name="method" id="method" class="form-control selectpicker" required>
+                        <select name="method" id="method" class="form-control selectpicker" required multiple>
                             <option value="">Select One</option>
                             <option value="1">1</option>
                             <option value="2">2</option>
@@ -151,10 +151,10 @@
                     evalScripts: true,
                     contentType: false,
                     processData: false,
-                    url: "{% url 'getLineChartData' %}",
+                    url: "{% url 'getMultipleLineChartData' %}",
                     data: formData,
                     success: function (response) {
-                        result = response.result.series;
+                        result = response.result;
                         renderChartData(result);
                     }
                 });
@@ -162,20 +162,31 @@
         });
 
         function renderChartData(result) {
-            // Sample data
-            const data = result;
-
             // Create the chart
             Highcharts.chart('chartContainer', {
+
                 chart: {
-                    type: 'line'
+                    zoomType: 'x'
                 },
-                credits: {
-                    enabled: false
-                },
+
                 title: {
                     text: 'Strain Data Analysis'
                 },
+
+                subtitle: {
+                    text: 'Using the Boost module'
+                },
+
+                accessibility: {
+                    screenReaderSection: {
+                        beforeChartFormat: '<{headingTagName}>{chartTitle}</{headingTagName}><div>{chartSubtitle}</div><div>{chartLongdesc}</div><div>{xAxisDescription}</div><div>{yAxisDescription}</div>'
+                    }
+                },
+
+                tooltip: {
+                    valueDecimals: 2
+                },
+
                 xAxis: {
                     type: 'datetime',
                     labels: {
@@ -184,24 +195,15 @@
                         }
                     }
                 },
-                plotOptions: {
-                    scatter: {
-                        showInLegend: false,
-                        marker: {
-                            radius: 2,
-                            symbol: 'circle'
-                        },
-                    }
-                },
+
                 tooltip: {
                     formatter: function () {
                         return Highcharts.dateFormat('%H:%M:%S', this.x) + '<br>' + 'Value: ' + this.y;
                     }
                 },
-                series: [{
-                    name: 'Time',
-                    data: data
-                }]
+
+                series: result.series
+
             });
         }
     </script>

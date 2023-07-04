@@ -48,8 +48,10 @@ def importCsv(request):
                     if not row[0]:
                         break
                     splitted = row[0].split(":")
-                    totalMiliSeconds = int(splitted[0]) * 60000 + int(splitted[1].split(".")[0]) * 1000 + int(splitted[1].split(".")[1])
-                    calculated_time = millisToMinutesAndSeconds(totalMiliSeconds)
+                    totalMiliSeconds = int(splitted[0]) * 60000 + int(
+                        splitted[1].split(".")[0]) * 1000 + int(splitted[1].split(".")[1])
+                    calculated_time = millisToMinutesAndSeconds(
+                        totalMiliSeconds)
                     if int(calculated_time.split(":")[0]) == 59:
                         flag = 1
                         # if len(csv_list) > 1000:
@@ -153,33 +155,50 @@ def getScatterChartData(request):
         })
 
 
+def lineChart(request):
+    total_hours = models.CsvData.objects.values('hour_slab').distinct()
+    context.update({'total_hours': total_hours})
+    return render(request, 'front/lineChart.html', context)
+
+
 def getLineChartData(request):
     if request.method == "POST":
-        csv_data = models.CsvData.objects.filter(hour_slab__gte=request.POST['from_hour'], hour_slab__lte=request.POST['to_hour']).order_by('id')
+        csv_data = models.CsvData.objects.filter(
+            hour_slab__gte=request.POST['from_hour'], hour_slab__lte=request.POST['to_hour']).order_by('id')
         series = []
         # method_2_data = []
         # method_3_data = []
         for row_data in csv_data:
             if int(request.POST['method']) == 1:
-                series.append([row_data.calculated_miliseconds, float(row_data.method_1)])
+                series.append([row_data.calculated_miliseconds,
+                              float(row_data.method_1)])
             elif int(request.POST['method']) == 2:
-                series.append([row_data.calculated_miliseconds, float(row_data.method_2)])
+                series.append([row_data.calculated_miliseconds,
+                              float(row_data.method_2)])
             elif int(request.POST['method']) == 3:
-                series.append([row_data.calculated_miliseconds, float(row_data.method_3)])
+                series.append([row_data.calculated_miliseconds,
+                              float(row_data.method_3)])
             elif int(request.POST['method']) == 4:
-                series.append([row_data.calculated_miliseconds, float(row_data.method_4)])
+                series.append([row_data.calculated_miliseconds,
+                              float(row_data.method_4)])
             elif int(request.POST['method']) == 5:
-                series.append([row_data.calculated_miliseconds, float(row_data.method_5)])
+                series.append([row_data.calculated_miliseconds,
+                              float(row_data.method_5)])
             elif int(request.POST['method']) == 6:
-                series.append([row_data.calculated_miliseconds, float(row_data.method_6)])
+                series.append([row_data.calculated_miliseconds,
+                              float(row_data.method_6)])
             elif int(request.POST['method']) == 7:
-                series.append([row_data.calculated_miliseconds, float(row_data.method_7)])
+                series.append([row_data.calculated_miliseconds,
+                              float(row_data.method_7)])
             elif int(request.POST['method']) == 8:
-                series.append([row_data.calculated_miliseconds, float(row_data.method_8)])
+                series.append([row_data.calculated_miliseconds,
+                              float(row_data.method_8)])
             elif int(request.POST['method']) == 9:
-                series.append([row_data.calculated_miliseconds, float(row_data.method_9)])
+                series.append([row_data.calculated_miliseconds,
+                              float(row_data.method_9)])
             elif int(request.POST['method']) == 10:
-                series.append([row_data.calculated_miliseconds, float(row_data.method_10)])
+                series.append([row_data.calculated_miliseconds,
+                              float(row_data.method_10)])
             # method_2_data.append(float(row_data.method_2))
             # method_2_data.append("{:02d}".format(row_data.hour_slab) + ":" + row_data.calculated_time.strftime("%M") + ":" + row_data.calculated_time.strftime("%S"))
             # method_3_data.append(float(row_data.method_3))
@@ -224,7 +243,68 @@ def getLineChartData(request):
         })
 
 
-def lineChart(request):
+def multipleLineChart(request):
     total_hours = models.CsvData.objects.values('hour_slab').distinct()
     context.update({'total_hours': total_hours})
-    return render(request, 'front/lineChart.html', context)
+    return render(request, 'front/multipleLineChart.html', context)
+
+
+def getMultipleLineChartData(request):
+    if request.method == "POST":
+        csv_data = models.CsvData.objects.filter(
+            hour_slab__gte=request.POST['from_hour'], hour_slab__lte=request.POST['to_hour']).order_by('id')[:200]
+        categories = []
+        series = []
+        method_1_data = []
+        method_2_data = []
+        method_3_data = []
+        method_4_data = []
+        method_5_data = []
+        method_6_data = []
+        method_7_data = []
+        method_8_data = []
+        method_9_data = []
+        method_10_data = []
+        for row_data in csv_data:
+            categories.append(millisToMinutesAndSeconds(row_data.calculated_miliseconds))
+            method_1_data.append([row_data.calculated_miliseconds, float(row_data.method_1)])
+            method_2_data.append([row_data.calculated_miliseconds, float(row_data.method_2)])
+            method_3_data.append([row_data.calculated_miliseconds, float(row_data.method_3)])
+            method_4_data.append([row_data.calculated_miliseconds, float(row_data.method_4)])
+            method_5_data.append([row_data.calculated_miliseconds, float(row_data.method_5)])
+            method_6_data.append([row_data.calculated_miliseconds, float(row_data.method_6)])
+            method_7_data.append([row_data.calculated_miliseconds, float(row_data.method_7)])
+            method_8_data.append([row_data.calculated_miliseconds, float(row_data.method_8)])
+            method_9_data.append([row_data.calculated_miliseconds, float(row_data.method_9)])
+            method_10_data.append([row_data.calculated_miliseconds, float(row_data.method_10)])
+        if '1' in request.POST.getlist('method'):
+            series.append({'name': 'Strain 1', 'data': method_1_data})
+        if '2' in request.POST.getlist('method'):
+            series.append({'name': 'Strain 2', 'data': method_2_data})
+        if '3' in request.POST.getlist('method'):
+            series.append({'name': 'Strain 3', 'data': method_3_data})
+        if '4' in request.POST.getlist('method'):
+            series.append({'name': 'Strain 4', 'data': method_4_data})
+        if '5' in request.POST.getlist('method'):
+            series.append({'name': 'Strain 5', 'data': method_5_data})
+        if '6' in request.POST.getlist('method'):
+            series.append({'name': 'Strain 6', 'data': method_6_data})
+        if '7' in request.POST.getlist('method'):
+            series.append({'name': 'Strain 7', 'data': method_7_data})
+        if '8' in request.POST.getlist('method'):
+            series.append({'name': 'Strain 8', 'data': method_8_data})
+        if '9' in request.POST.getlist('method'):
+            series.append({'name': 'Strain 9', 'data': method_9_data})
+        if '10' in request.POST.getlist('method'):
+            series.append({'name': 'Strain 10', 'data': method_10_data})
+        return JsonResponse({
+            'code': 200,
+            'status': "SUCCESS",
+            'result': {'categories': categories, 'series': series},
+        })
+    else:
+        return JsonResponse({
+            'code': 502,
+            'status': "ERROR",
+            'message': "There should be ajax method."
+        })
