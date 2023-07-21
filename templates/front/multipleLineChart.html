@@ -58,13 +58,35 @@
         .highcharts-data-table tr:hover {
             background: #f1f7ff;
         }
-        .mt-3 {
-            margin-top:5rem;
-        }
+
         .left-bg {
             background: aliceblue;
-            height: 70vh;
             padding-top: 35px;
+        }
+
+
+        @media only screen and (max-width: 1200px) {
+            body {
+                width: 100%;
+            }
+        }
+
+        @media only screen and (max-width: 992px) {
+            body {
+                width: 100%;
+            }
+        }
+
+        @media only screen and (max-width: 768px) {
+            body {
+                width: 100%;
+            }
+        }
+
+        @media only screen and (max-width: 576px) {
+            body {
+                width: 100%;
+            }
         }
     </style>
     <link rel="stylesheet" href="{% static 'select2/select2.min.css' %}">
@@ -72,77 +94,82 @@
 </head>
 
 <body>
-    <div class="container mt-3">
+    <div class="container">
         <div class="row">
-            <h2 style="font-weight: 600;">SPAAViz</h2>
+            <div class="col-md-12 col-sm-12 col-lg-12 col-xl-12 col-12">
+                <h2 style="font-weight: 600;">SPAAViz</h2>
+            </div>
         </div>
-        <form action="#" id="chart_details_form">
-            <div class="row" style="border: 1px solid #f7f7f7; box-shadow: 2px 3px 9px #979797;">
-                <div class="col-md-3 left-bg">
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label>Select Strains (Multiple)</label>
-                            <select name="method" id="method" class="form-control selectpicker" required multiple>
-                                <option value="">Select One</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                                <option value="6">6</option>
-                                <option value="7">7</option>
-                                <option value="8">8</option>
-                                <option value="9">9</option>
-                                <option value="10">10</option>
-                            </select>
+        
+        <div class="col-md-12 col-sm-12 col-lg-12 col-xl-12 col-12">
+            <form action="#" id="chart_details_form">
+                <div class="row" style="border: 1px solid #f7f7f7; box-shadow: 2px 3px 9px #979797;">
+                    <div class="col-md-3 col-sm-12 col-lg-3 col-xl-3 col-12 left-bg">
+                        <div class="col-md-12 col-sm-12 col-lg-12 col-xl-12 col-12">
+                            <div class="form-group">
+                                <label>Select Strains (Multiple)</label>
+                                <select name="method" id="method" class="form-control selectpicker" required multiple>
+                                    <option value="">Select One</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                    <option value="9">9</option>
+                                    <option value="10">10</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12 col-lg-12 col-xl-12 col-12">
+                            <div class="form-group">
+                                <label>From Time</label>
+                                <input name="from_time" type="time" class="form-control" required min="{{min_hour}}:00"
+                                    max="{{max_hour}}:00">
+                                <!-- <select name="from_hour" id="from_hour" class="form-control" required>
+                                    <option value="">Select One</option>
+                                    {% for each in total_hours %}
+                                    <option value="{{each.hour_slab}}">{{each.hour_slab}}</option>
+                                    {% endfor %}
+                                </select> -->
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12 col-lg-12 col-xl-12 col-12">
+                            <div class="form-group">
+                                <label>To Time</label>
+                                <input name="to_time" type="time" class="form-control" required min="{{min_hour}}:01"
+                                    max="{{max_hour}}:00">
+                                <!-- <select name="to_hour" id="to_hour" class="form-control" required>
+                                    <option value="">Select One</option>
+                                    {% for each in total_hours %}
+                                    <option value="{{each.hour_slab}}">{{each.hour_slab|add:"1"}}</option>
+                                    {% endfor %}
+                                </select> -->
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12 col-lg-12 col-xl-12 col-12">
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-sm btn-success submit_btn"
+                                    style="margin-top: 3rem;">Submit</button>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label>From Time</label>
-                            <input name="from_time" type="time" class="form-control" required min="{{min_hour}}:00"
-                                max="{{max_hour}}:00">
-                            <!-- <select name="from_hour" id="from_hour" class="form-control" required>
-                                <option value="">Select One</option>
-                                {% for each in total_hours %}
-                                <option value="{{each.hour_slab}}">{{each.hour_slab}}</option>
-                                {% endfor %}
-                            </select> -->
-                        </div>
+                    <div class="col-md-9 col-sm-12 col-lg-9 col-xl-9 col-12">
+                        <figure class="highcharts-figure">
+                            <div id="chartContainer"></div>
+                        </figure>
                     </div>
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label>To Time</label>
-                            <input name="to_time" type="time" class="form-control" required min="{{min_hour}}:01"
-                                max="{{max_hour}}:00">
-                            <!-- <select name="to_hour" id="to_hour" class="form-control" required>
-                                <option value="">Select One</option>
-                                {% for each in total_hours %}
-                                <option value="{{each.hour_slab}}">{{each.hour_slab|add:"1"}}</option>
-                                {% endfor %}
-                            </select> -->
-                        </div>
-                    </div>
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-sm btn-success submit_btn"
-                                style="margin-top: 3rem;">Submit</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-9">
-                    <figure class="highcharts-figure">
-                        <div id="chartContainer"></div>
-                    </figure>
-                 </div>
                 </div>
                 <div class="row">
-                
-            </div>
-        </form>
+
+                </div>
+            </form>
+        </div>
     </div>
 
-    
+
 
     <script src="{% static 'select2/select2.min.js' %}"></script>
     <script src="{% static 'js/highcharts/js/highcharts.js' %}"></script>
