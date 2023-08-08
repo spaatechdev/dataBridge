@@ -100,7 +100,7 @@
                 <h2 style="font-weight: 600;">SPAAViz</h2>
             </div>
         </div>
-        
+
         <div class="col-md-12 col-sm-12 col-lg-12 col-xl-12 col-12">
             <form action="#" id="chart_details_form">
                 <div class="row" style="border: 1px solid #f7f7f7; box-shadow: 2px 3px 9px #979797;">
@@ -110,43 +110,85 @@
                                 <label>Select Strains (Multiple)</label>
                                 <select name="method" id="method" class="form-control selectpicker" required multiple>
                                     <option value="">Select One</option>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                    <option value="5">5</option>
-                                    <option value="6">6</option>
-                                    <option value="7">7</option>
-                                    <option value="8">8</option>
-                                    <option value="9">9</option>
-                                    <option value="10">10</option>
+                                    {% for i in column_counts %}
+                                    <option value="{{i}}">{{i}}</option>
+                                    {% endfor %}
                                 </select>
                             </div>
                         </div>
                         <div class="col-md-12 col-sm-12 col-lg-12 col-xl-12 col-12">
                             <div class="form-group">
-                                <label>From Time</label>
-                                <input name="from_time" type="time" class="form-control" required min="{{min_hour}}:00"
-                                    max="{{max_hour}}:00">
-                                <!-- <select name="from_hour" id="from_hour" class="form-control" required>
+                                <label>Chart Type</label>
+                                <select name="chart_type" id="chart_type" class="form-control selectpicker" required>
+                                    <option value="">Select One</option>
+                                    <option value="line">Line</option>
+                                    <option value="bar">Bar</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="line_chart_style" style="display: none;">
+                            <div class="col-md-12 col-sm-12 col-lg-12 col-xl-12 col-12">
+                                <div class="form-group">
+                                    <label>From Time</label>
+                                    <input name="from_time" type="time" id="from_time" class="form-control" required
+                                        min="{{min_hour}}:00" max="{{max_hour}}:00">
+                                    <!-- <select name="from_hour" id="from_hour" class="form-control" required>
                                     <option value="">Select One</option>
                                     {% for each in total_hours %}
                                     <option value="{{each.hour_slab}}">{{each.hour_slab}}</option>
                                     {% endfor %}
                                 </select> -->
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-12 col-sm-12 col-lg-12 col-xl-12 col-12">
-                            <div class="form-group">
-                                <label>To Time</label>
-                                <input name="to_time" type="time" class="form-control" required min="{{min_hour}}:01"
-                                    max="{{max_hour}}:00">
-                                <!-- <select name="to_hour" id="to_hour" class="form-control" required>
+                            <div class="col-md-12 col-sm-12 col-lg-12 col-xl-12 col-12">
+                                <div class="form-group">
+                                    <label>To Time</label>
+                                    <input name="to_time" type="time" id="to_time" class="form-control" required
+                                        min="{{min_hour}}:01" max="{{max_hour}}:00">
+                                    <!-- <select name="to_hour" id="to_hour" class="form-control" required>
                                     <option value="">Select One</option>
                                     {% for each in total_hours %}
                                     <option value="{{each.hour_slab}}">{{each.hour_slab|add:"1"}}</option>
                                     {% endfor %}
                                 </select> -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bar_chart_style" style="display: none;">
+                            <div class="col-md-12 col-sm-12 col-lg-12 col-xl-12 col-12">
+                                <div class="form-group">
+                                    <label>From Hour</label>
+                                    <select name="bar_from_time" id="bar_from_time" class="form-control" required>
+                                        <option value="">Select One</option>
+                                        {% for each in total_hours %}
+                                        <option value="{{each.hour_slab}}">{{each.hour_slab}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-sm-12 col-lg-12 col-xl-12 col-12">
+                                <div class="form-group">
+                                    <label>To Hour</label>
+                                    <select name="bar_to_time" id="bar_to_time" class="form-control" required>
+                                        <option value="">Select One</option>
+                                        {% for each in total_hours %}
+                                        <option value="{{each.hour_slab|add:2}}">{{each.hour_slab|add:"1"}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-sm-12 col-lg-12 col-xl-12 col-12">
+                                <div class="form-group">
+                                    <label>Bar Chart Type</label>
+                                    <select name="bar_chart_type" id="bar_chart_type" class="form-control selectpicker">
+                                        <option value="">Select One</option>
+                                        <option value="min">Min</option>
+                                        <option value="max">Max</option>
+                                        <option value="avg">Average</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-12 col-sm-12 col-lg-12 col-xl-12 col-12">
@@ -187,6 +229,33 @@
             placeholder: ''
         });
 
+        $(document).on('change', '#chart_type', function () {
+            if ($('#chart_type').val() == 'bar') {
+                $('.bar_chart_style')[0].style.display = 'block';
+                $('#bar_chart_type').attr('required', 'required');
+
+                $('#bar_from_time').removeAttr('required');
+                $('#bar_to_time').removeAttr('required');
+
+                $('.line_chart_style')[0].style.display = 'none';
+                $('#from_time').removeAttr('required');
+                $('#to_time').removeAttr('required');
+            } else if ($('#chart_type').val() == 'line') {
+                $('.bar_chart_style')[0].style.display = 'none';
+                $('#bar_chart_type').removeAttr('required');
+
+                $('.line_chart_style')[0].style.display = 'block';
+                $('#from_time').attr('required', 'required');
+                $('#to_time').attr('required', 'required');
+
+                $('#bar_from_time').removeAttr('required');
+                $('#bar_to_time').removeAttr('required');
+            }
+            $('.selectpicker').select2({
+                placeholder: ''
+            });
+        })
+
         $(document).on('submit', '#chart_details_form', async function (e) {
             e.preventDefault();
             $('.submit_btn').text('Submitting...');
@@ -207,7 +276,11 @@
                     $('.submit_btn').prop('disabled', false);
                     if (response.code == 200) {
                         result = response.result;
-                        renderChartData(result);
+                        if (result.chart_type == 'line') {
+                            renderLineChart(result);
+                        } else if (result.chart_type == 'bar') {
+                            renderBarChart(result);
+                        }
                     } else {
                         alert(response.message)
                     }
@@ -216,7 +289,7 @@
             // }
         });
 
-        function renderChartData(result) {
+        function renderLineChart(result) {
             // Create the chart
             Highcharts.chart('chartContainer', {
 
@@ -229,10 +302,6 @@
                 },
                 title: {
                     text: 'Strain Data Analysis'
-                },
-
-                subtitle: {
-                    text: 'Using the Boost module'
                 },
 
                 accessibility: {
@@ -262,6 +331,25 @@
 
                 series: result.series
 
+            });
+        }
+
+        function renderBarChart(result) {
+            // Create the chart
+            Highcharts.chart('chartContainer', {
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: 'Strain Data Analysis'
+                },
+                xAxis: {
+                    categories: result.categories
+                },
+                credits: {
+                    enabled: false
+                },
+                series: result.series
             });
         }
     </script>

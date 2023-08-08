@@ -5,10 +5,12 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.core.files.storage import FileSystemStorage
 from . import models
+from django.db.models import Max, Min, Avg
 import os
 import math
 import csv
 import environ
+from collections import defaultdict
 
 import environ
 env = environ.Env()
@@ -241,83 +243,300 @@ def getLineChartData(request):
             'status': "ERROR",
             'message': "There should be ajax method."
         })
+    
+
+def getColumnCounts():
+    column_count = len(models.CsvData._meta.fields) - 5
+    first_row = models.CsvData.objects.get(pk=1)
+    column_counts = []
+    if first_row.method_1 == "":
+        column_count -= 1
+    elif first_row.method_2 == "":
+        column_count -= 1
+    elif first_row.method_3 == "":
+        column_count -= 1
+    elif first_row.method_4 == "":
+        column_count -= 1
+    elif first_row.method_5 == "":
+        column_count -= 1
+    elif first_row.method_6 == "":
+        column_count -= 1
+    elif first_row.method_7 == "":
+        column_count -= 1
+    elif first_row.method_8 == "":
+        column_count -= 1
+    elif first_row.method_9 == "":
+        column_count -= 1
+    elif first_row.method_10 == "":
+        column_count -= 1
+    for i in range(1, 11):
+        column_counts.append(i)
+    return column_counts
 
 
 def multipleLineChart(request):
     total_hours = models.CsvData.objects.values('hour_slab').distinct().order_by('hour_slab')
     min_hour = "{:02d}".format(total_hours[0]['hour_slab'])
     max_hour = "{:02d}".format(total_hours[len(total_hours) - 1]['hour_slab'])
-    context.update({'total_hours': total_hours, 'min_hour': min_hour, 'max_hour': max_hour})
+    column_counts = getColumnCounts()
+    context.update({'total_hours': total_hours, 'min_hour': min_hour, 'max_hour': max_hour, 'column_counts': column_counts})
     return render(request, 'front/multipleLineChart.html', context)
 
 
 def getMultipleLineChartData(request):
     if request.method == "POST":
-        from_time = request.POST['from_time']
-        to_time = request.POST['to_time']
+        chart_type = request.POST['chart_type']
+        bar_chart_type = request.POST['bar_chart_type']
+        
+        if chart_type == 'line':
+            from_time = request.POST['from_time']
+            to_time = request.POST['to_time']
+            from_miliseconds = int(from_time.split(':')[0]) * 3600 * 1000 + int(from_time.split(':')[1]) * 60 * 1000
+            to_miliseconds = int(to_time.split(':')[0]) * 3600 * 1000 + int(to_time.split(':')[1]) * 60 * 1000
 
-        from_miliseconds = int(from_time.split(':')[0]) * 3600 * 1000 + int(from_time.split(':')[1]) * 60 * 1000
-        to_miliseconds = int(to_time.split(':')[0]) * 3600 * 1000 + int(to_time.split(':')[1]) * 60 * 1000
+            if from_miliseconds > to_miliseconds:
+                return JsonResponse({
+                    'code': 503,
+                    'status': "ERROR",
+                    'message': "From time should not exceeds To time "
+                })
 
-        if from_miliseconds > to_miliseconds:
+            # csv_data = models.CsvData.objects.filter(
+            #     hour_slab__gte=request.POST['from_time'], hour_slab__lte=request.POST['to_time']).order_by('id')
+            csv_data = models.CsvData.objects.filter(calculated_miliseconds__gte=from_miliseconds, calculated_miliseconds__lte=to_miliseconds).order_by('id')
+            # categories = []
+            series = []
+            column_counts = getColumnCounts()
+            dynamic_vars = {}
+            for index, element in enumerate(column_counts, start=1):
+                dynamic_vars[f"method_{index}"] = []
+            for row_data in csv_data:
+                # categories.append(millisToMinutesAndSeconds(row_data.calculated_miliseconds))
+                for method in dynamic_vars:
+                    dynamic_vars[method].append([row_data.calculated_miliseconds, float(getattr(row_data, method))])
+            if '1' in request.POST.getlist('method'):
+                series.append({'name': 'Strain 1', 'data': dynamic_vars['method_1']})
+            if '2' in request.POST.getlist('method'):
+                series.append({'name': 'Strain 2', 'data': dynamic_vars['method_2']})
+            if '3' in request.POST.getlist('method'):
+                series.append({'name': 'Strain 3', 'data': dynamic_vars['method_3']})
+            if '4' in request.POST.getlist('method'):
+                series.append({'name': 'Strain 4', 'data': dynamic_vars['method_4']})
+            if '5' in request.POST.getlist('method'):
+                series.append({'name': 'Strain 5', 'data': dynamic_vars['method_5']})
+            if '6' in request.POST.getlist('method'):
+                series.append({'name': 'Strain 6', 'data': dynamic_vars['method_6']})
+            if '7' in request.POST.getlist('method'):
+                series.append({'name': 'Strain 7', 'data': dynamic_vars['method_7']})
+            if '8' in request.POST.getlist('method'):
+                series.append({'name': 'Strain 8', 'data': dynamic_vars['method_8']})
+            if '9' in request.POST.getlist('method'):
+                series.append({'name': 'Strain 9', 'data': dynamic_vars['method_9']})
+            if '10' in request.POST.getlist('method'):
+                series.append({'name': 'Strain 10', 'data': dynamic_vars['method_10']})
             return JsonResponse({
-                'code': 503,
-                'status': "ERROR",
-                'message': "From time should not exceeds To time "
+                'code': 200,
+                'status': "SUCCESS",
+                'result': {'series': series, 'chart_type': chart_type},
             })
+        elif chart_type == 'bar':
+            from_time = request.POST['bar_from_time']
+            to_time = request.POST['bar_to_time']
+            from_miliseconds = int(from_time) * 3600 * 1000
+            to_miliseconds = int(to_time) * 3600 * 1000
+            # from_miliseconds = int(from_time.split(':')[0]) * 3600 * 1000 + int(from_time.split(':')[1]) * 60 * 1000
+            # to_miliseconds = (int(to_time.split(':')[0]) + 1) * 3600 * 1000 + int(to_time.split(':')[1]) * 60 * 1000
+            if from_miliseconds > to_miliseconds:
+                return JsonResponse({
+                    'code': 504,
+                    'status': "ERROR",
+                    'message': "From time should not exceeds To time "
+                })
+            if bar_chart_type == 'max':
+                # csv_data = models.CsvData.objects.filter(calculated_miliseconds__gte=from_miliseconds, calculated_miliseconds__lte=to_miliseconds).values('hour_slab').annotate(val_method_1=Max('method_1'), val_method_2=Max('method_2'), val_method_3=Max('method_3'), val_method_4=Max('method_4'), val_method_5=Max('method_5'), val_method_6=Max('method_6'), val_method_7=Max('method_7'), val_method_8=Max('method_8'), val_method_9=Max('method_9'), val_method_10=Max('method_10')).order_by('id')
+                csv_data = models.CsvData.objects.values('hour_slab').filter(calculated_miliseconds__gte=from_miliseconds, calculated_miliseconds__lte=to_miliseconds).annotate(
+                    val_method_1=Max('method_1'),
+                    val_method_2=Max('method_2'),
+                    val_method_3=Max('method_3'),
+                    val_method_4=Max('method_4'),
+                    val_method_5=Max('method_5'),
+                    val_method_6=Max('method_6'),
+                    val_method_7=Max('method_7'),
+                    val_method_8=Max('method_8'),
+                    val_method_9=Max('method_9'),
+                    val_method_10=Max('method_10')
+                )
+                aggregated_data = defaultdict(float)
+                for item in csv_data:
+                    aggregated_data[item['hour_slab']] = [item['val_method_1'], item['val_method_2'], item['val_method_3'], item['val_method_4'], item['val_method_5'], item['val_method_6'], item['val_method_7'], item['val_method_8'], item['val_method_9'], item['val_method_10']]
+                categories = []
+                series = []
 
-        # csv_data = models.CsvData.objects.filter(
-        #     hour_slab__gte=request.POST['from_time'], hour_slab__lte=request.POST['to_time']).order_by('id')
-        csv_data = models.CsvData.objects.filter(calculated_miliseconds__gte=from_miliseconds, calculated_miliseconds__lte=to_miliseconds).order_by('id')
-        categories = []
-        series = []
-        method_1_data = []
-        method_2_data = []
-        method_3_data = []
-        method_4_data = []
-        method_5_data = []
-        method_6_data = []
-        method_7_data = []
-        method_8_data = []
-        method_9_data = []
-        method_10_data = []
-        for row_data in csv_data:
-            categories.append(millisToMinutesAndSeconds(row_data.calculated_miliseconds))
-            method_1_data.append([row_data.calculated_miliseconds, float(row_data.method_1)])
-            method_2_data.append([row_data.calculated_miliseconds, float(row_data.method_2)])
-            method_3_data.append([row_data.calculated_miliseconds, float(row_data.method_3)])
-            method_4_data.append([row_data.calculated_miliseconds, float(row_data.method_4)])
-            method_5_data.append([row_data.calculated_miliseconds, float(row_data.method_5)])
-            method_6_data.append([row_data.calculated_miliseconds, float(row_data.method_6)])
-            method_7_data.append([row_data.calculated_miliseconds, float(row_data.method_7)])
-            method_8_data.append([row_data.calculated_miliseconds, float(row_data.method_8)])
-            method_9_data.append([row_data.calculated_miliseconds, float(row_data.method_9)])
-            method_10_data.append([row_data.calculated_miliseconds, float(row_data.method_10)])
-        if '1' in request.POST.getlist('method'):
-            series.append({'name': 'Strain 1', 'data': method_1_data})
-        if '2' in request.POST.getlist('method'):
-            series.append({'name': 'Strain 2', 'data': method_2_data})
-        if '3' in request.POST.getlist('method'):
-            series.append({'name': 'Strain 3', 'data': method_3_data})
-        if '4' in request.POST.getlist('method'):
-            series.append({'name': 'Strain 4', 'data': method_4_data})
-        if '5' in request.POST.getlist('method'):
-            series.append({'name': 'Strain 5', 'data': method_5_data})
-        if '6' in request.POST.getlist('method'):
-            series.append({'name': 'Strain 6', 'data': method_6_data})
-        if '7' in request.POST.getlist('method'):
-            series.append({'name': 'Strain 7', 'data': method_7_data})
-        if '8' in request.POST.getlist('method'):
-            series.append({'name': 'Strain 8', 'data': method_8_data})
-        if '9' in request.POST.getlist('method'):
-            series.append({'name': 'Strain 9', 'data': method_9_data})
-        if '10' in request.POST.getlist('method'):
-            series.append({'name': 'Strain 10', 'data': method_10_data})
-        return JsonResponse({
-            'code': 200,
-            'status': "SUCCESS",
-            'result': {'categories': categories, 'series': series},
-        })
+                column_counts = getColumnCounts()
+                dynamic_vars = {}
+                for index, element in enumerate(column_counts, start=1):
+                    dynamic_vars[f"method_{index}"] = {}
+                for method in dynamic_vars:
+                    dynamic_vars[method]['name'] = method
+                    dynamic_vars[method]['data'] = []
+                for hour_slab, average_data in aggregated_data.items():
+                    if int(from_time) <= hour_slab or int(to_time) >= hour_slab:
+                        categories.append(hour_slab)
+                        dynamic_vars["method_1"]["data"].append(float(average_data[0]))
+                        dynamic_vars["method_2"]["data"].append(float(average_data[1]))
+                        dynamic_vars["method_3"]["data"].append(float(average_data[2]))
+                        dynamic_vars["method_4"]["data"].append(float(average_data[3]))
+                        dynamic_vars["method_5"]["data"].append(float(average_data[4]))
+                        dynamic_vars["method_6"]["data"].append(float(average_data[5]))
+                        dynamic_vars["method_7"]["data"].append(float(average_data[6]))
+                        dynamic_vars["method_8"]["data"].append(float(average_data[7]))
+                        dynamic_vars["method_9"]["data"].append(float(average_data[8]))
+                        dynamic_vars["method_10"]["data"].append(float(average_data[9]))
+                if '1' in request.POST.getlist('method'):
+                    series.append(dynamic_vars['method_1'])
+                if '2' in request.POST.getlist('method'):
+                    series.append(dynamic_vars['method_2'])
+                if '3' in request.POST.getlist('method'):
+                    series.append(dynamic_vars['method_3'])
+                if '4' in request.POST.getlist('method'):
+                    series.append(dynamic_vars['method_4'])
+                if '5' in request.POST.getlist('method'):
+                    series.append(dynamic_vars['method_5'])
+                if '6' in request.POST.getlist('method'):
+                    series.append(dynamic_vars['method_6'])
+                if '7' in request.POST.getlist('method'):
+                    series.append(dynamic_vars['method_7'])
+                if '8' in request.POST.getlist('method'):
+                    series.append(dynamic_vars['method_8'])
+                if '9' in request.POST.getlist('method'):
+                    series.append(dynamic_vars['method_9'])
+                if '10' in request.POST.getlist('method'):
+                    series.append(dynamic_vars['method_10'])
+            if bar_chart_type == 'min':
+                csv_data = models.CsvData.objects.values('hour_slab').filter(calculated_miliseconds__gte=from_miliseconds, calculated_miliseconds__lte=to_miliseconds).annotate(
+                    val_method_1=Min('method_1'),
+                    val_method_2=Min('method_2'),
+                    val_method_3=Min('method_3'),
+                    val_method_4=Min('method_4'),
+                    val_method_5=Min('method_5'),
+                    val_method_6=Min('method_6'),
+                    val_method_7=Min('method_7'),
+                    val_method_8=Min('method_8'),
+                    val_method_9=Min('method_9'),
+                    val_method_10=Min('method_10')
+                )
+                aggregated_data = defaultdict(float)
+
+                for item in csv_data:
+                    aggregated_data[item['hour_slab']] = [item['val_method_1'], item['val_method_2'], item['val_method_3'], item['val_method_4'], item['val_method_5'], item['val_method_6'], item['val_method_7'], item['val_method_8'], item['val_method_9'], item['val_method_10']]
+                categories = []
+                series = []
+
+                column_counts = getColumnCounts()
+                dynamic_vars = {}
+                for index, element in enumerate(column_counts, start=1):
+                    dynamic_vars[f"method_{index}"] = {}
+                for method in dynamic_vars:
+                    dynamic_vars[method]['name'] = method
+                    dynamic_vars[method]['data'] = []
+                for hour_slab, average_data in aggregated_data.items():
+                    if int(from_time) <= hour_slab or int(to_time) >= hour_slab:
+                        categories.append(hour_slab)
+                        dynamic_vars["method_1"]["data"].append(float(average_data[0]))
+                        dynamic_vars["method_2"]["data"].append(float(average_data[1]))
+                        dynamic_vars["method_3"]["data"].append(float(average_data[2]))
+                        dynamic_vars["method_4"]["data"].append(float(average_data[3]))
+                        dynamic_vars["method_5"]["data"].append(float(average_data[4]))
+                        dynamic_vars["method_6"]["data"].append(float(average_data[5]))
+                        dynamic_vars["method_7"]["data"].append(float(average_data[6]))
+                        dynamic_vars["method_8"]["data"].append(float(average_data[7]))
+                        dynamic_vars["method_9"]["data"].append(float(average_data[8]))
+                        dynamic_vars["method_10"]["data"].append(float(average_data[9]))
+                if '1' in request.POST.getlist('method'):
+                    series.append(dynamic_vars['method_1'])
+                if '2' in request.POST.getlist('method'):
+                    series.append(dynamic_vars['method_2'])
+                if '3' in request.POST.getlist('method'):
+                    series.append(dynamic_vars['method_3'])
+                if '4' in request.POST.getlist('method'):
+                    series.append(dynamic_vars['method_4'])
+                if '5' in request.POST.getlist('method'):
+                    series.append(dynamic_vars['method_5'])
+                if '6' in request.POST.getlist('method'):
+                    series.append(dynamic_vars['method_6'])
+                if '7' in request.POST.getlist('method'):
+                    series.append(dynamic_vars['method_7'])
+                if '8' in request.POST.getlist('method'):
+                    series.append(dynamic_vars['method_8'])
+                if '9' in request.POST.getlist('method'):
+                    series.append(dynamic_vars['method_9'])
+                if '10' in request.POST.getlist('method'):
+                    series.append(dynamic_vars['method_10'])
+            if bar_chart_type == 'avg':
+                csv_data = models.CsvData.objects.values('hour_slab').filter(calculated_miliseconds__gte=from_miliseconds, calculated_miliseconds__lte=to_miliseconds).annotate(
+                    val_method_1=Avg('method_1'),
+                    val_method_2=Avg('method_2'),
+                    val_method_3=Avg('method_3'),
+                    val_method_4=Avg('method_4'),
+                    val_method_5=Avg('method_5'),
+                    val_method_6=Avg('method_6'),
+                    val_method_7=Avg('method_7'),
+                    val_method_8=Avg('method_8'),
+                    val_method_9=Avg('method_9'),
+                    val_method_10=Avg('method_10')
+                )
+                aggregated_data = defaultdict(float)
+
+                for item in csv_data:
+                    aggregated_data[item['hour_slab']] = [item['val_method_1'], item['val_method_2'], item['val_method_3'], item['val_method_4'], item['val_method_5'], item['val_method_6'], item['val_method_7'], item['val_method_8'], item['val_method_9'], item['val_method_10']]
+                categories = []
+                series = []
+
+                column_counts = getColumnCounts()
+                dynamic_vars = {}
+                for index, element in enumerate(column_counts, start=1):
+                    dynamic_vars[f"method_{index}"] = {}
+                for method in dynamic_vars:
+                    dynamic_vars[method]['name'] = method
+                    dynamic_vars[method]['data'] = []
+                for hour_slab, average_data in aggregated_data.items():
+                    if int(from_time) <= hour_slab or int(to_time) >= hour_slab:
+                        categories.append(hour_slab)
+                        dynamic_vars["method_1"]["data"].append(float(average_data[0]))
+                        dynamic_vars["method_2"]["data"].append(float(average_data[1]))
+                        dynamic_vars["method_3"]["data"].append(float(average_data[2]))
+                        dynamic_vars["method_4"]["data"].append(float(average_data[3]))
+                        dynamic_vars["method_5"]["data"].append(float(average_data[4]))
+                        dynamic_vars["method_6"]["data"].append(float(average_data[5]))
+                        dynamic_vars["method_7"]["data"].append(float(average_data[6]))
+                        dynamic_vars["method_8"]["data"].append(float(average_data[7]))
+                        dynamic_vars["method_9"]["data"].append(float(average_data[8]))
+                        dynamic_vars["method_10"]["data"].append(float(average_data[9]))
+                if '1' in request.POST.getlist('method'):
+                    series.append(dynamic_vars['method_1'])
+                if '2' in request.POST.getlist('method'):
+                    series.append(dynamic_vars['method_2'])
+                if '3' in request.POST.getlist('method'):
+                    series.append(dynamic_vars['method_3'])
+                if '4' in request.POST.getlist('method'):
+                    series.append(dynamic_vars['method_4'])
+                if '5' in request.POST.getlist('method'):
+                    series.append(dynamic_vars['method_5'])
+                if '6' in request.POST.getlist('method'):
+                    series.append(dynamic_vars['method_6'])
+                if '7' in request.POST.getlist('method'):
+                    series.append(dynamic_vars['method_7'])
+                if '8' in request.POST.getlist('method'):
+                    series.append(dynamic_vars['method_8'])
+                if '9' in request.POST.getlist('method'):
+                    series.append(dynamic_vars['method_9'])
+                if '10' in request.POST.getlist('method'):
+                    series.append(dynamic_vars['method_10'])
+            return JsonResponse({
+                'code': 200,
+                'status': "SUCCESS",
+                'result': {'series': series, 'categories': categories, 'chart_type': chart_type},
+            })
     else:
         return JsonResponse({
             'code': 502,
