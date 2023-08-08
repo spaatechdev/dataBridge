@@ -174,7 +174,7 @@
                                     <select name="bar_to_time" id="bar_to_time" class="form-control" required>
                                         <option value="">Select One</option>
                                         {% for each in total_hours %}
-                                        <option value="{{each.hour_slab|add:2}}">{{each.hour_slab|add:"1"}}</option>
+                                        <option value="{{each.hour_slab|add:2}}">{{each.hour_slab}}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
