@@ -347,7 +347,13 @@
                     categories: result.categories
                 },
                 yAxis: {
-                    max: 1 // Set the minimum value for the y-axis
+                    max: 1,
+                    plotLines: [{
+                        value: 0,
+                        color: '#000033',
+                        width: 2,
+                        zIndex: 5
+                    }]
                 },
                 credits: {
                     enabled: false
