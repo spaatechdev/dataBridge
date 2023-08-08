@@ -315,25 +315,25 @@ def getMultipleLineChartData(request):
                 for method in dynamic_vars:
                     dynamic_vars[method].append([row_data.calculated_miliseconds, float(getattr(row_data, method))])
             if '1' in request.POST.getlist('method'):
-                series.append({'name': 'Strain 1', 'data': dynamic_vars['method_1']})
+                series.append({'name': 'Sensor 1', 'data': dynamic_vars['method_1']})
             if '2' in request.POST.getlist('method'):
-                series.append({'name': 'Strain 2', 'data': dynamic_vars['method_2']})
+                series.append({'name': 'Sensor 2', 'data': dynamic_vars['method_2']})
             if '3' in request.POST.getlist('method'):
-                series.append({'name': 'Strain 3', 'data': dynamic_vars['method_3']})
+                series.append({'name': 'Sensor 3', 'data': dynamic_vars['method_3']})
             if '4' in request.POST.getlist('method'):
-                series.append({'name': 'Strain 4', 'data': dynamic_vars['method_4']})
+                series.append({'name': 'Sensor 4', 'data': dynamic_vars['method_4']})
             if '5' in request.POST.getlist('method'):
-                series.append({'name': 'Strain 5', 'data': dynamic_vars['method_5']})
+                series.append({'name': 'Sensor 5', 'data': dynamic_vars['method_5']})
             if '6' in request.POST.getlist('method'):
-                series.append({'name': 'Strain 6', 'data': dynamic_vars['method_6']})
+                series.append({'name': 'Sensor 6', 'data': dynamic_vars['method_6']})
             if '7' in request.POST.getlist('method'):
-                series.append({'name': 'Strain 7', 'data': dynamic_vars['method_7']})
+                series.append({'name': 'Sensor 7', 'data': dynamic_vars['method_7']})
             if '8' in request.POST.getlist('method'):
-                series.append({'name': 'Strain 8', 'data': dynamic_vars['method_8']})
+                series.append({'name': 'Sensor 8', 'data': dynamic_vars['method_8']})
             if '9' in request.POST.getlist('method'):
-                series.append({'name': 'Strain 9', 'data': dynamic_vars['method_9']})
+                series.append({'name': 'Sensor 9', 'data': dynamic_vars['method_9']})
             if '10' in request.POST.getlist('method'):
-                series.append({'name': 'Strain 10', 'data': dynamic_vars['method_10']})
+                series.append({'name': 'Sensor 10', 'data': dynamic_vars['method_10']})
             return JsonResponse({
                 'code': 200,
                 'status': "SUCCESS",
@@ -375,43 +375,43 @@ def getMultipleLineChartData(request):
                 column_counts = getColumnCounts()
                 dynamic_vars = {}
                 for index, element in enumerate(column_counts, start=1):
-                    dynamic_vars[f"method_{index}"] = {}
+                    dynamic_vars[f"Sensor {index}"] = {}
                 for method in dynamic_vars:
                     dynamic_vars[method]['name'] = method
                     dynamic_vars[method]['data'] = []
                 for hour_slab, average_data in aggregated_data.items():
                     if int(from_time) <= hour_slab or int(to_time) >= hour_slab:
                         categories.append(hour_slab)
-                        dynamic_vars["method_1"]["data"].append(float(round(average_data[0], 2)))
-                        dynamic_vars["method_2"]["data"].append(float(round(average_data[1], 2)))
-                        dynamic_vars["method_3"]["data"].append(float(round(average_data[2], 2)))
-                        dynamic_vars["method_4"]["data"].append(float(round(average_data[3], 2)))
-                        dynamic_vars["method_5"]["data"].append(float(round(average_data[4], 2)))
-                        dynamic_vars["method_6"]["data"].append(float(round(average_data[5], 2)))
-                        dynamic_vars["method_7"]["data"].append(float(round(average_data[6], 2)))
-                        dynamic_vars["method_8"]["data"].append(float(round(average_data[7], 2)))
-                        dynamic_vars["method_9"]["data"].append(float(round(average_data[8], 2)))
-                        dynamic_vars["method_10"]["data"].append(float(round(average_data[9], 2)))
+                        dynamic_vars["Sensor 1"]["data"].append(float(round(average_data[0], 2)))
+                        dynamic_vars["Sensor 2"]["data"].append(float(round(average_data[1], 2)))
+                        dynamic_vars["Sensor 3"]["data"].append(float(round(average_data[2], 2)))
+                        dynamic_vars["Sensor 4"]["data"].append(float(round(average_data[3], 2)))
+                        dynamic_vars["Sensor 5"]["data"].append(float(round(average_data[4], 2)))
+                        dynamic_vars["Sensor 6"]["data"].append(float(round(average_data[5], 2)))
+                        dynamic_vars["Sensor 7"]["data"].append(float(round(average_data[6], 2)))
+                        dynamic_vars["Sensor 8"]["data"].append(float(round(average_data[7], 2)))
+                        dynamic_vars["Sensor 9"]["data"].append(float(round(average_data[8], 2)))
+                        dynamic_vars["Sensor 10"]["data"].append(float(round(average_data[9], 2)))
                 if '1' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['method_1'])
+                    series.append(dynamic_vars['Sensor 1'])
                 if '2' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['method_2'])
+                    series.append(dynamic_vars['Sensor 2'])
                 if '3' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['method_3'])
+                    series.append(dynamic_vars['Sensor 3'])
                 if '4' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['method_4'])
+                    series.append(dynamic_vars['Sensor 4'])
                 if '5' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['method_5'])
+                    series.append(dynamic_vars['Sensor 5'])
                 if '6' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['method_6'])
+                    series.append(dynamic_vars['Sensor 6'])
                 if '7' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['method_7'])
+                    series.append(dynamic_vars['Sensor 7'])
                 if '8' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['method_8'])
+                    series.append(dynamic_vars['Sensor 8'])
                 if '9' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['method_9'])
+                    series.append(dynamic_vars['Sensor 9'])
                 if '10' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['method_10'])
+                    series.append(dynamic_vars['Sensor 10'])
             if bar_chart_type == 'min':
                 csv_data = models.CsvData.objects.values('hour_slab').filter(calculated_miliseconds__gte=from_miliseconds, calculated_miliseconds__lte=to_miliseconds).annotate(
                     val_method_1=Min('method_1'),
@@ -435,43 +435,43 @@ def getMultipleLineChartData(request):
                 column_counts = getColumnCounts()
                 dynamic_vars = {}
                 for index, element in enumerate(column_counts, start=1):
-                    dynamic_vars[f"method_{index}"] = {}
+                    dynamic_vars[f"Sensor {index}"] = {}
                 for method in dynamic_vars:
                     dynamic_vars[method]['name'] = method
                     dynamic_vars[method]['data'] = []
                 for hour_slab, average_data in aggregated_data.items():
                     if int(from_time) <= hour_slab or int(to_time) >= hour_slab:
                         categories.append(hour_slab)
-                        dynamic_vars["method_1"]["data"].append(float(round(average_data[0], 2)))
-                        dynamic_vars["method_2"]["data"].append(float(round(average_data[1], 2)))
-                        dynamic_vars["method_3"]["data"].append(float(round(average_data[2], 2)))
-                        dynamic_vars["method_4"]["data"].append(float(round(average_data[3], 2)))
-                        dynamic_vars["method_5"]["data"].append(float(round(average_data[4], 2)))
-                        dynamic_vars["method_6"]["data"].append(float(round(average_data[5], 2)))
-                        dynamic_vars["method_7"]["data"].append(float(round(average_data[6], 2)))
-                        dynamic_vars["method_8"]["data"].append(float(round(average_data[7], 2)))
-                        dynamic_vars["method_9"]["data"].append(float(round(average_data[8], 2)))
-                        dynamic_vars["method_10"]["data"].append(float(round(average_data[9], 2)))
+                        dynamic_vars["Sensor 1"]["data"].append(float(round(average_data[0], 2)))
+                        dynamic_vars["Sensor 2"]["data"].append(float(round(average_data[1], 2)))
+                        dynamic_vars["Sensor 3"]["data"].append(float(round(average_data[2], 2)))
+                        dynamic_vars["Sensor 4"]["data"].append(float(round(average_data[3], 2)))
+                        dynamic_vars["Sensor 5"]["data"].append(float(round(average_data[4], 2)))
+                        dynamic_vars["Sensor 6"]["data"].append(float(round(average_data[5], 2)))
+                        dynamic_vars["Sensor 7"]["data"].append(float(round(average_data[6], 2)))
+                        dynamic_vars["Sensor 8"]["data"].append(float(round(average_data[7], 2)))
+                        dynamic_vars["Sensor 9"]["data"].append(float(round(average_data[8], 2)))
+                        dynamic_vars["Sensor 10"]["data"].append(float(round(average_data[9], 2)))
                 if '1' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['method_1'])
+                    series.append(dynamic_vars['Sensor 1'])
                 if '2' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['method_2'])
+                    series.append(dynamic_vars['Sensor 2'])
                 if '3' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['method_3'])
+                    series.append(dynamic_vars['Sensor 3'])
                 if '4' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['method_4'])
+                    series.append(dynamic_vars['Sensor 4'])
                 if '5' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['method_5'])
+                    series.append(dynamic_vars['Sensor 5'])
                 if '6' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['method_6'])
+                    series.append(dynamic_vars['Sensor 6'])
                 if '7' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['method_7'])
+                    series.append(dynamic_vars['Sensor 7'])
                 if '8' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['method_8'])
+                    series.append(dynamic_vars['Sensor 8'])
                 if '9' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['method_9'])
+                    series.append(dynamic_vars['Sensor 9'])
                 if '10' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['method_10'])
+                    series.append(dynamic_vars['Sensor 10'])
             if bar_chart_type == 'avg':
                 csv_data = models.CsvData.objects.values('hour_slab').filter(calculated_miliseconds__gte=from_miliseconds, calculated_miliseconds__lte=to_miliseconds).annotate(
                     val_method_1=Avg('method_1'),
@@ -495,43 +495,43 @@ def getMultipleLineChartData(request):
                 column_counts = getColumnCounts()
                 dynamic_vars = {}
                 for index, element in enumerate(column_counts, start=1):
-                    dynamic_vars[f"method_{index}"] = {}
+                    dynamic_vars[f"Sensor {index}"] = {}
                 for method in dynamic_vars:
                     dynamic_vars[method]['name'] = method
                     dynamic_vars[method]['data'] = []
                 for hour_slab, average_data in aggregated_data.items():
                     if int(from_time) <= hour_slab or int(to_time) >= hour_slab:
                         categories.append(hour_slab)
-                        dynamic_vars["method_1"]["data"].append(float(round(average_data[0], 2)))
-                        dynamic_vars["method_2"]["data"].append(float(round(average_data[1], 2)))
-                        dynamic_vars["method_3"]["data"].append(float(round(average_data[2], 2)))
-                        dynamic_vars["method_4"]["data"].append(float(round(average_data[3], 2)))
-                        dynamic_vars["method_5"]["data"].append(float(round(average_data[4], 2)))
-                        dynamic_vars["method_6"]["data"].append(float(round(average_data[5], 2)))
-                        dynamic_vars["method_7"]["data"].append(float(round(average_data[6], 2)))
-                        dynamic_vars["method_8"]["data"].append(float(round(average_data[7], 2)))
-                        dynamic_vars["method_9"]["data"].append(float(round(average_data[8], 2)))
-                        dynamic_vars["method_10"]["data"].append(float(round(average_data[9], 2)))
+                        dynamic_vars["Sensor 1"]["data"].append(float(round(average_data[0], 2)))
+                        dynamic_vars["Sensor 2"]["data"].append(float(round(average_data[1], 2)))
+                        dynamic_vars["Sensor 3"]["data"].append(float(round(average_data[2], 2)))
+                        dynamic_vars["Sensor 4"]["data"].append(float(round(average_data[3], 2)))
+                        dynamic_vars["Sensor 5"]["data"].append(float(round(average_data[4], 2)))
+                        dynamic_vars["Sensor 6"]["data"].append(float(round(average_data[5], 2)))
+                        dynamic_vars["Sensor 7"]["data"].append(float(round(average_data[6], 2)))
+                        dynamic_vars["Sensor 8"]["data"].append(float(round(average_data[7], 2)))
+                        dynamic_vars["Sensor 9"]["data"].append(float(round(average_data[8], 2)))
+                        dynamic_vars["Sensor 10"]["data"].append(float(round(average_data[9], 2)))
                 if '1' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['method_1'])
+                    series.append(dynamic_vars['Sensor 1'])
                 if '2' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['method_2'])
+                    series.append(dynamic_vars['Sensor 2'])
                 if '3' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['method_3'])
+                    series.append(dynamic_vars['Sensor 3'])
                 if '4' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['method_4'])
+                    series.append(dynamic_vars['Sensor 4'])
                 if '5' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['method_5'])
+                    series.append(dynamic_vars['Sensor 5'])
                 if '6' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['method_6'])
+                    series.append(dynamic_vars['Sensor 6'])
                 if '7' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['method_7'])
+                    series.append(dynamic_vars['Sensor 7'])
                 if '8' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['method_8'])
+                    series.append(dynamic_vars['Sensor 8'])
                 if '9' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['method_9'])
+                    series.append(dynamic_vars['Sensor 9'])
                 if '10' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['method_10'])
+                    series.append(dynamic_vars['Sensor 10'])
             return JsonResponse({
                 'code': 200,
                 'status': "SUCCESS",
