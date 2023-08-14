@@ -107,7 +107,7 @@
                     <div class="col-md-3 col-sm-12 col-lg-3 col-xl-3 col-12 left-bg">
                         <div class="col-md-12 col-sm-12 col-lg-12 col-xl-12 col-12">
                             <div class="form-group">
-                                <label>Select Strains (Multiple)</label>
+                                <label>Select Sensors (Multiple)</label>
                                 <select name="method" id="method" class="form-control selectpicker" required multiple>
                                     <option value="">Select One</option>
                                     {% for i in column_counts %}
@@ -174,7 +174,7 @@
                                     <select name="bar_to_time" id="bar_to_time" class="form-control" required>
                                         <option value="">Select One</option>
                                         {% for each in total_hours %}
-                                        <option value="{{each.hour_slab|add:2}}">{{each.hour_slab}}</option>
+                                        <option value="{{each.hour_slab|add:1}}">{{each.hour_slab}}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -191,10 +191,16 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-12 col-sm-12 col-lg-12 col-xl-12 col-12">
+                        <div class="col-md-6 col-sm-6 col-lg-6 col-xl-6 col-6">
                             <div class="form-group">
                                 <button type="submit" class="btn btn-sm btn-success submit_btn"
                                     style="margin-top: 3rem;">Submit</button>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6 col-lg-6 col-xl-6 col-6 reset_btn" style="display: none;">
+                            <div class="form-group">
+                                <a href="{% url 'index' %}" class="btn btn-sm btn-warning"
+                                    style="margin-top: 3rem;">Reset</a>
                             </div>
                         </div>
                     </div>
@@ -203,9 +209,6 @@
                             <div id="chartContainer"></div>
                         </figure>
                     </div>
-                </div>
-                <div class="row">
-
                 </div>
             </form>
         </div>
@@ -275,6 +278,7 @@
                     $('.submit_btn').text('Submit');
                     $('.submit_btn').prop('disabled', false);
                     if (response.code == 200) {
+                        $('.reset_btn').css('display', 'block')
                         result = response.result;
                         if (result.chart_type == 'line') {
                             renderLineChart(result);

@@ -381,7 +381,7 @@ def getMultipleLineChartData(request):
                     dynamic_vars[method]['data'] = []
                 for hour_slab, average_data in aggregated_data.items():
                     if int(from_time) <= hour_slab or int(to_time) >= hour_slab:
-                        categories.append(hour_slab)
+                        categories.append("Hour " + str(hour_slab))
                         dynamic_vars["Sensor 1"]["data"].append(float(round(average_data[0], 2)))
                         dynamic_vars["Sensor 2"]["data"].append(float(round(average_data[1], 2)))
                         dynamic_vars["Sensor 3"]["data"].append(float(round(average_data[2], 2)))
@@ -441,7 +441,7 @@ def getMultipleLineChartData(request):
                     dynamic_vars[method]['data'] = []
                 for hour_slab, average_data in aggregated_data.items():
                     if int(from_time) <= hour_slab or int(to_time) >= hour_slab:
-                        categories.append(hour_slab)
+                        categories.append("Hour " + str(hour_slab))
                         dynamic_vars["Sensor 1"]["data"].append(float(round(average_data[0], 2)))
                         dynamic_vars["Sensor 2"]["data"].append(float(round(average_data[1], 2)))
                         dynamic_vars["Sensor 3"]["data"].append(float(round(average_data[2], 2)))
@@ -501,7 +501,7 @@ def getMultipleLineChartData(request):
                     dynamic_vars[method]['data'] = []
                 for hour_slab, average_data in aggregated_data.items():
                     if int(from_time) <= hour_slab or int(to_time) >= hour_slab:
-                        categories.append(hour_slab)
+                        categories.append("Hour " + str(hour_slab))
                         dynamic_vars["Sensor 1"]["data"].append(float(round(average_data[0], 2)))
                         dynamic_vars["Sensor 2"]["data"].append(float(round(average_data[1], 2)))
                         dynamic_vars["Sensor 3"]["data"].append(float(round(average_data[2], 2)))
