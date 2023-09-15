@@ -576,6 +576,7 @@ def millisToMinutesAndSeconds(millis=None):
 
 def importCsv(request):
     if request.method == "POST":
+        models.CsvData.objects.all().delete()
         csv_list = []
         if request.FILES.get('csv_data', None):
             file = request.FILES['csv_data']
@@ -822,6 +823,8 @@ def getColumnCounts():
 
 def multipleLineChart(request):
     total_hours = models.CsvData.objects.values('hour_slab').distinct().order_by('hour_slab')
+    if len(total_hours) == 0:
+        return redirect('importCsv')
     min_hour = "{:02d}".format(total_hours[0]['hour_slab'])
     max_hour = "{:02d}".format(total_hours[len(total_hours) - 1]['hour_slab'])
     column_counts = getColumnCounts()
