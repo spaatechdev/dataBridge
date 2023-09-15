@@ -25,13 +25,13 @@ class CsvData(models.Model):
         db_table = 'csv_data'
         verbose_name_plural = 'csv_data'
 
-# Create your models here.
-class Test(models.Model):
+# # Create your models here.
+# class Test(models.Model):
 
-    def __str__(self):
-        return self.id
+#     def __str__(self):
+#         return self.id
 
-    class Meta:
-        managed = True
-        db_table = 'test'
-        verbose_name_plural = 'test'
+#     class Meta:
+#         managed = True
+#         db_table = 'test'
+#         verbose_name_plural = 'test'
