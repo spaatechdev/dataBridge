@@ -1,560 +1,23 @@
-# from django.shortcuts import render, redirect
-# from datetime import datetime
-# from dataBridge import settings
-# from django.contrib import messages
-# from django.http import JsonResponse
-# from django.core.files.storage import FileSystemStorage
-# from . import models
-# from django.db.models import Max, Min, Avg
-# import os
-# import math
-# import csv
-# import environ
-# from collections import defaultdict
-# import pymysql
-
-# import environ
-# env = environ.Env()
-# environ.Env.read_env()
-
-# context = {}
-# context['project_name'] = env("PROJECT_NAME")
-# context['client_name'] = env("CLIENT_NAME")
-
-# # Create your views here.
-
-
-# def millisToMinutesAndSeconds(millis=None):
-#     minutes = math.floor(millis / 60000)
-#     seconds = '{0:.2f}'.format((millis % 60000) / 1000)
-#     return str(minutes) + ":" + str('0' if float(seconds) < 10 else '') + str(round(float(seconds)))
-
-
-# def importCsv(request):
-#     if request.method == "POST":
-#         csv_list = []
-#         if request.FILES.get('csv_data', None):
-#             file = request.FILES['csv_data']
-#             tmpname = str(datetime.now().microsecond) + \
-#                 os.path.splitext(str(file))[1]
-#             fs = FileSystemStorage(
-#                 settings.MEDIA_ROOT + "csv/", settings.MEDIA_ROOT + "/csv/")
-#             fs.save(tmpname, file)
-#             file_name = "csv/" + tmpname
-
-#             db = pymysql.connect(host=env("DATABASE_HOST"), user=env("DATABASE_USER"), password=env("DATABASE_PASSWORD"), db=env("DATABASE_NAME"))
-#             with open(settings.MEDIA_ROOT + file_name, newline='', mode='r', encoding='ISO-8859-1') as csvfile:
-#                 reader = csv.reader(csvfile)
-#                 header = next(reader)
-#             # Generate SQL to add new columns
-#             alter_table_sql = f"ALTER TABLE test {', '.join(f'ADD COLUMN {col} VARCHAR(255)' for col in header)}"
-#             # Execute dynamic SQL to add columns
-#             cursor = db.cursor()
-#             cursor.execute(alter_table_sql)
-
-#             with open(settings.MEDIA_ROOT + file_name, newline='', mode='r', encoding='ISO-8859-1') as csvfile:
-#                 next(csvfile)
-#                 # reader = csv.DictReader(csvfile)
-#                 reader = csv.reader(csvfile)
-#                 # hour_slab = 0
-#                 # flag = 0
-#                 for row in reader:
-#                     # if not row[0]:
-#                     #     break
-#                     # splitted = row[0].split(":")
-#                     # totalMiliSeconds = int(splitted[0]) * 60000 + int(
-#                     #     splitted[1].split(".")[0]) * 1000 + int(splitted[1].split(".")[1])
-#                     # calculated_time = millisToMinutesAndSeconds(
-#                     #     totalMiliSeconds)
-#                     # if int(calculated_time.split(":")[0]) == 59:
-#                     #     flag = 1
-#                     #     # if len(csv_list) > 1000:
-#                     #     #     models.CsvData.objects.bulk_create(csv_list)
-#                     #     #     csv_list = []
-#                     #     #     csv_list.append(models.CsvData(time=row[0], method_1=row[1], method_2=row[2], method_3=row[3], method_4=row[4], method_5=row[5], method_6=row[6],
-#                     #     #                     method_7=row[7], method_8=row[8], method_9=row[9], method_10=row[10], calculated_time="00:"+calculated_time, hour_slab=hour_slab))
-#                     #     # else:
-#                     #     #     csv_list.append(models.CsvData(time=row[0], method_1=row[1], method_2=row[2], method_3=row[3], method_4=row[4], method_5=row[5], method_6=row[6],
-#                     #     #                     method_7=row[7], method_8=row[8], method_9=row[9], method_10=row[10], calculated_time="00:"+calculated_time, hour_slab=hour_slab))
-
-#                     # if flag == 1 and int(calculated_time.split(":")[0]) == 0:
-#                     #     hour_slab += 1
-#                     #     flag = 0
-#                     #     # if len(csv_list) > 1000:
-#                     #     #     models.CsvData.objects.bulk_create(csv_list)
-#                     #     #     csv_list = []
-#                     #     #     csv_list.append(models.CsvData(time=row[0], method_1=row[1], method_2=row[2], method_3=row[3], method_4=row[4], method_5=row[5], method_6=row[6],
-#                     #     #                     method_7=row[7], method_8=row[8], method_9=row[9], method_10=row[10], calculated_time="00:"+calculated_time, hour_slab=hour_slab))
-#                     #     # else:
-#                     #     #     csv_list.append(models.CsvData(time=row[0], method_1=row[1], method_2=row[2], method_3=row[3], method_4=row[4], method_5=row[5], method_6=row[6],
-#                     #     #                     method_7=row[7], method_8=row[8], method_9=row[9], method_10=row[10], calculated_time="00:"+calculated_time, hour_slab=hour_slab))
-
-#                     # elif flag == 1 and int(calculated_time.split(":")[0]) != 0:
-#                     #     hour_slab += 0
-#                     #     # if len(csv_list) > 1000:
-#                     #     #     models.CsvData.objects.bulk_create(csv_list)
-#                     #     #     csv_list = []
-#                     #     #     csv_list.append(models.CsvData(time=row[0], method_1=row[1], method_2=row[2], method_3=row[3], method_4=row[4], method_5=row[5], method_6=row[6],
-#                     #     #                     method_7=row[7], method_8=row[8], method_9=row[9], method_10=row[10], calculated_time="00:"+calculated_time, hour_slab=hour_slab))
-#                     #     # else:
-#                     #     #     csv_list.append(models.CsvData(time=row[0], method_1=row[1], method_2=row[2], method_3=row[3], method_4=row[4], method_5=row[5], method_6=row[6],
-#                     #     #                     method_7=row[7], method_8=row[8], method_9=row[9], method_10=row[10], calculated_time="00:"+calculated_time, hour_slab=hour_slab))
-
-#                     # if len(csv_list) > 1000:
-#                     #     models.CsvData.objects.bulk_create(csv_list)
-#                     #     csv_list = []
-#                     #     csv_list.append(models.CsvData(time=row[0], method_1=row[1], method_2=row[2], method_3=row[3], method_4=row[4], method_5=row[5], method_6=row[6],
-#                     #                     method_7=row[7], method_8=row[8], method_9=row[9], method_10=row[10], calculated_miliseconds=(hour_slab * 60 * 60 * 1000) + totalMiliSeconds, calculated_time="00:"+calculated_time, hour_slab=hour_slab))
-#                     # else:
-#                     #     csv_list.append(models.CsvData(time=row[0], method_1=row[1], method_2=row[2], method_3=row[3], method_4=row[4], method_5=row[5], method_6=row[6],
-#                     #                     method_7=row[7], method_8=row[8], method_9=row[9], method_10=row[10], calculated_miliseconds=(hour_slab * 60 * 60 * 1000) + totalMiliSeconds, calculated_time="00:"+calculated_time, hour_slab=hour_slab))
-#                     insert_sql = f"INSERT INTO test ({', '.join(header)}) VALUES ({', '.join(['%s'] * len(header))})"
-#                     cursor.execute(insert_sql, row)
-
-#                 # models.CsvData.objects.bulk_create(csv_list)
-#                 # csvfile.close()
-#                 # os.remove(settings.MEDIA_ROOT + file_name)
-            
-#             db.commit()
-#             db.close()
-#             messages.success(request, 'Csv Data Uploaded Successfully.')
-#             return redirect('index')
-#     return render(request, 'front/index.html', context)
-
-
-# def scatterChart(request):
-#     total_hours = models.CsvData.objects.values('hour_slab').distinct()
-#     context.update({'total_hours': total_hours})
-#     return render(request, 'front/scatterChart.html', context)
-
-
-# def getScatterChartData(request):
-#     if request.method == "POST":
-#         hour = request.POST['hour']
-#         csv_data = models.CsvData.objects.filter(hour_slab=int(hour))
-#         categories = [
-#             field.name for field in csv_data.model._meta.fields if field.name.startswith('method_')]
-#         method_1_single_data = []
-#         method_2_single_data = []
-#         method_3_single_data = []
-#         method_4_single_data = []
-#         method_5_single_data = []
-#         method_6_single_data = []
-#         method_7_single_data = []
-#         method_8_single_data = []
-#         method_9_single_data = []
-#         method_10_single_data = []
-#         for row_data in csv_data:
-#             method_1_single_data.append([0, float(row_data.method_1)])
-#             method_2_single_data.append([1, float(row_data.method_2)])
-#             method_3_single_data.append([2, float(row_data.method_3)])
-#             method_4_single_data.append([3, float(row_data.method_4)])
-#             method_5_single_data.append([4, float(row_data.method_5)])
-#             method_6_single_data.append([5, float(row_data.method_6)])
-#             method_7_single_data.append([6, float(row_data.method_7)])
-#             method_8_single_data.append([7, float(row_data.method_8)])
-#             method_9_single_data.append([8, float(row_data.method_9)])
-#             method_10_single_data.append([9, float(row_data.method_10)])
-#         series = [{'name': 'method_1', 'data': method_1_single_data}, {'name': 'method_2', 'data': method_2_single_data}, {'name': 'method_3', 'data': method_3_single_data}, {'name': 'method_4', 'data': method_4_single_data}, {'name': 'method_5', 'data': method_5_single_data}, {
-#             'name': 'method_6', 'data': method_6_single_data}, {'name': 'method_7', 'data': method_7_single_data}, {'name': 'method_8', 'data': method_8_single_data}, {'name': 'method_9', 'data': method_9_single_data}, {'name': 'method_10', 'data': method_10_single_data}]
-#         # for each in series:
-#         #     if each['name'] == 'method_1':
-#         #         print(each)
-#         #         exit()
-#         return JsonResponse({
-#             'code': 200,
-#             'status': "SUCCESS",
-#             'result': {'categories': categories, 'series': series},
-#         })
-#     else:
-#         return JsonResponse({
-#             'code': 501,
-#             'status': "ERROR",
-#             'message': "There should be ajax method."
-#         })
-
-
-# def lineChart(request):
-#     total_hours = models.CsvData.objects.values('hour_slab').distinct()
-#     context.update({'total_hours': total_hours})
-#     return render(request, 'front/lineChart.html', context)
-
-
-# def getLineChartData(request):
-#     if request.method == "POST":
-#         csv_data = models.CsvData.objects.filter(
-#             hour_slab__gte=request.POST['from_hour'], hour_slab__lte=request.POST['to_hour']).order_by('id')
-#         series = []
-#         # method_2_data = []
-#         # method_3_data = []
-#         for row_data in csv_data:
-#             if int(request.POST['method']) == 1:
-#                 series.append([row_data.calculated_miliseconds,
-#                               float(row_data.method_1)])
-#             elif int(request.POST['method']) == 2:
-#                 series.append([row_data.calculated_miliseconds,
-#                               float(row_data.method_2)])
-#             elif int(request.POST['method']) == 3:
-#                 series.append([row_data.calculated_miliseconds,
-#                               float(row_data.method_3)])
-#             elif int(request.POST['method']) == 4:
-#                 series.append([row_data.calculated_miliseconds,
-#                               float(row_data.method_4)])
-#             elif int(request.POST['method']) == 5:
-#                 series.append([row_data.calculated_miliseconds,
-#                               float(row_data.method_5)])
-#             elif int(request.POST['method']) == 6:
-#                 series.append([row_data.calculated_miliseconds,
-#                               float(row_data.method_6)])
-#             elif int(request.POST['method']) == 7:
-#                 series.append([row_data.calculated_miliseconds,
-#                               float(row_data.method_7)])
-#             elif int(request.POST['method']) == 8:
-#                 series.append([row_data.calculated_miliseconds,
-#                               float(row_data.method_8)])
-#             elif int(request.POST['method']) == 9:
-#                 series.append([row_data.calculated_miliseconds,
-#                               float(row_data.method_9)])
-#             elif int(request.POST['method']) == 10:
-#                 series.append([row_data.calculated_miliseconds,
-#                               float(row_data.method_10)])
-#             # method_2_data.append(float(row_data.method_2))
-#             # method_2_data.append("{:02d}".format(row_data.hour_slab) + ":" + row_data.calculated_time.strftime("%M") + ":" + row_data.calculated_time.strftime("%S"))
-#             # method_3_data.append(float(row_data.method_3))
-#             # method_3_data.append("{:02d}".format(row_data.hour_slab) + ":" + row_data.calculated_time.strftime("%M") + ":" + row_data.calculated_time.strftime("%S"))
-#         # series.append(
-#         #     {
-#         #         'name': 'method_1',
-#         #         'id': 'method_1',
-#         #         'marker': {
-#         #             'symbol': 'circle'
-#         #         },
-#         #         'data': method_1_data
-#         #     })
-#         # series.append(
-#         #     {
-#         #         'name': 'method_2',
-#         #         'id': 'method_2',
-#         #         'marker': {
-#         #             'symbol': 'circle'
-#         #         },
-#         #         'data': method_2_data
-#         #     })
-#         # series.append(
-#         #     {
-#         #         'name': 'method_3',
-#         #         'id': 'method_3',
-#         #         'marker': {
-#         #             'symbol': 'circle'
-#         #         },
-#         #         'data': method_3_data
-#         #     })
-#         return JsonResponse({
-#             'code': 200,
-#             'status': "SUCCESS",
-#             'result': {'series': series},
-#         })
-#     else:
-#         return JsonResponse({
-#             'code': 502,
-#             'status': "ERROR",
-#             'message': "There should be ajax method."
-#         })
-    
-
-# def getColumnCounts():
-#     column_counts = []
-#     column_count = len(models.CsvData._meta.fields) - 5
-#     for i in range(1, column_count + 1):
-#         column_counts.append(i)
-#     return column_counts
-
-
-# def multipleLineChart(request):
-#     total_hours = models.CsvData.objects.values('hour_slab').distinct().order_by('hour_slab')
-#     min_hour = "{:02d}".format(total_hours[0]['hour_slab'])
-#     max_hour = "{:02d}".format(total_hours[len(total_hours) - 1]['hour_slab'])
-#     column_counts = getColumnCounts()
-#     context.update({'total_hours': total_hours, 'min_hour': min_hour, 'max_hour': max_hour, 'column_counts': column_counts})
-#     return render(request, 'front/multipleLineChart.html', context)
-
-
-# def getMultipleLineChartData(request):
-#     if request.method == "POST":
-#         chart_type = request.POST['chart_type']
-#         bar_chart_type = request.POST['bar_chart_type']
-        
-#         if chart_type == 'line':
-#             from_time = request.POST['from_time']
-#             to_time = request.POST['to_time']
-#             from_miliseconds = int(from_time.split(':')[0]) * 3600 * 1000 + int(from_time.split(':')[1]) * 60 * 1000
-#             to_miliseconds = int(to_time.split(':')[0]) * 3600 * 1000 + int(to_time.split(':')[1]) * 60 * 1000
-
-#             if from_miliseconds > to_miliseconds:
-#                 return JsonResponse({
-#                     'code': 503,
-#                     'status': "ERROR",
-#                     'message': "From time should not exceeds To time "
-#                 })
-
-#             # csv_data = models.CsvData.objects.filter(
-#             #     hour_slab__gte=request.POST['from_time'], hour_slab__lte=request.POST['to_time']).order_by('id')
-#             csv_data = models.CsvData.objects.filter(calculated_miliseconds__gte=from_miliseconds, calculated_miliseconds__lte=to_miliseconds).order_by('id')
-#             # categories = []
-#             series = []
-#             column_counts = getColumnCounts()
-#             dynamic_vars = {}
-#             for index, element in enumerate(column_counts, start=1):
-#                 dynamic_vars[f"method_{index}"] = []
-#             for row_data in csv_data:
-#                 # categories.append(millisToMinutesAndSeconds(row_data.calculated_miliseconds))
-#                 for method in dynamic_vars:
-#                     dynamic_vars[method].append([row_data.calculated_miliseconds, float(getattr(row_data, method))])
-#             if '1' in request.POST.getlist('method'):
-#                 series.append({'name': 'Sensor 1', 'data': dynamic_vars['method_1']})
-#             if '2' in request.POST.getlist('method'):
-#                 series.append({'name': 'Sensor 2', 'data': dynamic_vars['method_2']})
-#             if '3' in request.POST.getlist('method'):
-#                 series.append({'name': 'Sensor 3', 'data': dynamic_vars['method_3']})
-#             if '4' in request.POST.getlist('method'):
-#                 series.append({'name': 'Sensor 4', 'data': dynamic_vars['method_4']})
-#             if '5' in request.POST.getlist('method'):
-#                 series.append({'name': 'Sensor 5', 'data': dynamic_vars['method_5']})
-#             if '6' in request.POST.getlist('method'):
-#                 series.append({'name': 'Sensor 6', 'data': dynamic_vars['method_6']})
-#             if '7' in request.POST.getlist('method'):
-#                 series.append({'name': 'Sensor 7', 'data': dynamic_vars['method_7']})
-#             if '8' in request.POST.getlist('method'):
-#                 series.append({'name': 'Sensor 8', 'data': dynamic_vars['method_8']})
-#             if '9' in request.POST.getlist('method'):
-#                 series.append({'name': 'Sensor 9', 'data': dynamic_vars['method_9']})
-#             if '10' in request.POST.getlist('method'):
-#                 series.append({'name': 'Sensor 10', 'data': dynamic_vars['method_10']})
-#             return JsonResponse({
-#                 'code': 200,
-#                 'status': "SUCCESS",
-#                 'result': {'series': series, 'chart_type': chart_type},
-#             })
-#         elif chart_type == 'bar':
-#             from_time = request.POST['bar_from_time']
-#             to_time = request.POST['bar_to_time']
-#             from_miliseconds = int(from_time) * 3600 * 1000
-#             to_miliseconds = int(to_time) * 3600 * 1000
-#             # from_miliseconds = int(from_time.split(':')[0]) * 3600 * 1000 + int(from_time.split(':')[1]) * 60 * 1000
-#             # to_miliseconds = (int(to_time.split(':')[0]) + 1) * 3600 * 1000 + int(to_time.split(':')[1]) * 60 * 1000
-#             if from_miliseconds > to_miliseconds:
-#                 return JsonResponse({
-#                     'code': 504,
-#                     'status': "ERROR",
-#                     'message': "From time should not exceeds To time "
-#                 })
-#             if bar_chart_type == 'max':
-#                 # csv_data = models.CsvData.objects.filter(calculated_miliseconds__gte=from_miliseconds, calculated_miliseconds__lte=to_miliseconds).values('hour_slab').annotate(val_method_1=Max('method_1'), val_method_2=Max('method_2'), val_method_3=Max('method_3'), val_method_4=Max('method_4'), val_method_5=Max('method_5'), val_method_6=Max('method_6'), val_method_7=Max('method_7'), val_method_8=Max('method_8'), val_method_9=Max('method_9'), val_method_10=Max('method_10')).order_by('id')
-#                 csv_data = models.CsvData.objects.values('hour_slab').filter(calculated_miliseconds__gte=from_miliseconds, calculated_miliseconds__lte=to_miliseconds).annotate(
-#                     val_method_1=Max('method_1'),
-#                     val_method_2=Max('method_2'),
-#                     val_method_3=Max('method_3'),
-#                     val_method_4=Max('method_4'),
-#                     val_method_5=Max('method_5'),
-#                     val_method_6=Max('method_6'),
-#                     val_method_7=Max('method_7'),
-#                     val_method_8=Max('method_8'),
-#                     val_method_9=Max('method_9'),
-#                     val_method_10=Max('method_10')
-#                 )
-#                 aggregated_data = defaultdict(float)
-#                 for item in csv_data:
-#                     aggregated_data[item['hour_slab']] = [item['val_method_1'], item['val_method_2'], item['val_method_3'], item['val_method_4'], item['val_method_5'], item['val_method_6'], item['val_method_7'], item['val_method_8'], item['val_method_9'], item['val_method_10']]
-#                 categories = []
-#                 series = []
-
-#                 column_counts = getColumnCounts()
-#                 dynamic_vars = {}
-#                 for index, element in enumerate(column_counts, start=1):
-#                     dynamic_vars[f"Sensor {index}"] = {}
-#                 for method in dynamic_vars:
-#                     dynamic_vars[method]['name'] = method
-#                     dynamic_vars[method]['data'] = []
-#                 for hour_slab, average_data in aggregated_data.items():
-#                     if int(from_time) <= hour_slab or int(to_time) >= hour_slab:
-#                         categories.append("Hour " + str(hour_slab))
-#                         dynamic_vars["Sensor 1"]["data"].append(float(round(average_data[0], 2)))
-#                         dynamic_vars["Sensor 2"]["data"].append(float(round(average_data[1], 2)))
-#                         dynamic_vars["Sensor 3"]["data"].append(float(round(average_data[2], 2)))
-#                         dynamic_vars["Sensor 4"]["data"].append(float(round(average_data[3], 2)))
-#                         dynamic_vars["Sensor 5"]["data"].append(float(round(average_data[4], 2)))
-#                         dynamic_vars["Sensor 6"]["data"].append(float(round(average_data[5], 2)))
-#                         dynamic_vars["Sensor 7"]["data"].append(float(round(average_data[6], 2)))
-#                         dynamic_vars["Sensor 8"]["data"].append(float(round(average_data[7], 2)))
-#                         dynamic_vars["Sensor 9"]["data"].append(float(round(average_data[8], 2)))
-#                         dynamic_vars["Sensor 10"]["data"].append(float(round(average_data[9], 2)))
-#                 if '1' in request.POST.getlist('method'):
-#                     series.append(dynamic_vars['Sensor 1'])
-#                 if '2' in request.POST.getlist('method'):
-#                     series.append(dynamic_vars['Sensor 2'])
-#                 if '3' in request.POST.getlist('method'):
-#                     series.append(dynamic_vars['Sensor 3'])
-#                 if '4' in request.POST.getlist('method'):
-#                     series.append(dynamic_vars['Sensor 4'])
-#                 if '5' in request.POST.getlist('method'):
-#                     series.append(dynamic_vars['Sensor 5'])
-#                 if '6' in request.POST.getlist('method'):
-#                     series.append(dynamic_vars['Sensor 6'])
-#                 if '7' in request.POST.getlist('method'):
-#                     series.append(dynamic_vars['Sensor 7'])
-#                 if '8' in request.POST.getlist('method'):
-#                     series.append(dynamic_vars['Sensor 8'])
-#                 if '9' in request.POST.getlist('method'):
-#                     series.append(dynamic_vars['Sensor 9'])
-#                 if '10' in request.POST.getlist('method'):
-#                     series.append(dynamic_vars['Sensor 10'])
-#             if bar_chart_type == 'min':
-#                 csv_data = models.CsvData.objects.values('hour_slab').filter(calculated_miliseconds__gte=from_miliseconds, calculated_miliseconds__lte=to_miliseconds).annotate(
-#                     val_method_1=Min('method_1'),
-#                     val_method_2=Min('method_2'),
-#                     val_method_3=Min('method_3'),
-#                     val_method_4=Min('method_4'),
-#                     val_method_5=Min('method_5'),
-#                     val_method_6=Min('method_6'),
-#                     val_method_7=Min('method_7'),
-#                     val_method_8=Min('method_8'),
-#                     val_method_9=Min('method_9'),
-#                     val_method_10=Min('method_10')
-#                 )
-#                 aggregated_data = defaultdict(float)
-
-#                 for item in csv_data:
-#                     aggregated_data[item['hour_slab']] = [item['val_method_1'], item['val_method_2'], item['val_method_3'], item['val_method_4'], item['val_method_5'], item['val_method_6'], item['val_method_7'], item['val_method_8'], item['val_method_9'], item['val_method_10']]
-#                 categories = []
-#                 series = []
-
-#                 column_counts = getColumnCounts()
-#                 dynamic_vars = {}
-#                 for index, element in enumerate(column_counts, start=1):
-#                     dynamic_vars[f"Sensor {index}"] = {}
-#                 for method in dynamic_vars:
-#                     dynamic_vars[method]['name'] = method
-#                     dynamic_vars[method]['data'] = []
-#                 for hour_slab, average_data in aggregated_data.items():
-#                     if int(from_time) <= hour_slab or int(to_time) >= hour_slab:
-#                         categories.append("Hour " + str(hour_slab))
-#                         dynamic_vars["Sensor 1"]["data"].append(float(round(average_data[0], 2)))
-#                         dynamic_vars["Sensor 2"]["data"].append(float(round(average_data[1], 2)))
-#                         dynamic_vars["Sensor 3"]["data"].append(float(round(average_data[2], 2)))
-#                         dynamic_vars["Sensor 4"]["data"].append(float(round(average_data[3], 2)))
-#                         dynamic_vars["Sensor 5"]["data"].append(float(round(average_data[4], 2)))
-#                         dynamic_vars["Sensor 6"]["data"].append(float(round(average_data[5], 2)))
-#                         dynamic_vars["Sensor 7"]["data"].append(float(round(average_data[6], 2)))
-#                         dynamic_vars["Sensor 8"]["data"].append(float(round(average_data[7], 2)))
-#                         dynamic_vars["Sensor 9"]["data"].append(float(round(average_data[8], 2)))
-#                         dynamic_vars["Sensor 10"]["data"].append(float(round(average_data[9], 2)))
-#                 if '1' in request.POST.getlist('method'):
-#                     series.append(dynamic_vars['Sensor 1'])
-#                 if '2' in request.POST.getlist('method'):
-#                     series.append(dynamic_vars['Sensor 2'])
-#                 if '3' in request.POST.getlist('method'):
-#                     series.append(dynamic_vars['Sensor 3'])
-#                 if '4' in request.POST.getlist('method'):
-#                     series.append(dynamic_vars['Sensor 4'])
-#                 if '5' in request.POST.getlist('method'):
-#                     series.append(dynamic_vars['Sensor 5'])
-#                 if '6' in request.POST.getlist('method'):
-#                     series.append(dynamic_vars['Sensor 6'])
-#                 if '7' in request.POST.getlist('method'):
-#                     series.append(dynamic_vars['Sensor 7'])
-#                 if '8' in request.POST.getlist('method'):
-#                     series.append(dynamic_vars['Sensor 8'])
-#                 if '9' in request.POST.getlist('method'):
-#                     series.append(dynamic_vars['Sensor 9'])
-#                 if '10' in request.POST.getlist('method'):
-#                     series.append(dynamic_vars['Sensor 10'])
-#             if bar_chart_type == 'avg':
-#                 csv_data = models.CsvData.objects.values('hour_slab').filter(calculated_miliseconds__gte=from_miliseconds, calculated_miliseconds__lte=to_miliseconds).annotate(
-#                     val_method_1=Avg('method_1'),
-#                     val_method_2=Avg('method_2'),
-#                     val_method_3=Avg('method_3'),
-#                     val_method_4=Avg('method_4'),
-#                     val_method_5=Avg('method_5'),
-#                     val_method_6=Avg('method_6'),
-#                     val_method_7=Avg('method_7'),
-#                     val_method_8=Avg('method_8'),
-#                     val_method_9=Avg('method_9'),
-#                     val_method_10=Avg('method_10')
-#                 )
-#                 aggregated_data = defaultdict(float)
-
-#                 for item in csv_data:
-#                     aggregated_data[item['hour_slab']] = [item['val_method_1'], item['val_method_2'], item['val_method_3'], item['val_method_4'], item['val_method_5'], item['val_method_6'], item['val_method_7'], item['val_method_8'], item['val_method_9'], item['val_method_10']]
-#                 categories = []
-#                 series = []
-
-#                 column_counts = getColumnCounts()
-#                 dynamic_vars = {}
-#                 for index, element in enumerate(column_counts, start=1):
-#                     dynamic_vars[f"Sensor {index}"] = {}
-#                 for method in dynamic_vars:
-#                     dynamic_vars[method]['name'] = method
-#                     dynamic_vars[method]['data'] = []
-#                 for hour_slab, average_data in aggregated_data.items():
-#                     if int(from_time) <= hour_slab or int(to_time) >= hour_slab:
-#                         categories.append("Hour " + str(hour_slab))
-#                         dynamic_vars["Sensor 1"]["data"].append(float(round(average_data[0], 2)))
-#                         dynamic_vars["Sensor 2"]["data"].append(float(round(average_data[1], 2)))
-#                         dynamic_vars["Sensor 3"]["data"].append(float(round(average_data[2], 2)))
-#                         dynamic_vars["Sensor 4"]["data"].append(float(round(average_data[3], 2)))
-#                         dynamic_vars["Sensor 5"]["data"].append(float(round(average_data[4], 2)))
-#                         dynamic_vars["Sensor 6"]["data"].append(float(round(average_data[5], 2)))
-#                         dynamic_vars["Sensor 7"]["data"].append(float(round(average_data[6], 2)))
-#                         dynamic_vars["Sensor 8"]["data"].append(float(round(average_data[7], 2)))
-#                         dynamic_vars["Sensor 9"]["data"].append(float(round(average_data[8], 2)))
-#                         dynamic_vars["Sensor 10"]["data"].append(float(round(average_data[9], 2)))
-#                 if '1' in request.POST.getlist('method'):
-#                     series.append(dynamic_vars['Sensor 1'])
-#                 if '2' in request.POST.getlist('method'):
-#                     series.append(dynamic_vars['Sensor 2'])
-#                 if '3' in request.POST.getlist('method'):
-#                     series.append(dynamic_vars['Sensor 3'])
-#                 if '4' in request.POST.getlist('method'):
-#                     series.append(dynamic_vars['Sensor 4'])
-#                 if '5' in request.POST.getlist('method'):
-#                     series.append(dynamic_vars['Sensor 5'])
-#                 if '6' in request.POST.getlist('method'):
-#                     series.append(dynamic_vars['Sensor 6'])
-#                 if '7' in request.POST.getlist('method'):
-#                     series.append(dynamic_vars['Sensor 7'])
-#                 if '8' in request.POST.getlist('method'):
-#                     series.append(dynamic_vars['Sensor 8'])
-#                 if '9' in request.POST.getlist('method'):
-#                     series.append(dynamic_vars['Sensor 9'])
-#                 if '10' in request.POST.getlist('method'):
-#                     series.append(dynamic_vars['Sensor 10'])
-#             return JsonResponse({
-#                 'code': 200,
-#                 'status': "SUCCESS",
-#                 'result': {'series': series, 'categories': categories, 'chart_type': chart_type},
-#             })
-#     else:
-#         return JsonResponse({
-#             'code': 502,
-#             'status': "ERROR",
-#             'message': "There should be ajax method."
-#         })
-
-
-
-
 from django.shortcuts import render, redirect
 from datetime import datetime
+from decimal import Decimal
 from dataBridge import settings
 from django.contrib import messages
 from django.http import JsonResponse
 from django.core.files.storage import FileSystemStorage
 from . import models
+from . import constants
 from django.db.models import Max, Min, Avg
 import os
 import math
+import pathlib
 import csv
 import environ
+import json
+import openpyxl
+from django.db import connections
+from django.contrib.messages import get_messages
+import re
 from collections import defaultdict
 
 import environ
@@ -566,526 +29,894 @@ context['project_name'] = env("PROJECT_NAME")
 context['client_name'] = env("CLIENT_NAME")
 
 # Create your views here.
+def get_constants(sensor_type):
+    if sensor_type == 'strain':
+        file_path = "templates/constants/strain_columns.txt"
+        f = open(file_path)
+        columns = f.read()
+        if columns == "":
+            columns = json.dumps(constants.strain_columns)
+            f = open(file_path, "w+")
+            f.write(columns)
+        f.close()
+        return json.loads(columns)
+    if sensor_type == 'tilt':
+        file_path = "templates/constants/tilt_columns.txt"
+        f = open(file_path)
+        columns = f.read()
+        if columns == "":
+            columns = json.dumps(constants.tilt_columns)
+            f = open(file_path, "w+")
+            f.write(columns)
+        f.close()
+        return json.loads(columns)
+    if sensor_type == 'displacement':
+        file_path = "templates/constants/displacement_columns.txt"
+        f = open(file_path)
+        columns = f.read()
+        if columns == "":
+            columns = json.dumps(constants.displacement_columns)
+            f = open(file_path, "w+")
+            f.write(columns)
+        f.close()
+        return json.loads(columns)
+    if sensor_type == 'settlement':
+        file_path = "templates/constants/settlement_columns.txt"
+        f = open(file_path)
+        columns = f.read()
+        if columns == "":
+            columns = json.dumps(constants.settlement_columns)
+            f = open(file_path, "w+")
+            f.write(columns)
+        f.close()
+        return json.loads(columns)
+    if sensor_type == 'vibration':
+        file_path = "templates/constants/vibration_columns.txt"
+        f = open(file_path)
+        columns = f.read()
+        if columns == "":
+            columns = json.dumps(constants.vibration_columns)
+            f = open(file_path, "w+")
+            f.write(columns)
+        f.close()
+        return json.loads(columns)
+    
 
-
-def millisToMinutesAndSeconds(millis=None):
-    minutes = math.floor(millis / 60000)
-    seconds = '{0:.2f}'.format((millis % 60000) / 1000)
-    return str(minutes) + ":" + str('0' if float(seconds) < 10 else '') + str(round(float(seconds)))
-
-
-def importCsv(request):
+def getSensorsByTypes(request):
     if request.method == "POST":
-        models.CsvData.objects.all().delete()
-        csv_list = []
-        if request.FILES.get('csv_data', None):
-            file = request.FILES['csv_data']
-            tmpname = str(datetime.now().microsecond) + \
-                os.path.splitext(str(file))[1]
-            fs = FileSystemStorage(
-                settings.MEDIA_ROOT + "csv/", settings.MEDIA_ROOT + "/csv/")
-            fs.save(tmpname, file)
-            file_name = "csv/" + tmpname
+        sensor_type = request.POST['sensor_type']
+        sensor_names = get_constants(sensor_type)
+        columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
 
-            with open(settings.MEDIA_ROOT + file_name, newline='', mode='r', encoding='ISO-8859-1') as csvfile:
-                next(csvfile)
-                # reader = csv.DictReader(csvfile)
-                reader = csv.reader(csvfile)
-                hour_slab = 0
-                flag = 0
-                for row in reader:
-                    if not row[0]:
-                        break
-                    splitted = row[0].split(":")
-                    totalMiliSeconds = int(splitted[0]) * 60000 + int(
-                        splitted[1].split(".")[0]) * 1000 + int(splitted[1].split(".")[1])
-                    calculated_time = millisToMinutesAndSeconds(
-                        totalMiliSeconds)
-                    if int(calculated_time.split(":")[0]) == 59:
-                        flag = 1
-                        # if len(csv_list) > 1000:
-                        #     models.CsvData.objects.bulk_create(csv_list)
-                        #     csv_list = []
-                        #     csv_list.append(models.CsvData(time=row[0], method_1=row[1], method_2=row[2], method_3=row[3], method_4=row[4], method_5=row[5], method_6=row[6],
-                        #                     method_7=row[7], method_8=row[8], method_9=row[9], method_10=row[10], calculated_time="00:"+calculated_time, hour_slab=hour_slab))
-                        # else:
-                        #     csv_list.append(models.CsvData(time=row[0], method_1=row[1], method_2=row[2], method_3=row[3], method_4=row[4], method_5=row[5], method_6=row[6],
-                        #                     method_7=row[7], method_8=row[8], method_9=row[9], method_10=row[10], calculated_time="00:"+calculated_time, hour_slab=hour_slab))
-
-                    if flag == 1 and int(calculated_time.split(":")[0]) == 0:
-                        hour_slab += 1
-                        flag = 0
-                        # if len(csv_list) > 1000:
-                        #     models.CsvData.objects.bulk_create(csv_list)
-                        #     csv_list = []
-                        #     csv_list.append(models.CsvData(time=row[0], method_1=row[1], method_2=row[2], method_3=row[3], method_4=row[4], method_5=row[5], method_6=row[6],
-                        #                     method_7=row[7], method_8=row[8], method_9=row[9], method_10=row[10], calculated_time="00:"+calculated_time, hour_slab=hour_slab))
-                        # else:
-                        #     csv_list.append(models.CsvData(time=row[0], method_1=row[1], method_2=row[2], method_3=row[3], method_4=row[4], method_5=row[5], method_6=row[6],
-                        #                     method_7=row[7], method_8=row[8], method_9=row[9], method_10=row[10], calculated_time="00:"+calculated_time, hour_slab=hour_slab))
-
-                    elif flag == 1 and int(calculated_time.split(":")[0]) != 0:
-                        hour_slab += 0
-                        # if len(csv_list) > 1000:
-                        #     models.CsvData.objects.bulk_create(csv_list)
-                        #     csv_list = []
-                        #     csv_list.append(models.CsvData(time=row[0], method_1=row[1], method_2=row[2], method_3=row[3], method_4=row[4], method_5=row[5], method_6=row[6],
-                        #                     method_7=row[7], method_8=row[8], method_9=row[9], method_10=row[10], calculated_time="00:"+calculated_time, hour_slab=hour_slab))
-                        # else:
-                        #     csv_list.append(models.CsvData(time=row[0], method_1=row[1], method_2=row[2], method_3=row[3], method_4=row[4], method_5=row[5], method_6=row[6],
-                        #                     method_7=row[7], method_8=row[8], method_9=row[9], method_10=row[10], calculated_time="00:"+calculated_time, hour_slab=hour_slab))
-
-                    if len(csv_list) > 1000:
-                        models.CsvData.objects.bulk_create(csv_list)
-                        csv_list = []
-                        csv_list.append(models.CsvData(time=row[0], method_1=row[1], method_2=row[2], method_3=row[3], method_4=row[4], method_5=row[5], method_6=row[6],
-                                        method_7=row[7], method_8=row[8], method_9=row[9], method_10=row[10], calculated_miliseconds=(hour_slab * 60 * 60 * 1000) + totalMiliSeconds, calculated_time="00:"+calculated_time, hour_slab=hour_slab))
-                    else:
-                        csv_list.append(models.CsvData(time=row[0], method_1=row[1], method_2=row[2], method_3=row[3], method_4=row[4], method_5=row[5], method_6=row[6],
-                                        method_7=row[7], method_8=row[8], method_9=row[9], method_10=row[10], calculated_miliseconds=(hour_slab * 60 * 60 * 1000) + totalMiliSeconds, calculated_time="00:"+calculated_time, hour_slab=hour_slab))
-
-                models.CsvData.objects.bulk_create(csv_list)
-                csvfile.close()
-                os.remove(settings.MEDIA_ROOT + file_name)
-            messages.success(request, 'Csv Data Uploaded Successfully.')
-            return redirect('index')
-    return render(request, 'front/index.html', context)
-
-
-def scatterChart(request):
-    total_hours = models.CsvData.objects.values('hour_slab').distinct()
-    context.update({'total_hours': total_hours})
-    return render(request, 'front/scatterChart.html', context)
-
-
-def getScatterChartData(request):
-    if request.method == "POST":
-        hour = request.POST['hour']
-        csv_data = models.CsvData.objects.filter(hour_slab=int(hour))
-        categories = [
-            field.name for field in csv_data.model._meta.fields if field.name.startswith('method_')]
-        method_1_single_data = []
-        method_2_single_data = []
-        method_3_single_data = []
-        method_4_single_data = []
-        method_5_single_data = []
-        method_6_single_data = []
-        method_7_single_data = []
-        method_8_single_data = []
-        method_9_single_data = []
-        method_10_single_data = []
-        for row_data in csv_data:
-            method_1_single_data.append([0, float(row_data.method_1)])
-            method_2_single_data.append([1, float(row_data.method_2)])
-            method_3_single_data.append([2, float(row_data.method_3)])
-            method_4_single_data.append([3, float(row_data.method_4)])
-            method_5_single_data.append([4, float(row_data.method_5)])
-            method_6_single_data.append([5, float(row_data.method_6)])
-            method_7_single_data.append([6, float(row_data.method_7)])
-            method_8_single_data.append([7, float(row_data.method_8)])
-            method_9_single_data.append([8, float(row_data.method_9)])
-            method_10_single_data.append([9, float(row_data.method_10)])
-        series = [{'name': 'method_1', 'data': method_1_single_data}, {'name': 'method_2', 'data': method_2_single_data}, {'name': 'method_3', 'data': method_3_single_data}, {'name': 'method_4', 'data': method_4_single_data}, {'name': 'method_5', 'data': method_5_single_data}, {
-            'name': 'method_6', 'data': method_6_single_data}, {'name': 'method_7', 'data': method_7_single_data}, {'name': 'method_8', 'data': method_8_single_data}, {'name': 'method_9', 'data': method_9_single_data}, {'name': 'method_10', 'data': method_10_single_data}]
-        # for each in series:
-        #     if each['name'] == 'method_1':
-        #         print(each)
-        #         exit()
+        if sensor_type == 'strain':
+            min_time = (models.StrainData.objects.all().order_by('date_time')[0].date_time).strftime("%Y-%m-%dT%H:%M:%S")
+            max_time = (models.StrainData.objects.all().order_by('-date_time')[0].date_time).strftime("%Y-%m-%dT%H:%M:%S")
+        if sensor_type == 'tilt':
+            min_time = (models.TiltData.objects.all().order_by('date_time')[0].date_time).strftime("%Y-%m-%dT%H:%M:%S")
+            max_time = (models.TiltData.objects.all().order_by('-date_time')[0].date_time).strftime("%Y-%m-%dT%H:%M:%S")
+        if sensor_type == 'displacement':
+            min_time = (models.DisplacementData.objects.all().order_by('date_time')[0].date_time).strftime("%Y-%m-%dT%H:%M:%S")
+            max_time = (models.DisplacementData.objects.all().order_by('-date_time')[0].date_time).strftime("%Y-%m-%dT%H:%M:%S")
+        if sensor_type == 'settlement':
+            min_time = (models.SettlementData.objects.all().order_by('date_time')[0].date_time).strftime("%Y-%m-%dT%H:%M:%S")
+            max_time = (models.SettlementData.objects.all().order_by('-date_time')[0].date_time).strftime("%Y-%m-%dT%H:%M:%S")
+        if sensor_type == 'vibration':
+            min_time = (models.VibrationData.objects.all().order_by('date_time')[0].date_time).strftime("%Y-%m-%dT%H:%M:%S")
+            max_time = (models.VibrationData.objects.all().order_by('-date_time')[0].date_time).strftime("%Y-%m-%dT%H:%M:%S")
         return JsonResponse({
             'code': 200,
             'status': "SUCCESS",
-            'result': {'categories': categories, 'series': series},
+            'columns': columns,
+            'min_time': min_time,
+            'max_time': max_time
         })
     else:
         return JsonResponse({
             'code': 501,
             'status': "ERROR",
-            'message': "There should be ajax method."
+            'message': "There should be ajax method"
         })
 
 
-def lineChart(request):
-    total_hours = models.CsvData.objects.values('hour_slab').distinct()
-    context.update({'total_hours': total_hours})
-    return render(request, 'front/lineChart.html', context)
+def getSensorCounts(sensor_type):
+    if sensor_type == 'strain':
+        column_names = []
+        file_path = "templates/constants/strain_columns.txt"
+        f = open(file_path)
+        columns_constants = f.read()
+        f.close()
+        columns_constants = json.loads(columns_constants)
+
+        columns_fields = [field.name for field in models.StrainData._meta.get_fields()]
+        for each in columns_fields:
+            if each.startswith('test_method_') and columns_constants[each] != each:
+                column_names.append(columns_constants[each])
+        return column_names
+    if sensor_type == 'tilt':
+        column_names = []
+        file_path = "templates/constants/tilt_columns.txt"
+        f = open(file_path)
+        columns_constants = f.read()
+        f.close()
+        columns_constants = json.loads(columns_constants)
+
+        columns_fields = [field.name for field in models.TiltData._meta.get_fields()]
+        for each in columns_fields:
+            if each.startswith('test_method_') and columns_constants[each] != each:
+                column_names.append(columns_constants[each])
+        return column_names
+    if sensor_type == 'displacement':
+        column_names = []
+        file_path = "templates/constants/displacement_columns.txt"
+        f = open(file_path)
+        columns_constants = f.read()
+        f.close()
+        columns_constants = json.loads(columns_constants)
+
+        columns_fields = [field.name for field in models.DisplacementData._meta.get_fields()]
+        for each in columns_fields:
+            if each.startswith('test_method_') and columns_constants[each] != each:
+                column_names.append(columns_constants[each])
+        return column_names
+    if sensor_type == 'settlement':
+        column_names = []
+        file_path = "templates/constants/settlement_columns.txt"
+        f = open(file_path)
+        columns_constants = f.read()
+        f.close()
+        columns_constants = json.loads(columns_constants)
+
+        columns_fields = [field.name for field in models.SettlementData._meta.get_fields()]
+        for each in columns_fields:
+            if each.startswith('test_method_') and columns_constants[each] != each:
+                column_names.append(columns_constants[each])
+        return column_names
+    if sensor_type == 'vibration':
+        column_names = []
+        file_path = "templates/constants/vibration_columns.txt"
+        f = open(file_path)
+        columns_constants = f.read()
+        f.close()
+        columns_constants = json.loads(columns_constants)
+
+        columns_fields = [field.name for field in models.VibrationData._meta.get_fields()]
+        for each in columns_fields:
+            if each.startswith('test_method_') and columns_constants[each] != each:
+                column_names.append(columns_constants[each])
+        return column_names
 
 
-def getLineChartData(request):
+def index(request):
+    strain_data = models.StrainData.objects.count()
+    if strain_data == 0:
+        # Delete all messages by popping them from the list
+        try:
+            storage = get_messages(request)
+            for message in storage:
+                message = ''
+            storage.used = False
+        except:
+            pass
+        messages.error(request, 'No Strain Data Is Present.')
+        return redirect('importCsv')
+    tilt_data = models.TiltData.objects.count()
+    if tilt_data == 0:
+        # Delete all messages by popping them from the list
+        try:
+            storage = get_messages(request)
+            for message in storage:
+                message = ''
+            storage.used = False
+        except:
+            pass
+        messages.error(request, 'No Tilt Data Is Present.')
+        return redirect('importCsv')
+    displacement_data = models.DisplacementData.objects.count()
+    if displacement_data == 0:
+        # Delete all messages by popping them from the list
+        try:
+            storage = get_messages(request)
+            for message in storage:
+                message = ''
+            storage.used = False
+        except:
+            pass
+        messages.error(request, 'No Displacement Data Is Present.')
+        return redirect('importCsv')
+    settlement_data = models.SettlementData.objects.count()
+    if settlement_data == 0:
+        # Delete all messages by popping them from the list
+        try:
+            storage = get_messages(request)
+            for message in storage:
+                message = ''
+            storage.used = False
+        except:
+            pass
+        messages.error(request, 'No Settlement Data Is Present.')
+        return redirect('importCsv')
+    vibration_data = models.VibrationData.objects.count()
+    if vibration_data == 0:
+        # Delete all messages by popping them from the list
+        try:
+            storage = get_messages(request)
+            for message in storage:
+                message = ''
+            storage.used = False
+        except:
+            pass
+        messages.error(request, 'No Vibration Data Is Present.')
+        return redirect('importCsv')
+    # strain_sensor_counts = getSensorCounts('strain')
+    # tilt_sensor_counts = getSensorCounts('tilt')
+    # displacement_sensor_counts = getSensorCounts('displacement')
+    # settlement_sensor_counts = getSensorCounts('settlement')
+    # vibration_sensor_counts = getSensorCounts('vibration')
+    # min_time = (models.StrainData.objects.all().order_by('date_time')[0].date_time).strftime("%Y-%m-%dT%H:%M:%S")
+    # max_time = (models.StrainData.objects.all().order_by('-date_time')[0].date_time).strftime("%Y-%m-%dT%H:%M:%S")
+    sensor_types = {
+        'keys': list(constants.sensor_types.keys()),
+        'values': list(constants.sensor_types.values())
+    }
+    # context.update({'sensor_types':sensor_types, 'strain_sensor_counts': strain_sensor_counts, 'tilt_sensor_counts': tilt_sensor_counts, 'displacement_sensor_counts': displacement_sensor_counts, 'settlement_sensor_counts': settlement_sensor_counts, 'vibration_sensor_counts': vibration_sensor_counts, 'min_time': min_time, 'max_time': max_time})
+    context.update({'sensor_types':sensor_types})
+    return render(request, 'front/index.html', context)
+
+
+def importCsv(request):
     if request.method == "POST":
-        csv_data = models.CsvData.objects.filter(
-            hour_slab__gte=request.POST['from_hour'], hour_slab__lte=request.POST['to_hour']).order_by('id')
-        series = []
-        # method_2_data = []
-        # method_3_data = []
-        for row_data in csv_data:
-            if int(request.POST['method']) == 1:
-                series.append([row_data.calculated_miliseconds,
-                              float(row_data.method_1)])
-            elif int(request.POST['method']) == 2:
-                series.append([row_data.calculated_miliseconds,
-                              float(row_data.method_2)])
-            elif int(request.POST['method']) == 3:
-                series.append([row_data.calculated_miliseconds,
-                              float(row_data.method_3)])
-            elif int(request.POST['method']) == 4:
-                series.append([row_data.calculated_miliseconds,
-                              float(row_data.method_4)])
-            elif int(request.POST['method']) == 5:
-                series.append([row_data.calculated_miliseconds,
-                              float(row_data.method_5)])
-            elif int(request.POST['method']) == 6:
-                series.append([row_data.calculated_miliseconds,
-                              float(row_data.method_6)])
-            elif int(request.POST['method']) == 7:
-                series.append([row_data.calculated_miliseconds,
-                              float(row_data.method_7)])
-            elif int(request.POST['method']) == 8:
-                series.append([row_data.calculated_miliseconds,
-                              float(row_data.method_8)])
-            elif int(request.POST['method']) == 9:
-                series.append([row_data.calculated_miliseconds,
-                              float(row_data.method_9)])
-            elif int(request.POST['method']) == 10:
-                series.append([row_data.calculated_miliseconds,
-                              float(row_data.method_10)])
-            # method_2_data.append(float(row_data.method_2))
-            # method_2_data.append("{:02d}".format(row_data.hour_slab) + ":" + row_data.calculated_time.strftime("%M") + ":" + row_data.calculated_time.strftime("%S"))
-            # method_3_data.append(float(row_data.method_3))
-            # method_3_data.append("{:02d}".format(row_data.hour_slab) + ":" + row_data.calculated_time.strftime("%M") + ":" + row_data.calculated_time.strftime("%S"))
-        # series.append(
-        #     {
-        #         'name': 'method_1',
-        #         'id': 'method_1',
-        #         'marker': {
-        #             'symbol': 'circle'
-        #         },
-        #         'data': method_1_data
-        #     })
-        # series.append(
-        #     {
-        #         'name': 'method_2',
-        #         'id': 'method_2',
-        #         'marker': {
-        #             'symbol': 'circle'
-        #         },
-        #         'data': method_2_data
-        #     })
-        # series.append(
-        #     {
-        #         'name': 'method_3',
-        #         'id': 'method_3',
-        #         'marker': {
-        #             'symbol': 'circle'
-        #         },
-        #         'data': method_3_data
-        #     })
+        if 'strain_required' in request.POST.keys():
+            models.StrainData.objects.all().delete()
+            if request.FILES.get('strain_gauge', None):
+                file = request.FILES['strain_gauge']
+                tmpname = str(datetime.now().microsecond) + os.path.splitext(str(file))[1]
+                fs = FileSystemStorage(settings.MEDIA_ROOT + "csv/", settings.MEDIA_ROOT + "/csv/")
+                fs.save(tmpname, file)
+                file_name = "csv/" + tmpname
+
+                wb = openpyxl.load_workbook(settings.MEDIA_ROOT + file_name, data_only=True)
+                ws = wb.active
+
+                # Extract and clean column names from the Excel file (assuming they are in the first row)
+                # column_names = [re.sub(r'[^a-zA-Z0-9_]', '_', str(cell.value)) for cell in ws[1]]
+                column_names = [str(cell.value) for cell in ws[1]]
+
+                # Removing Date Time Column
+                del column_names[0]
+
+                strain_columns = get_constants('strain')
+                for index, column in enumerate(column_names):
+                    strain_columns[list(strain_columns.keys())[index]] = column
+
+                f = open("templates/constants/strain_columns.txt", "w+")
+                columns = json.dumps(strain_columns)
+                f.write(columns)
+                f.close()
+
+                data_list = []
+
+                # Initialize a flag to skip the first row
+                skip_first_row = True
+
+                for row in ws.iter_rows(values_only=True):
+                    if skip_first_row:
+                        skip_first_row = False
+                        continue  # Skip the first row
+                    if not row[0]:
+                        break
+                    if len(data_list) > 1000:
+                        models.StrainData.objects.bulk_create(data_list)
+                        data_list = []
+                        data_list.append(models.StrainData(
+                            date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), 
+                            test_method_1=Decimal(row[1]) if len(row) > 1 else 0, 
+                            test_method_2=Decimal(row[2]) if len(row) > 2 else 0, 
+                            test_method_3=Decimal(row[3]) if len(row) > 3 else 0, 
+                            test_method_4=Decimal(row[4]) if len(row) > 4 else 0, 
+                            test_method_5=Decimal(row[5]) if len(row) > 5 else 0, 
+                            test_method_6=Decimal(row[6]) if len(row) > 6 else 0, 
+                            test_method_7=Decimal(row[7]) if len(row) > 7 else 0, 
+                            test_method_8=Decimal(row[8]) if len(row) > 8 else 0, 
+                            test_method_9=Decimal(row[9]) if len(row) > 9 else 0, 
+                            test_method_10=Decimal(row[10]) if len(row) > 10 else 0, 
+                            test_method_11=Decimal(row[11]) if len(row) > 11 else 0, 
+                            test_method_12=Decimal(row[12]) if len(row) > 12 else 0, 
+                            test_method_13=Decimal(row[13]) if len(row) > 13 else 0, 
+                            test_method_14=Decimal(row[14]) if len(row) > 14 else 0, 
+                            test_method_15=Decimal(row[15]) if len(row) > 15 else 0, 
+                            test_method_16=Decimal(row[16]) if len(row) > 16 else 0, 
+                            test_method_17=Decimal(row[17]) if len(row) > 17 else 0, 
+                            test_method_18=Decimal(row[18]) if len(row) > 18 else 0, 
+                            test_method_19=Decimal(row[19]) if len(row) > 19 else 0, 
+                            test_method_20=Decimal(row[20]) if len(row) > 20 else 0, 
+                            test_method_21=Decimal(row[21]) if len(row) > 21 else 0, 
+                            test_method_22=Decimal(row[22]) if len(row) > 22 else 0, 
+                            test_method_23=Decimal(row[23]) if len(row) > 23 else 0, 
+                            test_method_24=Decimal(row[24]) if len(row) > 24 else 0, 
+                            test_method_25=Decimal(row[25]) if len(row) > 25 else 0, 
+                            test_method_26=Decimal(row[26]) if len(row) > 26 else 0, 
+                            test_method_27=Decimal(row[27]) if len(row) > 27 else 0, 
+                            test_method_28=Decimal(row[28]) if len(row) > 28 else 0, 
+                            test_method_29=Decimal(row[29]) if len(row) > 29 else 0, 
+                            test_method_30=Decimal(row[30]) if len(row) > 30 else 0, 
+                            test_method_31=Decimal(row[31]) if len(row) > 31 else 0, 
+                            test_method_32=Decimal(row[32]) if len(row) > 32 else 0, 
+                            test_method_33=Decimal(row[33]) if len(row) > 33 else 0, 
+                            test_method_34=Decimal(row[34]) if len(row) > 34 else 0, 
+                            test_method_35=Decimal(row[35]) if len(row) > 35 else 0, 
+                            test_method_36=Decimal(row[36]) if len(row) > 36 else 0, 
+                            test_method_37=Decimal(row[37]) if len(row) > 37 else 0, 
+                            test_method_38=Decimal(row[38]) if len(row) > 38 else 0, 
+                            test_method_39=Decimal(row[39]) if len(row) > 39 else 0, 
+                            test_method_40=Decimal(row[40]) if len(row) > 40 else 0, 
+                            test_method_41=Decimal(row[41]) if len(row) > 41 else 0, 
+                            test_method_42=Decimal(row[42]) if len(row) > 42 else 0
+                        ))
+                    else:
+                        data_list.append(models.StrainData(
+                            date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), 
+                            test_method_1=Decimal(row[1]) if len(row) > 1 else 0, 
+                            test_method_2=Decimal(row[2]) if len(row) > 2 else 0, 
+                            test_method_3=Decimal(row[3]) if len(row) > 3 else 0, 
+                            test_method_4=Decimal(row[4]) if len(row) > 4 else 0, 
+                            test_method_5=Decimal(row[5]) if len(row) > 5 else 0, 
+                            test_method_6=Decimal(row[6]) if len(row) > 6 else 0, 
+                            test_method_7=Decimal(row[7]) if len(row) > 7 else 0, 
+                            test_method_8=Decimal(row[8]) if len(row) > 8 else 0, 
+                            test_method_9=Decimal(row[9]) if len(row) > 9 else 0, 
+                            test_method_10=Decimal(row[10]) if len(row) > 10 else 0, 
+                            test_method_11=Decimal(row[11]) if len(row) > 11 else 0, 
+                            test_method_12=Decimal(row[12]) if len(row) > 12 else 0, 
+                            test_method_13=Decimal(row[13]) if len(row) > 13 else 0, 
+                            test_method_14=Decimal(row[14]) if len(row) > 14 else 0, 
+                            test_method_15=Decimal(row[15]) if len(row) > 15 else 0, 
+                            test_method_16=Decimal(row[16]) if len(row) > 16 else 0, 
+                            test_method_17=Decimal(row[17]) if len(row) > 17 else 0, 
+                            test_method_18=Decimal(row[18]) if len(row) > 18 else 0, 
+                            test_method_19=Decimal(row[19]) if len(row) > 19 else 0, 
+                            test_method_20=Decimal(row[20]) if len(row) > 20 else 0, 
+                            test_method_21=Decimal(row[21]) if len(row) > 21 else 0, 
+                            test_method_22=Decimal(row[22]) if len(row) > 22 else 0, 
+                            test_method_23=Decimal(row[23]) if len(row) > 23 else 0, 
+                            test_method_24=Decimal(row[24]) if len(row) > 24 else 0, 
+                            test_method_25=Decimal(row[25]) if len(row) > 25 else 0, 
+                            test_method_26=Decimal(row[26]) if len(row) > 26 else 0, 
+                            test_method_27=Decimal(row[27]) if len(row) > 27 else 0, 
+                            test_method_28=Decimal(row[28]) if len(row) > 28 else 0, 
+                            test_method_29=Decimal(row[29]) if len(row) > 29 else 0, 
+                            test_method_30=Decimal(row[30]) if len(row) > 30 else 0, 
+                            test_method_31=Decimal(row[31]) if len(row) > 31 else 0, 
+                            test_method_32=Decimal(row[32]) if len(row) > 32 else 0, 
+                            test_method_33=Decimal(row[33]) if len(row) > 33 else 0, 
+                            test_method_34=Decimal(row[34]) if len(row) > 34 else 0, 
+                            test_method_35=Decimal(row[35]) if len(row) > 35 else 0, 
+                            test_method_36=Decimal(row[36]) if len(row) > 36 else 0, 
+                            test_method_37=Decimal(row[37]) if len(row) > 37 else 0, 
+                            test_method_38=Decimal(row[38]) if len(row) > 38 else 0, 
+                            test_method_39=Decimal(row[39]) if len(row) > 39 else 0, 
+                            test_method_40=Decimal(row[40]) if len(row) > 40 else 0, 
+                            test_method_41=Decimal(row[41]) if len(row) > 41 else 0, 
+                            test_method_42=Decimal(row[42]) if len(row) > 42 else 0
+                        ))
+                models.StrainData.objects.bulk_create(data_list)    
+                os.remove(settings.MEDIA_ROOT + file_name)
+        if 'tilt_required' in request.POST.keys():
+            models.TiltData.objects.all().delete()
+            if request.FILES.get('tilt', None):
+                file = request.FILES['tilt']
+                tmpname = str(datetime.now().microsecond) + os.path.splitext(str(file))[1]
+                fs = FileSystemStorage(settings.MEDIA_ROOT + "csv/", settings.MEDIA_ROOT + "/csv/")
+                fs.save(tmpname, file)
+                file_name = "csv/" + tmpname
+
+                wb = openpyxl.load_workbook(settings.MEDIA_ROOT + file_name, data_only=True)
+                ws = wb.active
+
+                # Extract and clean column names from the Excel file (assuming they are in the first row)
+                # column_names = [re.sub(r'[^a-zA-Z0-9_]', '_', str(cell.value)) for cell in ws[1]]
+                column_names = [str(cell.value) for cell in ws[1]]
+
+                # Removing Date Time Column
+                del column_names[0]
+
+                tilt_columns = get_constants('tilt')
+
+                for index, column in enumerate(column_names):
+                    tilt_columns[list(tilt_columns.keys())[index]] = column
+
+                f = open("templates/constants/tilt_columns.txt", "w+")
+                columns = json.dumps(tilt_columns)
+                f.write(columns)
+                f.close()
+
+                data_list = []
+
+                # Initialize a flag to skip the first row
+                skip_first_row = True
+
+                for row in ws.iter_rows(values_only=True):
+                    if skip_first_row:
+                        skip_first_row = False
+                        continue  # Skip the first row
+                    if not row[0]:
+                        break
+                    if len(data_list) > 1000:
+                        models.TiltData.objects.bulk_create(data_list)
+                        data_list = []
+                        data_list.append(models.TiltData(
+                            date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), 
+                            test_method_1=Decimal(row[1]) if len(row) > 1 else 0, 
+                            test_method_2=Decimal(row[2]) if len(row) > 2 else 0, 
+                            test_method_3=Decimal(row[3]) if len(row) > 3 else 0, 
+                            test_method_4=Decimal(row[4]) if len(row) > 4 else 0, 
+                            test_method_5=Decimal(row[5]) if len(row) > 5 else 0, 
+                            test_method_6=Decimal(row[6]) if len(row) > 6 else 0, 
+                            test_method_7=Decimal(row[7]) if len(row) > 7 else 0, 
+                            test_method_8=Decimal(row[8]) if len(row) > 8 else 0, 
+                            test_method_9=Decimal(row[9]) if len(row) > 9 else 0, 
+                            test_method_10=Decimal(row[10]) if len(row) > 10 else 0, 
+                            test_method_11=Decimal(row[11]) if len(row) > 11 else 0, 
+                            test_method_12=Decimal(row[12]) if len(row) > 12 else 0, 
+                            test_method_13=Decimal(row[13]) if len(row) > 13 else 0, 
+                            test_method_14=Decimal(row[14]) if len(row) > 14 else 0, 
+                            test_method_15=Decimal(row[15]) if len(row) > 15 else 0, 
+                            test_method_16=Decimal(row[16]) if len(row) > 16 else 0, 
+                            test_method_17=Decimal(row[17]) if len(row) > 17 else 0, 
+                            test_method_18=Decimal(row[18]) if len(row) > 18 else 0, 
+                            test_method_19=Decimal(row[19]) if len(row) > 19 else 0, 
+                            test_method_20=Decimal(row[20]) if len(row) > 20 else 0, 
+                            test_method_21=Decimal(row[21]) if len(row) > 21 else 0, 
+                            test_method_22=Decimal(row[22]) if len(row) > 22 else 0, 
+                            test_method_23=Decimal(row[23]) if len(row) > 23 else 0, 
+                            test_method_24=Decimal(row[24]) if len(row) > 24 else 0, 
+                            test_method_25=Decimal(row[25]) if len(row) > 25 else 0
+                        ))
+                    else:
+                        data_list.append(models.TiltData(
+                            date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), 
+                            test_method_1=Decimal(row[1]) if len(row) > 1 else 0, 
+                            test_method_2=Decimal(row[2]) if len(row) > 2 else 0, 
+                            test_method_3=Decimal(row[3]) if len(row) > 3 else 0, 
+                            test_method_4=Decimal(row[4]) if len(row) > 4 else 0, 
+                            test_method_5=Decimal(row[5]) if len(row) > 5 else 0, 
+                            test_method_6=Decimal(row[6]) if len(row) > 6 else 0, 
+                            test_method_7=Decimal(row[7]) if len(row) > 7 else 0, 
+                            test_method_8=Decimal(row[8]) if len(row) > 8 else 0, 
+                            test_method_9=Decimal(row[9]) if len(row) > 9 else 0, 
+                            test_method_10=Decimal(row[10]) if len(row) > 10 else 0, 
+                            test_method_11=Decimal(row[11]) if len(row) > 11 else 0, 
+                            test_method_12=Decimal(row[12]) if len(row) > 12 else 0, 
+                            test_method_13=Decimal(row[13]) if len(row) > 13 else 0, 
+                            test_method_14=Decimal(row[14]) if len(row) > 14 else 0, 
+                            test_method_15=Decimal(row[15]) if len(row) > 15 else 0, 
+                            test_method_16=Decimal(row[16]) if len(row) > 16 else 0, 
+                            test_method_17=Decimal(row[17]) if len(row) > 17 else 0, 
+                            test_method_18=Decimal(row[18]) if len(row) > 18 else 0, 
+                            test_method_19=Decimal(row[19]) if len(row) > 19 else 0, 
+                            test_method_20=Decimal(row[20]) if len(row) > 20 else 0, 
+                            test_method_21=Decimal(row[21]) if len(row) > 21 else 0, 
+                            test_method_22=Decimal(row[22]) if len(row) > 22 else 0, 
+                            test_method_23=Decimal(row[23]) if len(row) > 23 else 0, 
+                            test_method_24=Decimal(row[24]) if len(row) > 24 else 0, 
+                            test_method_25=Decimal(row[25]) if len(row) > 25 else 0
+                        ))
+                models.TiltData.objects.bulk_create(data_list)
+                os.remove(settings.MEDIA_ROOT + file_name)
+        if 'displacement_required' in request.POST.keys():
+            models.DisplacementData.objects.all().delete()
+            if request.FILES.get('displacement', None):
+                file = request.FILES['displacement']
+                tmpname = str(datetime.now().microsecond) + os.path.splitext(str(file))[1]
+                fs = FileSystemStorage(settings.MEDIA_ROOT + "csv/", settings.MEDIA_ROOT + "/csv/")
+                fs.save(tmpname, file)
+                file_name = "csv/" + tmpname
+
+                wb = openpyxl.load_workbook(settings.MEDIA_ROOT + file_name, data_only=True)
+                ws = wb.active
+
+                # Extract and clean column names from the Excel file (assuming they are in the first row)
+                # column_names = [re.sub(r'[^a-zA-Z0-9_]', '_', str(cell.value)) for cell in ws[1]]
+                column_names = [str(cell.value) for cell in ws[1]]
+
+                # Removing Date Time Column
+                del column_names[0]
+
+                displacement_columns = get_constants('displacement')
+
+                for index, column in enumerate(column_names):
+                    displacement_columns[list(displacement_columns.keys())[index]] = column
+
+                f = open("templates/constants/displacement_columns.txt", "w+")
+                columns = json.dumps(displacement_columns)
+                f.write(columns)
+                f.close()
+
+                data_list = []
+
+                # Initialize a flag to skip the first row
+                skip_first_row = True
+
+                for row in ws.iter_rows(values_only=True):
+                    if skip_first_row:
+                        skip_first_row = False
+                        continue  # Skip the first row
+                    if not row[0]:
+                        break
+                    if len(data_list) > 1000:
+                        models.DisplacementData.objects.bulk_create(data_list)
+                        data_list = []
+                        data_list.append(models.DisplacementData(
+                            date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), 
+                            test_method_1=Decimal(row[1]) if len(row) > 1 else 0, 
+                            test_method_2=Decimal(row[2]) if len(row) > 2 else 0, 
+                            test_method_3=Decimal(row[3]) if len(row) > 3 else 0, 
+                            test_method_4=Decimal(row[4]) if len(row) > 4 else 0, 
+                            test_method_5=Decimal(row[5]) if len(row) > 5 else 0, 
+                            test_method_6=Decimal(row[6]) if len(row) > 6 else 0, 
+                            test_method_7=Decimal(row[7]) if len(row) > 7 else 0, 
+                            test_method_8=Decimal(row[8]) if len(row) > 8 else 0, 
+                            test_method_9=Decimal(row[9]) if len(row) > 9 else 0, 
+                            test_method_10=Decimal(row[10]) if len(row) > 10 else 0, 
+                            test_method_11=Decimal(row[11]) if len(row) > 11 else 0, 
+                            test_method_12=Decimal(row[12]) if len(row) > 12 else 0, 
+                            test_method_13=Decimal(row[13]) if len(row) > 13 else 0, 
+                            test_method_14=Decimal(row[14]) if len(row) > 14 else 0, 
+                            test_method_15=Decimal(row[15]) if len(row) > 15 else 0, 
+                            test_method_16=Decimal(row[16]) if len(row) > 16 else 0, 
+                            test_method_17=Decimal(row[17]) if len(row) > 17 else 0, 
+                            test_method_18=Decimal(row[18]) if len(row) > 18 else 0, 
+                            test_method_19=Decimal(row[19]) if len(row) > 19 else 0, 
+                            test_method_20=Decimal(row[20]) if len(row) > 20 else 0, 
+                            test_method_21=Decimal(row[21]) if len(row) > 21 else 0, 
+                            test_method_22=Decimal(row[22]) if len(row) > 22 else 0, 
+                            test_method_23=Decimal(row[23]) if len(row) > 23 else 0, 
+                            test_method_24=Decimal(row[24]) if len(row) > 24 else 0, 
+                            test_method_25=Decimal(row[25]) if len(row) > 25 else 0
+                        ))
+                    else:
+                        data_list.append(models.DisplacementData(
+                            date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), 
+                            test_method_1=Decimal(row[1]) if len(row) > 1 else 0, 
+                            test_method_2=Decimal(row[2]) if len(row) > 2 else 0, 
+                            test_method_3=Decimal(row[3]) if len(row) > 3 else 0, 
+                            test_method_4=Decimal(row[4]) if len(row) > 4 else 0, 
+                            test_method_5=Decimal(row[5]) if len(row) > 5 else 0, 
+                            test_method_6=Decimal(row[6]) if len(row) > 6 else 0, 
+                            test_method_7=Decimal(row[7]) if len(row) > 7 else 0, 
+                            test_method_8=Decimal(row[8]) if len(row) > 8 else 0, 
+                            test_method_9=Decimal(row[9]) if len(row) > 9 else 0, 
+                            test_method_10=Decimal(row[10]) if len(row) > 10 else 0, 
+                            test_method_11=Decimal(row[11]) if len(row) > 11 else 0, 
+                            test_method_12=Decimal(row[12]) if len(row) > 12 else 0, 
+                            test_method_13=Decimal(row[13]) if len(row) > 13 else 0, 
+                            test_method_14=Decimal(row[14]) if len(row) > 14 else 0, 
+                            test_method_15=Decimal(row[15]) if len(row) > 15 else 0, 
+                            test_method_16=Decimal(row[16]) if len(row) > 16 else 0, 
+                            test_method_17=Decimal(row[17]) if len(row) > 17 else 0, 
+                            test_method_18=Decimal(row[18]) if len(row) > 18 else 0, 
+                            test_method_19=Decimal(row[19]) if len(row) > 19 else 0, 
+                            test_method_20=Decimal(row[20]) if len(row) > 20 else 0, 
+                            test_method_21=Decimal(row[21]) if len(row) > 21 else 0, 
+                            test_method_22=Decimal(row[22]) if len(row) > 22 else 0, 
+                            test_method_23=Decimal(row[23]) if len(row) > 23 else 0, 
+                            test_method_24=Decimal(row[24]) if len(row) > 24 else 0, 
+                            test_method_25=Decimal(row[25]) if len(row) > 25 else 0
+                        ))
+                models.DisplacementData.objects.bulk_create(data_list)
+                os.remove(settings.MEDIA_ROOT + file_name)
+        if 'settlement_required' in request.POST.keys():
+            models.SettlementData.objects.all().delete()
+            if request.FILES.get('settlement', None):
+                file = request.FILES['settlement']
+                tmpname = str(datetime.now().microsecond) + os.path.splitext(str(file))[1]
+                fs = FileSystemStorage(settings.MEDIA_ROOT + "csv/", settings.MEDIA_ROOT + "/csv/")
+                fs.save(tmpname, file)
+                file_name = "csv/" + tmpname
+
+                wb = openpyxl.load_workbook(settings.MEDIA_ROOT + file_name, data_only=True)
+                ws = wb.active
+
+                # Extract and clean column names from the Excel file (assuming they are in the first row)
+                # column_names = [re.sub(r'[^a-zA-Z0-9_]', '_', str(cell.value)) for cell in ws[1]]
+                column_names = [str(cell.value) for cell in ws[1]]
+
+                # Removing Date Time Column
+                del column_names[0]
+
+                settlement_columns = get_constants('settlement')
+
+                for index, column in enumerate(column_names):
+                    settlement_columns[list(settlement_columns.keys())[index]] = column
+
+                f = open("templates/constants/settlement_columns.txt", "w+")
+                columns = json.dumps(settlement_columns)
+                f.write(columns)
+                f.close()
+
+                data_list = []
+
+                # Initialize a flag to skip the first row
+                skip_first_row = True
+
+                for row in ws.iter_rows(values_only=True):
+                    if skip_first_row:
+                        skip_first_row = False
+                        continue  # Skip the first row
+                    if not row[0]:
+                        break
+                    if len(data_list) > 1000:
+                        models.SettlementData.objects.bulk_create(data_list)
+                        data_list = []
+                        data_list.append(models.SettlementData(
+                            date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), 
+                            test_method_1=Decimal(row[1]) if len(row) > 1 else 0, 
+                            test_method_2=Decimal(row[2]) if len(row) > 2 else 0, 
+                            test_method_3=Decimal(row[3]) if len(row) > 3 else 0, 
+                            test_method_4=Decimal(row[4]) if len(row) > 4 else 0, 
+                            test_method_5=Decimal(row[5]) if len(row) > 5 else 0, 
+                            test_method_6=Decimal(row[6]) if len(row) > 6 else 0, 
+                            test_method_7=Decimal(row[7]) if len(row) > 7 else 0, 
+                            test_method_8=Decimal(row[8]) if len(row) > 8 else 0, 
+                            test_method_9=Decimal(row[9]) if len(row) > 9 else 0, 
+                            test_method_10=Decimal(row[10]) if len(row) > 10 else 0, 
+                            test_method_11=Decimal(row[11]) if len(row) > 11 else 0, 
+                            test_method_12=Decimal(row[12]) if len(row) > 12 else 0, 
+                            test_method_13=Decimal(row[13]) if len(row) > 13 else 0, 
+                            test_method_14=Decimal(row[14]) if len(row) > 14 else 0, 
+                            test_method_15=Decimal(row[15]) if len(row) > 15 else 0, 
+                            test_method_16=Decimal(row[16]) if len(row) > 16 else 0, 
+                            test_method_17=Decimal(row[17]) if len(row) > 17 else 0, 
+                            test_method_18=Decimal(row[18]) if len(row) > 18 else 0, 
+                            test_method_19=Decimal(row[19]) if len(row) > 19 else 0, 
+                            test_method_20=Decimal(row[20]) if len(row) > 20 else 0, 
+                            test_method_21=Decimal(row[21]) if len(row) > 21 else 0, 
+                            test_method_22=Decimal(row[22]) if len(row) > 22 else 0, 
+                            test_method_23=Decimal(row[23]) if len(row) > 23 else 0, 
+                            test_method_24=Decimal(row[24]) if len(row) > 24 else 0, 
+                            test_method_25=Decimal(row[25]) if len(row) > 25 else 0
+                        ))
+                    else:
+                        data_list.append(models.SettlementData(
+                            date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), 
+                            test_method_1=Decimal(row[1]) if len(row) > 1 else 0, 
+                            test_method_2=Decimal(row[2]) if len(row) > 2 else 0, 
+                            test_method_3=Decimal(row[3]) if len(row) > 3 else 0, 
+                            test_method_4=Decimal(row[4]) if len(row) > 4 else 0, 
+                            test_method_5=Decimal(row[5]) if len(row) > 5 else 0, 
+                            test_method_6=Decimal(row[6]) if len(row) > 6 else 0, 
+                            test_method_7=Decimal(row[7]) if len(row) > 7 else 0, 
+                            test_method_8=Decimal(row[8]) if len(row) > 8 else 0, 
+                            test_method_9=Decimal(row[9]) if len(row) > 9 else 0, 
+                            test_method_10=Decimal(row[10]) if len(row) > 10 else 0, 
+                            test_method_11=Decimal(row[11]) if len(row) > 11 else 0, 
+                            test_method_12=Decimal(row[12]) if len(row) > 12 else 0, 
+                            test_method_13=Decimal(row[13]) if len(row) > 13 else 0, 
+                            test_method_14=Decimal(row[14]) if len(row) > 14 else 0, 
+                            test_method_15=Decimal(row[15]) if len(row) > 15 else 0, 
+                            test_method_16=Decimal(row[16]) if len(row) > 16 else 0, 
+                            test_method_17=Decimal(row[17]) if len(row) > 17 else 0, 
+                            test_method_18=Decimal(row[18]) if len(row) > 18 else 0, 
+                            test_method_19=Decimal(row[19]) if len(row) > 19 else 0, 
+                            test_method_20=Decimal(row[20]) if len(row) > 20 else 0, 
+                            test_method_21=Decimal(row[21]) if len(row) > 21 else 0, 
+                            test_method_22=Decimal(row[22]) if len(row) > 22 else 0, 
+                            test_method_23=Decimal(row[23]) if len(row) > 23 else 0, 
+                            test_method_24=Decimal(row[24]) if len(row) > 24 else 0, 
+                            test_method_25=Decimal(row[25]) if len(row) > 25 else 0
+                        ))
+                models.SettlementData.objects.bulk_create(data_list)
+                os.remove(settings.MEDIA_ROOT + file_name)
+        if 'vibration_required' in request.POST.keys():
+            models.VibrationData.objects.all().delete()
+            if request.FILES.get('vibration', None):
+                file = request.FILES['vibration']
+                tmpname = str(datetime.now().microsecond) + os.path.splitext(str(file))[1]
+                fs = FileSystemStorage(settings.MEDIA_ROOT + "csv/", settings.MEDIA_ROOT + "/csv/")
+                fs.save(tmpname, file)
+                file_name = "csv/" + tmpname
+
+                wb = openpyxl.load_workbook(settings.MEDIA_ROOT + file_name, data_only=True)
+                ws = wb.active
+
+                # Extract and clean column names from the Excel file (assuming they are in the first row)
+                # column_names = [re.sub(r'[^a-zA-Z0-9_]', '_', str(cell.value)) for cell in ws[1]]
+                column_names = [str(cell.value) for cell in ws[1]]
+
+                # Removing Date Time Column
+                del column_names[0]
+
+                vibration_columns = get_constants('vibration')
+
+                for index, column in enumerate(column_names):
+                    vibration_columns[list(vibration_columns.keys())[index]] = column
+
+                f = open("templates/constants/vibration_columns.txt", "w+")
+                columns = json.dumps(vibration_columns)
+                f.write(columns)
+                f.close()
+
+                data_list = []
+
+                # Initialize a flag to skip the first row
+                skip_first_row = True
+
+                for row in ws.iter_rows(values_only=True):
+                    if skip_first_row:
+                        skip_first_row = False
+                        continue  # Skip the first row
+                    if not row[0]:
+                        break
+                    if len(data_list) > 1000:
+                        models.VibrationData.objects.bulk_create(data_list)
+                        data_list = []
+                        data_list.append(models.VibrationData(
+                            date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), 
+                            test_method_1=Decimal(row[1]) if len(row) > 1 else 0, 
+                            test_method_2=Decimal(row[2]) if len(row) > 2 else 0, 
+                            test_method_3=Decimal(row[3]) if len(row) > 3 else 0, 
+                            test_method_4=Decimal(row[4]) if len(row) > 4 else 0, 
+                            test_method_5=Decimal(row[5]) if len(row) > 5 else 0, 
+                            test_method_6=Decimal(row[6]) if len(row) > 6 else 0, 
+                            test_method_7=Decimal(row[7]) if len(row) > 7 else 0, 
+                            test_method_8=Decimal(row[8]) if len(row) > 8 else 0, 
+                            test_method_9=Decimal(row[9]) if len(row) > 9 else 0, 
+                            test_method_10=Decimal(row[10]) if len(row) > 10 else 0, 
+                            test_method_11=Decimal(row[11]) if len(row) > 11 else 0, 
+                            test_method_12=Decimal(row[12]) if len(row) > 12 else 0, 
+                            test_method_13=Decimal(row[13]) if len(row) > 13 else 0, 
+                            test_method_14=Decimal(row[14]) if len(row) > 14 else 0, 
+                            test_method_15=Decimal(row[15]) if len(row) > 15 else 0, 
+                            test_method_16=Decimal(row[16]) if len(row) > 16 else 0, 
+                            test_method_17=Decimal(row[17]) if len(row) > 17 else 0, 
+                            test_method_18=Decimal(row[18]) if len(row) > 18 else 0, 
+                            test_method_19=Decimal(row[19]) if len(row) > 19 else 0, 
+                            test_method_20=Decimal(row[20]) if len(row) > 20 else 0, 
+                            test_method_21=Decimal(row[21]) if len(row) > 21 else 0, 
+                            test_method_22=Decimal(row[22]) if len(row) > 22 else 0, 
+                            test_method_23=Decimal(row[23]) if len(row) > 23 else 0, 
+                            test_method_24=Decimal(row[24]) if len(row) > 24 else 0, 
+                            test_method_25=Decimal(row[25]) if len(row) > 25 else 0
+                        ))
+                    else:
+                        data_list.append(models.VibrationData(
+                            date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), 
+                            test_method_1=Decimal(row[1]) if len(row) > 1 else 0, 
+                            test_method_2=Decimal(row[2]) if len(row) > 2 else 0, 
+                            test_method_3=Decimal(row[3]) if len(row) > 3 else 0, 
+                            test_method_4=Decimal(row[4]) if len(row) > 4 else 0, 
+                            test_method_5=Decimal(row[5]) if len(row) > 5 else 0, 
+                            test_method_6=Decimal(row[6]) if len(row) > 6 else 0, 
+                            test_method_7=Decimal(row[7]) if len(row) > 7 else 0, 
+                            test_method_8=Decimal(row[8]) if len(row) > 8 else 0, 
+                            test_method_9=Decimal(row[9]) if len(row) > 9 else 0, 
+                            test_method_10=Decimal(row[10]) if len(row) > 10 else 0, 
+                            test_method_11=Decimal(row[11]) if len(row) > 11 else 0, 
+                            test_method_12=Decimal(row[12]) if len(row) > 12 else 0, 
+                            test_method_13=Decimal(row[13]) if len(row) > 13 else 0, 
+                            test_method_14=Decimal(row[14]) if len(row) > 14 else 0, 
+                            test_method_15=Decimal(row[15]) if len(row) > 15 else 0, 
+                            test_method_16=Decimal(row[16]) if len(row) > 16 else 0, 
+                            test_method_17=Decimal(row[17]) if len(row) > 17 else 0, 
+                            test_method_18=Decimal(row[18]) if len(row) > 18 else 0, 
+                            test_method_19=Decimal(row[19]) if len(row) > 19 else 0, 
+                            test_method_20=Decimal(row[20]) if len(row) > 20 else 0, 
+                            test_method_21=Decimal(row[21]) if len(row) > 21 else 0, 
+                            test_method_22=Decimal(row[22]) if len(row) > 22 else 0, 
+                            test_method_23=Decimal(row[23]) if len(row) > 23 else 0, 
+                            test_method_24=Decimal(row[24]) if len(row) > 24 else 0, 
+                            test_method_25=Decimal(row[25]) if len(row) > 25 else 0
+                        ))
+                models.VibrationData.objects.bulk_create(data_list)
+                os.remove(settings.MEDIA_ROOT + file_name)
+        # Delete all messages by popping them from the list
+        try:
+            storage = get_messages(request)
+            for message in storage:
+                message = ''
+            storage.used = False
+        except:
+            pass
+        messages.success(request, 'Data Uploaded Successfully.')
+        return redirect('index')
+    return render(request, 'front/import.html', context)   
+
+
+def find_key_by_value(dictionary, value_to_find):
+    for key, value in dictionary.items():
+        if value == value_to_find:
+            return key
+    # If the value is not found, you can return None or raise an exception.
+    return None  # or raise ValueError("Value not found")
+
+
+def getChartData(request):
+    if request.method == "POST":
+        sensor_type = request.POST['sensor_type']
+        from_time = request.POST['from_time']
+        to_time = request.POST['to_time']
+        from_miliseconds = int(datetime.fromisoformat(from_time).timestamp() * 1000)
+        to_miliseconds = int(datetime.fromisoformat(to_time).timestamp() * 1000)
+        if from_miliseconds > to_miliseconds:
+            return JsonResponse({
+                'code': 503,
+                'status': "ERROR",
+                'message': "From time should not exceeds To time "
+            })
+        if sensor_type == 'strain':
+            data = models.StrainData.objects.filter(date_time__range=(from_time, to_time)).order_by('id')
+            series = []
+            sensor_counts = getSensorCounts(sensor_type)
+            sensor_names = get_constants(sensor_type)
+            columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+            dynamic_vars = {}
+            for index, element in enumerate(sensor_counts, start=1):
+                dynamic_vars[f"test_method_{index}"] = []
+            for row_data in data:
+                for method in dynamic_vars:
+                    dynamic_vars[method].append([int(datetime.fromisoformat(str(row_data.date_time)).timestamp() * 1000), float(getattr(row_data, method))])
+            for index, elem in enumerate(request.POST.getlist('method')):
+                series.append({'name': columns[elem], 'data': dynamic_vars[elem]})
+        if sensor_type == 'tilt':
+            data = models.TiltData.objects.filter(date_time__range=(from_time, to_time)).order_by('id')
+            series = []
+            sensor_counts = getSensorCounts(sensor_type)
+            sensor_names = get_constants(sensor_type)
+            columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+            dynamic_vars = {}
+            for index, element in enumerate(sensor_counts, start=1):
+                dynamic_vars[f"test_method_{index}"] = []
+            for row_data in data:
+                for method in dynamic_vars:
+                    dynamic_vars[method].append([int(datetime.fromisoformat(str(row_data.date_time)).timestamp() * 1000), float(getattr(row_data, method))])
+            for index, elem in enumerate(request.POST.getlist('method')):
+                series.append({'name': columns[elem], 'data': dynamic_vars[elem]})
+        if sensor_type == 'displacement':
+            data = models.DisplacementData.objects.filter(date_time__range=(from_time, to_time)).order_by('id')
+            series = []
+            sensor_counts = getSensorCounts(sensor_type)
+            sensor_names = get_constants(sensor_type)
+            columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+            dynamic_vars = {}
+            for index, element in enumerate(sensor_counts, start=1):
+                dynamic_vars[f"test_method_{index}"] = []
+            for row_data in data:
+                for method in dynamic_vars:
+                    dynamic_vars[method].append([int(datetime.fromisoformat(str(row_data.date_time)).timestamp() * 1000), float(getattr(row_data, method))])
+            for index, elem in enumerate(request.POST.getlist('method')):
+                series.append({'name': columns[elem], 'data': dynamic_vars[elem]})
+        if sensor_type == 'settlement':
+            data = models.SettlementData.objects.filter(date_time__range=(from_time, to_time)).order_by('id')
+            series = []
+            sensor_counts = getSensorCounts(sensor_type)
+            sensor_names = get_constants(sensor_type)
+            columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+            dynamic_vars = {}
+            for index, element in enumerate(sensor_counts, start=1):
+                dynamic_vars[f"test_method_{index}"] = []
+            for row_data in data:
+                for method in dynamic_vars:
+                    dynamic_vars[method].append([int(datetime.fromisoformat(str(row_data.date_time)).timestamp() * 1000), float(getattr(row_data, method))])
+            for index, elem in enumerate(request.POST.getlist('method')):
+                series.append({'name': columns[elem], 'data': dynamic_vars[elem]})
+        if sensor_type == 'vibration':
+            data = models.VibrationData.objects.filter(date_time__range=(from_time, to_time)).order_by('id')
+            series = []
+            sensor_counts = getSensorCounts(sensor_type)
+            sensor_names = get_constants(sensor_type)
+            columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+            dynamic_vars = {}
+            for index, element in enumerate(sensor_counts, start=1):
+                dynamic_vars[f"test_method_{index}"] = []
+            for row_data in data:
+                for method in dynamic_vars:
+                    dynamic_vars[method].append([int(datetime.fromisoformat(str(row_data.date_time)).timestamp() * 1000), float(getattr(row_data, method))])
+            for index, elem in enumerate(request.POST.getlist('method')):
+                series.append({'name': columns[elem], 'data': dynamic_vars[elem]})
         return JsonResponse({
             'code': 200,
             'status': "SUCCESS",
             'result': {'series': series},
         })
-    else:
-        return JsonResponse({
-            'code': 502,
-            'status': "ERROR",
-            'message': "There should be ajax method."
-        })
-    
-
-def getColumnCounts():
-    column_count = len(models.CsvData._meta.fields) - 5
-    first_row = models.CsvData.objects.get(pk=1)
-    column_counts = []
-    if first_row.method_1 == "":
-        column_count -= 1
-    elif first_row.method_2 == "":
-        column_count -= 1
-    elif first_row.method_3 == "":
-        column_count -= 1
-    elif first_row.method_4 == "":
-        column_count -= 1
-    elif first_row.method_5 == "":
-        column_count -= 1
-    elif first_row.method_6 == "":
-        column_count -= 1
-    elif first_row.method_7 == "":
-        column_count -= 1
-    elif first_row.method_8 == "":
-        column_count -= 1
-    elif first_row.method_9 == "":
-        column_count -= 1
-    elif first_row.method_10 == "":
-        column_count -= 1
-    for i in range(1, 11):
-        column_counts.append(i)
-    return column_counts
-
-
-def multipleLineChart(request):
-    total_hours = models.CsvData.objects.values('hour_slab').distinct().order_by('hour_slab')
-    if len(total_hours) == 0:
-        return redirect('importCsv')
-    min_hour = "{:02d}".format(total_hours[0]['hour_slab'])
-    max_hour = "{:02d}".format(total_hours[len(total_hours) - 1]['hour_slab'])
-    column_counts = getColumnCounts()
-    context.update({'total_hours': total_hours, 'min_hour': min_hour, 'max_hour': max_hour, 'column_counts': column_counts})
-    return render(request, 'front/multipleLineChart.html', context)
-
-
-def getMultipleLineChartData(request):
-    if request.method == "POST":
-        chart_type = request.POST['chart_type']
-        bar_chart_type = request.POST['bar_chart_type']
-        
-        if chart_type == 'line':
-            from_time = request.POST['from_time']
-            to_time = request.POST['to_time']
-            from_miliseconds = int(from_time.split(':')[0]) * 3600 * 1000 + int(from_time.split(':')[1]) * 60 * 1000
-            to_miliseconds = int(to_time.split(':')[0]) * 3600 * 1000 + int(to_time.split(':')[1]) * 60 * 1000
-
-            if from_miliseconds > to_miliseconds:
-                return JsonResponse({
-                    'code': 503,
-                    'status': "ERROR",
-                    'message': "From time should not exceeds To time "
-                })
-
-            # csv_data = models.CsvData.objects.filter(
-            #     hour_slab__gte=request.POST['from_time'], hour_slab__lte=request.POST['to_time']).order_by('id')
-            csv_data = models.CsvData.objects.filter(calculated_miliseconds__gte=from_miliseconds, calculated_miliseconds__lte=to_miliseconds).order_by('id')
-            # categories = []
-            series = []
-            column_counts = getColumnCounts()
-            dynamic_vars = {}
-            for index, element in enumerate(column_counts, start=1):
-                dynamic_vars[f"method_{index}"] = []
-            for row_data in csv_data:
-                # categories.append(millisToMinutesAndSeconds(row_data.calculated_miliseconds))
-                for method in dynamic_vars:
-                    dynamic_vars[method].append([row_data.calculated_miliseconds, float(getattr(row_data, method))])
-            if '1' in request.POST.getlist('method'):
-                series.append({'name': 'Sensor 1', 'data': dynamic_vars['method_1']})
-            if '2' in request.POST.getlist('method'):
-                series.append({'name': 'Sensor 2', 'data': dynamic_vars['method_2']})
-            if '3' in request.POST.getlist('method'):
-                series.append({'name': 'Sensor 3', 'data': dynamic_vars['method_3']})
-            if '4' in request.POST.getlist('method'):
-                series.append({'name': 'Sensor 4', 'data': dynamic_vars['method_4']})
-            if '5' in request.POST.getlist('method'):
-                series.append({'name': 'Sensor 5', 'data': dynamic_vars['method_5']})
-            if '6' in request.POST.getlist('method'):
-                series.append({'name': 'Sensor 6', 'data': dynamic_vars['method_6']})
-            if '7' in request.POST.getlist('method'):
-                series.append({'name': 'Sensor 7', 'data': dynamic_vars['method_7']})
-            if '8' in request.POST.getlist('method'):
-                series.append({'name': 'Sensor 8', 'data': dynamic_vars['method_8']})
-            if '9' in request.POST.getlist('method'):
-                series.append({'name': 'Sensor 9', 'data': dynamic_vars['method_9']})
-            if '10' in request.POST.getlist('method'):
-                series.append({'name': 'Sensor 10', 'data': dynamic_vars['method_10']})
-            return JsonResponse({
-                'code': 200,
-                'status': "SUCCESS",
-                'result': {'series': series, 'chart_type': chart_type},
-            })
-        elif chart_type == 'bar':
-            from_time = request.POST['bar_from_time']
-            to_time = request.POST['bar_to_time']
-            from_miliseconds = int(from_time) * 3600 * 1000
-            to_miliseconds = int(to_time) * 3600 * 1000
-            # from_miliseconds = int(from_time.split(':')[0]) * 3600 * 1000 + int(from_time.split(':')[1]) * 60 * 1000
-            # to_miliseconds = (int(to_time.split(':')[0]) + 1) * 3600 * 1000 + int(to_time.split(':')[1]) * 60 * 1000
-            if from_miliseconds > to_miliseconds:
-                return JsonResponse({
-                    'code': 504,
-                    'status': "ERROR",
-                    'message': "From time should not exceeds To time "
-                })
-            if bar_chart_type == 'max':
-                # csv_data = models.CsvData.objects.filter(calculated_miliseconds__gte=from_miliseconds, calculated_miliseconds__lte=to_miliseconds).values('hour_slab').annotate(val_method_1=Max('method_1'), val_method_2=Max('method_2'), val_method_3=Max('method_3'), val_method_4=Max('method_4'), val_method_5=Max('method_5'), val_method_6=Max('method_6'), val_method_7=Max('method_7'), val_method_8=Max('method_8'), val_method_9=Max('method_9'), val_method_10=Max('method_10')).order_by('id')
-                csv_data = models.CsvData.objects.values('hour_slab').filter(calculated_miliseconds__gte=from_miliseconds, calculated_miliseconds__lte=to_miliseconds).annotate(
-                    val_method_1=Max('method_1'),
-                    val_method_2=Max('method_2'),
-                    val_method_3=Max('method_3'),
-                    val_method_4=Max('method_4'),
-                    val_method_5=Max('method_5'),
-                    val_method_6=Max('method_6'),
-                    val_method_7=Max('method_7'),
-                    val_method_8=Max('method_8'),
-                    val_method_9=Max('method_9'),
-                    val_method_10=Max('method_10')
-                )
-                aggregated_data = defaultdict(float)
-                for item in csv_data:
-                    aggregated_data[item['hour_slab']] = [item['val_method_1'], item['val_method_2'], item['val_method_3'], item['val_method_4'], item['val_method_5'], item['val_method_6'], item['val_method_7'], item['val_method_8'], item['val_method_9'], item['val_method_10']]
-                categories = []
-                series = []
-
-                column_counts = getColumnCounts()
-                dynamic_vars = {}
-                for index, element in enumerate(column_counts, start=1):
-                    dynamic_vars[f"Sensor {index}"] = {}
-                for method in dynamic_vars:
-                    dynamic_vars[method]['name'] = method
-                    dynamic_vars[method]['data'] = []
-                for hour_slab, average_data in aggregated_data.items():
-                    if int(from_time) <= hour_slab or int(to_time) >= hour_slab:
-                        categories.append("Hour " + str(hour_slab))
-                        dynamic_vars["Sensor 1"]["data"].append(float(round(average_data[0], 2)))
-                        dynamic_vars["Sensor 2"]["data"].append(float(round(average_data[1], 2)))
-                        dynamic_vars["Sensor 3"]["data"].append(float(round(average_data[2], 2)))
-                        dynamic_vars["Sensor 4"]["data"].append(float(round(average_data[3], 2)))
-                        dynamic_vars["Sensor 5"]["data"].append(float(round(average_data[4], 2)))
-                        dynamic_vars["Sensor 6"]["data"].append(float(round(average_data[5], 2)))
-                        dynamic_vars["Sensor 7"]["data"].append(float(round(average_data[6], 2)))
-                        dynamic_vars["Sensor 8"]["data"].append(float(round(average_data[7], 2)))
-                        dynamic_vars["Sensor 9"]["data"].append(float(round(average_data[8], 2)))
-                        dynamic_vars["Sensor 10"]["data"].append(float(round(average_data[9], 2)))
-                if '1' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['Sensor 1'])
-                if '2' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['Sensor 2'])
-                if '3' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['Sensor 3'])
-                if '4' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['Sensor 4'])
-                if '5' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['Sensor 5'])
-                if '6' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['Sensor 6'])
-                if '7' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['Sensor 7'])
-                if '8' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['Sensor 8'])
-                if '9' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['Sensor 9'])
-                if '10' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['Sensor 10'])
-            if bar_chart_type == 'min':
-                csv_data = models.CsvData.objects.values('hour_slab').filter(calculated_miliseconds__gte=from_miliseconds, calculated_miliseconds__lte=to_miliseconds).annotate(
-                    val_method_1=Min('method_1'),
-                    val_method_2=Min('method_2'),
-                    val_method_3=Min('method_3'),
-                    val_method_4=Min('method_4'),
-                    val_method_5=Min('method_5'),
-                    val_method_6=Min('method_6'),
-                    val_method_7=Min('method_7'),
-                    val_method_8=Min('method_8'),
-                    val_method_9=Min('method_9'),
-                    val_method_10=Min('method_10')
-                )
-                aggregated_data = defaultdict(float)
-
-                for item in csv_data:
-                    aggregated_data[item['hour_slab']] = [item['val_method_1'], item['val_method_2'], item['val_method_3'], item['val_method_4'], item['val_method_5'], item['val_method_6'], item['val_method_7'], item['val_method_8'], item['val_method_9'], item['val_method_10']]
-                categories = []
-                series = []
-
-                column_counts = getColumnCounts()
-                dynamic_vars = {}
-                for index, element in enumerate(column_counts, start=1):
-                    dynamic_vars[f"Sensor {index}"] = {}
-                for method in dynamic_vars:
-                    dynamic_vars[method]['name'] = method
-                    dynamic_vars[method]['data'] = []
-                for hour_slab, average_data in aggregated_data.items():
-                    if int(from_time) <= hour_slab or int(to_time) >= hour_slab:
-                        categories.append("Hour " + str(hour_slab))
-                        dynamic_vars["Sensor 1"]["data"].append(float(round(average_data[0], 2)))
-                        dynamic_vars["Sensor 2"]["data"].append(float(round(average_data[1], 2)))
-                        dynamic_vars["Sensor 3"]["data"].append(float(round(average_data[2], 2)))
-                        dynamic_vars["Sensor 4"]["data"].append(float(round(average_data[3], 2)))
-                        dynamic_vars["Sensor 5"]["data"].append(float(round(average_data[4], 2)))
-                        dynamic_vars["Sensor 6"]["data"].append(float(round(average_data[5], 2)))
-                        dynamic_vars["Sensor 7"]["data"].append(float(round(average_data[6], 2)))
-                        dynamic_vars["Sensor 8"]["data"].append(float(round(average_data[7], 2)))
-                        dynamic_vars["Sensor 9"]["data"].append(float(round(average_data[8], 2)))
-                        dynamic_vars["Sensor 10"]["data"].append(float(round(average_data[9], 2)))
-                if '1' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['Sensor 1'])
-                if '2' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['Sensor 2'])
-                if '3' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['Sensor 3'])
-                if '4' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['Sensor 4'])
-                if '5' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['Sensor 5'])
-                if '6' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['Sensor 6'])
-                if '7' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['Sensor 7'])
-                if '8' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['Sensor 8'])
-                if '9' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['Sensor 9'])
-                if '10' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['Sensor 10'])
-            if bar_chart_type == 'avg':
-                csv_data = models.CsvData.objects.values('hour_slab').filter(calculated_miliseconds__gte=from_miliseconds, calculated_miliseconds__lte=to_miliseconds).annotate(
-                    val_method_1=Avg('method_1'),
-                    val_method_2=Avg('method_2'),
-                    val_method_3=Avg('method_3'),
-                    val_method_4=Avg('method_4'),
-                    val_method_5=Avg('method_5'),
-                    val_method_6=Avg('method_6'),
-                    val_method_7=Avg('method_7'),
-                    val_method_8=Avg('method_8'),
-                    val_method_9=Avg('method_9'),
-                    val_method_10=Avg('method_10')
-                )
-                aggregated_data = defaultdict(float)
-
-                for item in csv_data:
-                    aggregated_data[item['hour_slab']] = [item['val_method_1'], item['val_method_2'], item['val_method_3'], item['val_method_4'], item['val_method_5'], item['val_method_6'], item['val_method_7'], item['val_method_8'], item['val_method_9'], item['val_method_10']]
-                categories = []
-                series = []
-
-                column_counts = getColumnCounts()
-                dynamic_vars = {}
-                for index, element in enumerate(column_counts, start=1):
-                    dynamic_vars[f"Sensor {index}"] = {}
-                for method in dynamic_vars:
-                    dynamic_vars[method]['name'] = method
-                    dynamic_vars[method]['data'] = []
-                for hour_slab, average_data in aggregated_data.items():
-                    if int(from_time) <= hour_slab or int(to_time) >= hour_slab:
-                        categories.append("Hour " + str(hour_slab))
-                        dynamic_vars["Sensor 1"]["data"].append(float(round(average_data[0], 2)))
-                        dynamic_vars["Sensor 2"]["data"].append(float(round(average_data[1], 2)))
-                        dynamic_vars["Sensor 3"]["data"].append(float(round(average_data[2], 2)))
-                        dynamic_vars["Sensor 4"]["data"].append(float(round(average_data[3], 2)))
-                        dynamic_vars["Sensor 5"]["data"].append(float(round(average_data[4], 2)))
-                        dynamic_vars["Sensor 6"]["data"].append(float(round(average_data[5], 2)))
-                        dynamic_vars["Sensor 7"]["data"].append(float(round(average_data[6], 2)))
-                        dynamic_vars["Sensor 8"]["data"].append(float(round(average_data[7], 2)))
-                        dynamic_vars["Sensor 9"]["data"].append(float(round(average_data[8], 2)))
-                        dynamic_vars["Sensor 10"]["data"].append(float(round(average_data[9], 2)))
-                if '1' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['Sensor 1'])
-                if '2' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['Sensor 2'])
-                if '3' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['Sensor 3'])
-                if '4' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['Sensor 4'])
-                if '5' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['Sensor 5'])
-                if '6' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['Sensor 6'])
-                if '7' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['Sensor 7'])
-                if '8' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['Sensor 8'])
-                if '9' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['Sensor 9'])
-                if '10' in request.POST.getlist('method'):
-                    series.append(dynamic_vars['Sensor 10'])
-            return JsonResponse({
-                'code': 200,
-                'status': "SUCCESS",
-                'result': {'series': series, 'categories': categories, 'chart_type': chart_type},
-            })
     else:
         return JsonResponse({
             'code': 502,

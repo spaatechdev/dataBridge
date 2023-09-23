@@ -1,37 +1,203 @@
 from django.db import models
 
 # Create your models here.
-class CsvData(models.Model):
-    time = models.CharField(max_length=100, blank=True, null=True)
-    method_1 = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    method_2 = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    method_3 = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    method_4 = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    method_5 = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    method_6 = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    method_7 = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    method_8 = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    method_9 = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    method_10 = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    calculated_miliseconds = models.BigIntegerField(blank=True, null=True)
-    calculated_time = models.TimeField(blank=True, null=True)
-    hour_slab = models.IntegerField(blank=True, null=True)
+class StrainData(models.Model):
+    date_time = models.DateTimeField(blank=True, null=True)
+    test_method_1 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_2 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_3 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_4 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_5 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_6 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_7 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_8 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_9 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_10 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_11 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_12 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_13 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_14 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_15 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_16 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_17 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_18 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_19 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_20 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_21 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_22 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_23 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_24 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_25 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_26 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_27 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_28 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_29 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_30 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_31 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_32 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_33 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_34 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_35 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_36 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_37 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_38 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_39 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_40 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_41 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_42 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
 
     def __str__(self):
-        return self.time
+        return self.date_time
 
     class Meta:
         managed = True
-        db_table = 'csv_data'
-        verbose_name_plural = 'csv_data'
+        db_table = 'strain_data'
+        verbose_name_plural = 'strain_data'
 
-# # Create your models here.
-# class Test(models.Model):
 
-#     def __str__(self):
-#         return self.id
+class TiltData(models.Model):
+    date_time = models.DateTimeField(blank=True, null=True)
+    test_method_1 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_2 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_3 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_4 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_5 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_6 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_7 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_8 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_9 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_10 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_11 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_12 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_13 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_14 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_15 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_16 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_17 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_18 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_19 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_20 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_21 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_22 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_23 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_24 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_25 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
 
-#     class Meta:
-#         managed = True
-#         db_table = 'test'
-#         verbose_name_plural = 'test'
+    def __str__(self):
+        return self.date_time
+
+    class Meta:
+        managed = True
+        db_table = 'tilt_data'
+        verbose_name_plural = 'tilt_data'
+
+
+class DisplacementData(models.Model):
+    date_time = models.DateTimeField(blank=True, null=True)
+    test_method_1 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_2 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_3 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_4 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_5 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_6 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_7 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_8 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_9 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_10 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_11 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_12 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_13 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_14 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_15 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_16 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_17 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_18 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_19 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_20 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_21 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_22 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_23 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_24 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_25 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+
+    def __str__(self):
+        return self.date_time
+
+    class Meta:
+        managed = True
+        db_table = 'displacement_data'
+        verbose_name_plural = 'displacement_data'
+
+
+class SettlementData(models.Model):
+    date_time = models.DateTimeField(blank=True, null=True)
+    test_method_1 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_2 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_3 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_4 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_5 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_6 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_7 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_8 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_9 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_10 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_11 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_12 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_13 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_14 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_15 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_16 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_17 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_18 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_19 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_20 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_21 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_22 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_23 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_24 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_25 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+
+    def __str__(self):
+        return self.date_time
+
+    class Meta:
+        managed = True
+        db_table = 'settlement_data'
+        verbose_name_plural = 'settlement_data'
+
+
+class VibrationData(models.Model):
+    date_time = models.DateTimeField(blank=True, null=True)
+    test_method_1 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_2 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_3 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_4 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_5 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_6 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_7 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_8 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_9 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_10 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_11 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_12 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_13 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_14 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_15 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_16 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_17 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_18 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_19 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_20 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_21 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_22 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_23 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_24 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+    test_method_25 = models.DecimalField(max_digits=10, decimal_places=5, default=0)
+
+    def __str__(self):
+        return self.date_time
+
+    class Meta:
+        managed = True
+        db_table = 'vibration_data'
+        verbose_name_plural = 'vibration_data'
