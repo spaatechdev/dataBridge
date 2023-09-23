@@ -293,7 +293,7 @@ def importCsv(request):
                 f.write(columns)
                 f.close()
 
-                # data_list = []
+                data_list = []
 
                 # Initialize a flag to skip the first row
                 skip_first_row = True
@@ -304,146 +304,101 @@ def importCsv(request):
                         continue  # Skip the first row
                     if not row[0]:
                         break
-                    data = models.StrainData()
-                    data.date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), 
-                    data.test_method_1=Decimal(row[1]) if len(row) > 1 else None, 
-                    data.test_method_2=Decimal(row[2]) if len(row) > 2 else None, 
-                    data.test_method_3=Decimal(row[3]) if len(row) > 3 else None, 
-                    data.test_method_4=Decimal(row[4]) if len(row) > 4 else None, 
-                    data.test_method_5=Decimal(row[5]) if len(row) > 5 else None, 
-                    data.test_method_6=Decimal(row[6]) if len(row) > 6 else None, 
-                    data.test_method_7=Decimal(row[7]) if len(row) > 7 else None, 
-                    data.test_method_8=Decimal(row[8]) if len(row) > 8 else None, 
-                    data.test_method_9=Decimal(row[9]) if len(row) > 9 else None, 
-                    data.test_method_10=Decimal(row[10]) if len(row) > 10 else None, 
-                    data.test_method_11=Decimal(row[11]) if len(row) > 11 else None, 
-                    data.test_method_12=Decimal(row[12]) if len(row) > 12 else None, 
-                    data.test_method_13=Decimal(row[13]) if len(row) > 13 else None, 
-                    data.test_method_14=Decimal(row[14]) if len(row) > 14 else None, 
-                    data.test_method_15=Decimal(row[15]) if len(row) > 15 else None, 
-                    data.test_method_16=Decimal(row[16]) if len(row) > 16 else None, 
-                    data.test_method_17=Decimal(row[17]) if len(row) > 17 else None, 
-                    data.test_method_18=Decimal(row[18]) if len(row) > 18 else None, 
-                    data.test_method_19=Decimal(row[19]) if len(row) > 19 else None, 
-                    data.test_method_20=Decimal(row[20]) if len(row) > 20 else None, 
-                    data.test_method_21=Decimal(row[21]) if len(row) > 21 else None, 
-                    data.test_method_22=Decimal(row[22]) if len(row) > 22 else None, 
-                    data.test_method_23=Decimal(row[23]) if len(row) > 23 else None, 
-                    data.test_method_24=Decimal(row[24]) if len(row) > 24 else None, 
-                    data.test_method_25=Decimal(row[25]) if len(row) > 25 else None, 
-                    data.test_method_26=Decimal(row[26]) if len(row) > 26 else None, 
-                    data.test_method_27=Decimal(row[27]) if len(row) > 27 else None, 
-                    data.test_method_28=Decimal(row[28]) if len(row) > 28 else None, 
-                    data.test_method_29=Decimal(row[29]) if len(row) > 29 else None, 
-                    data.test_method_30=Decimal(row[30]) if len(row) > 30 else None, 
-                    data.test_method_31=Decimal(row[31]) if len(row) > 31 else None, 
-                    data.test_method_32=Decimal(row[32]) if len(row) > 32 else None, 
-                    data.test_method_33=Decimal(row[33]) if len(row) > 33 else None, 
-                    data.test_method_34=Decimal(row[34]) if len(row) > 34 else None, 
-                    data.test_method_35=Decimal(row[35]) if len(row) > 35 else None, 
-                    data.test_method_36=Decimal(row[36]) if len(row) > 36 else None, 
-                    data.test_method_37=Decimal(row[37]) if len(row) > 37 else None, 
-                    data.test_method_38=Decimal(row[38]) if len(row) > 38 else None, 
-                    data.test_method_39=Decimal(row[39]) if len(row) > 39 else None, 
-                    data.test_method_40=Decimal(row[40]) if len(row) > 40 else None, 
-                    data.test_method_41=Decimal(row[41]) if len(row) > 41 else None, 
-                    data.test_method_42=Decimal(row[42]) if len(row) > 42 else None
-                    data.save()
-                #     if len(data_list) > 1000:
-                #         models.StrainData.objects.bulk_create(data_list)
-                #         data_list = []
-                #         data_list.append(models.StrainData(
-                #             date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), 
-                #             test_method_1=Decimal(row[1]) if len(row) > 1 else None, 
-                #             test_method_2=Decimal(row[2]) if len(row) > 2 else None, 
-                #             test_method_3=Decimal(row[3]) if len(row) > 3 else None, 
-                #             test_method_4=Decimal(row[4]) if len(row) > 4 else None, 
-                #             test_method_5=Decimal(row[5]) if len(row) > 5 else None, 
-                #             test_method_6=Decimal(row[6]) if len(row) > 6 else None, 
-                #             test_method_7=Decimal(row[7]) if len(row) > 7 else None, 
-                #             test_method_8=Decimal(row[8]) if len(row) > 8 else None, 
-                #             test_method_9=Decimal(row[9]) if len(row) > 9 else None, 
-                #             test_method_10=Decimal(row[10]) if len(row) > 10 else None, 
-                #             test_method_11=Decimal(row[11]) if len(row) > 11 else None, 
-                #             test_method_12=Decimal(row[12]) if len(row) > 12 else None, 
-                #             test_method_13=Decimal(row[13]) if len(row) > 13 else None, 
-                #             test_method_14=Decimal(row[14]) if len(row) > 14 else None, 
-                #             test_method_15=Decimal(row[15]) if len(row) > 15 else None, 
-                #             test_method_16=Decimal(row[16]) if len(row) > 16 else None, 
-                #             test_method_17=Decimal(row[17]) if len(row) > 17 else None, 
-                #             test_method_18=Decimal(row[18]) if len(row) > 18 else None, 
-                #             test_method_19=Decimal(row[19]) if len(row) > 19 else None, 
-                #             test_method_20=Decimal(row[20]) if len(row) > 20 else None, 
-                #             test_method_21=Decimal(row[21]) if len(row) > 21 else None, 
-                #             test_method_22=Decimal(row[22]) if len(row) > 22 else None, 
-                #             test_method_23=Decimal(row[23]) if len(row) > 23 else None, 
-                #             test_method_24=Decimal(row[24]) if len(row) > 24 else None, 
-                #             test_method_25=Decimal(row[25]) if len(row) > 25 else None, 
-                #             test_method_26=Decimal(row[26]) if len(row) > 26 else None, 
-                #             test_method_27=Decimal(row[27]) if len(row) > 27 else None, 
-                #             test_method_28=Decimal(row[28]) if len(row) > 28 else None, 
-                #             test_method_29=Decimal(row[29]) if len(row) > 29 else None, 
-                #             test_method_30=Decimal(row[30]) if len(row) > 30 else None, 
-                #             test_method_31=Decimal(row[31]) if len(row) > 31 else None, 
-                #             test_method_32=Decimal(row[32]) if len(row) > 32 else None, 
-                #             test_method_33=Decimal(row[33]) if len(row) > 33 else None, 
-                #             test_method_34=Decimal(row[34]) if len(row) > 34 else None, 
-                #             test_method_35=Decimal(row[35]) if len(row) > 35 else None, 
-                #             test_method_36=Decimal(row[36]) if len(row) > 36 else None, 
-                #             test_method_37=Decimal(row[37]) if len(row) > 37 else None, 
-                #             test_method_38=Decimal(row[38]) if len(row) > 38 else None, 
-                #             test_method_39=Decimal(row[39]) if len(row) > 39 else None, 
-                #             test_method_40=Decimal(row[40]) if len(row) > 40 else None, 
-                #             test_method_41=Decimal(row[41]) if len(row) > 41 else None, 
-                #             test_method_42=Decimal(row[42]) if len(row) > 42 else None
-                #         ))
-                #     else:
-                #         data_list.append(models.StrainData(
-                #             date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), 
-                #             test_method_1=Decimal(row[1]) if len(row) > 1 else None, 
-                #             test_method_2=Decimal(row[2]) if len(row) > 2 else None, 
-                #             test_method_3=Decimal(row[3]) if len(row) > 3 else None, 
-                #             test_method_4=Decimal(row[4]) if len(row) > 4 else None, 
-                #             test_method_5=Decimal(row[5]) if len(row) > 5 else None, 
-                #             test_method_6=Decimal(row[6]) if len(row) > 6 else None, 
-                #             test_method_7=Decimal(row[7]) if len(row) > 7 else None, 
-                #             test_method_8=Decimal(row[8]) if len(row) > 8 else None, 
-                #             test_method_9=Decimal(row[9]) if len(row) > 9 else None, 
-                #             test_method_10=Decimal(row[10]) if len(row) > 10 else None, 
-                #             test_method_11=Decimal(row[11]) if len(row) > 11 else None, 
-                #             test_method_12=Decimal(row[12]) if len(row) > 12 else None, 
-                #             test_method_13=Decimal(row[13]) if len(row) > 13 else None, 
-                #             test_method_14=Decimal(row[14]) if len(row) > 14 else None, 
-                #             test_method_15=Decimal(row[15]) if len(row) > 15 else None, 
-                #             test_method_16=Decimal(row[16]) if len(row) > 16 else None, 
-                #             test_method_17=Decimal(row[17]) if len(row) > 17 else None, 
-                #             test_method_18=Decimal(row[18]) if len(row) > 18 else None, 
-                #             test_method_19=Decimal(row[19]) if len(row) > 19 else None, 
-                #             test_method_20=Decimal(row[20]) if len(row) > 20 else None, 
-                #             test_method_21=Decimal(row[21]) if len(row) > 21 else None, 
-                #             test_method_22=Decimal(row[22]) if len(row) > 22 else None, 
-                #             test_method_23=Decimal(row[23]) if len(row) > 23 else None, 
-                #             test_method_24=Decimal(row[24]) if len(row) > 24 else None, 
-                #             test_method_25=Decimal(row[25]) if len(row) > 25 else None, 
-                #             test_method_26=Decimal(row[26]) if len(row) > 26 else None, 
-                #             test_method_27=Decimal(row[27]) if len(row) > 27 else None, 
-                #             test_method_28=Decimal(row[28]) if len(row) > 28 else None, 
-                #             test_method_29=Decimal(row[29]) if len(row) > 29 else None, 
-                #             test_method_30=Decimal(row[30]) if len(row) > 30 else None, 
-                #             test_method_31=Decimal(row[31]) if len(row) > 31 else None, 
-                #             test_method_32=Decimal(row[32]) if len(row) > 32 else None, 
-                #             test_method_33=Decimal(row[33]) if len(row) > 33 else None, 
-                #             test_method_34=Decimal(row[34]) if len(row) > 34 else None, 
-                #             test_method_35=Decimal(row[35]) if len(row) > 35 else None, 
-                #             test_method_36=Decimal(row[36]) if len(row) > 36 else None, 
-                #             test_method_37=Decimal(row[37]) if len(row) > 37 else None, 
-                #             test_method_38=Decimal(row[38]) if len(row) > 38 else None, 
-                #             test_method_39=Decimal(row[39]) if len(row) > 39 else None, 
-                #             test_method_40=Decimal(row[40]) if len(row) > 40 else None, 
-                #             test_method_41=Decimal(row[41]) if len(row) > 41 else None, 
-                #             test_method_42=Decimal(row[42]) if len(row) > 42 else None
-                #         ))
-                # models.StrainData.objects.bulk_create(data_list)    
+                    if len(data_list) > 1000:
+                        models.StrainData.objects.bulk_create(data_list)
+                        data_list = []
+                        data_list.append(models.StrainData(
+                            date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), 
+                            test_method_1=Decimal(row[1]) if len(row) > 1 else "", 
+                            test_method_2=Decimal(row[2]) if len(row) > 2 else "", 
+                            test_method_3=Decimal(row[3]) if len(row) > 3 else "", 
+                            test_method_4=Decimal(row[4]) if len(row) > 4 else "", 
+                            test_method_5=Decimal(row[5]) if len(row) > 5 else "", 
+                            test_method_6=Decimal(row[6]) if len(row) > 6 else "", 
+                            test_method_7=Decimal(row[7]) if len(row) > 7 else "", 
+                            test_method_8=Decimal(row[8]) if len(row) > 8 else "", 
+                            test_method_9=Decimal(row[9]) if len(row) > 9 else "", 
+                            test_method_10=Decimal(row[10]) if len(row) > 10 else "", 
+                            test_method_11=Decimal(row[11]) if len(row) > 11 else "", 
+                            test_method_12=Decimal(row[12]) if len(row) > 12 else "", 
+                            test_method_13=Decimal(row[13]) if len(row) > 13 else "", 
+                            test_method_14=Decimal(row[14]) if len(row) > 14 else "", 
+                            test_method_15=Decimal(row[15]) if len(row) > 15 else "", 
+                            test_method_16=Decimal(row[16]) if len(row) > 16 else "", 
+                            test_method_17=Decimal(row[17]) if len(row) > 17 else "", 
+                            test_method_18=Decimal(row[18]) if len(row) > 18 else "", 
+                            test_method_19=Decimal(row[19]) if len(row) > 19 else "", 
+                            test_method_20=Decimal(row[20]) if len(row) > 20 else "", 
+                            test_method_21=Decimal(row[21]) if len(row) > 21 else "", 
+                            test_method_22=Decimal(row[22]) if len(row) > 22 else "", 
+                            test_method_23=Decimal(row[23]) if len(row) > 23 else "", 
+                            test_method_24=Decimal(row[24]) if len(row) > 24 else "", 
+                            test_method_25=Decimal(row[25]) if len(row) > 25 else "", 
+                            test_method_26=Decimal(row[26]) if len(row) > 26 else "", 
+                            test_method_27=Decimal(row[27]) if len(row) > 27 else "", 
+                            test_method_28=Decimal(row[28]) if len(row) > 28 else "", 
+                            test_method_29=Decimal(row[29]) if len(row) > 29 else "", 
+                            test_method_30=Decimal(row[30]) if len(row) > 30 else "", 
+                            test_method_31=Decimal(row[31]) if len(row) > 31 else "", 
+                            test_method_32=Decimal(row[32]) if len(row) > 32 else "", 
+                            test_method_33=Decimal(row[33]) if len(row) > 33 else "", 
+                            test_method_34=Decimal(row[34]) if len(row) > 34 else "", 
+                            test_method_35=Decimal(row[35]) if len(row) > 35 else "", 
+                            test_method_36=Decimal(row[36]) if len(row) > 36 else "", 
+                            test_method_37=Decimal(row[37]) if len(row) > 37 else "", 
+                            test_method_38=Decimal(row[38]) if len(row) > 38 else "", 
+                            test_method_39=Decimal(row[39]) if len(row) > 39 else "", 
+                            test_method_40=Decimal(row[40]) if len(row) > 40 else "", 
+                            test_method_41=Decimal(row[41]) if len(row) > 41 else "", 
+                            test_method_42=Decimal(row[42]) if len(row) > 42 else ""
+                        ))
+                    else:
+                        data_list.append(models.StrainData(
+                            date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), 
+                            test_method_1=Decimal(row[1]) if len(row) > 1 else "", 
+                            test_method_2=Decimal(row[2]) if len(row) > 2 else "", 
+                            test_method_3=Decimal(row[3]) if len(row) > 3 else "", 
+                            test_method_4=Decimal(row[4]) if len(row) > 4 else "", 
+                            test_method_5=Decimal(row[5]) if len(row) > 5 else "", 
+                            test_method_6=Decimal(row[6]) if len(row) > 6 else "", 
+                            test_method_7=Decimal(row[7]) if len(row) > 7 else "", 
+                            test_method_8=Decimal(row[8]) if len(row) > 8 else "", 
+                            test_method_9=Decimal(row[9]) if len(row) > 9 else "", 
+                            test_method_10=Decimal(row[10]) if len(row) > 10 else "", 
+                            test_method_11=Decimal(row[11]) if len(row) > 11 else "", 
+                            test_method_12=Decimal(row[12]) if len(row) > 12 else "", 
+                            test_method_13=Decimal(row[13]) if len(row) > 13 else "", 
+                            test_method_14=Decimal(row[14]) if len(row) > 14 else "", 
+                            test_method_15=Decimal(row[15]) if len(row) > 15 else "", 
+                            test_method_16=Decimal(row[16]) if len(row) > 16 else "", 
+                            test_method_17=Decimal(row[17]) if len(row) > 17 else "", 
+                            test_method_18=Decimal(row[18]) if len(row) > 18 else "", 
+                            test_method_19=Decimal(row[19]) if len(row) > 19 else "", 
+                            test_method_20=Decimal(row[20]) if len(row) > 20 else "", 
+                            test_method_21=Decimal(row[21]) if len(row) > 21 else "", 
+                            test_method_22=Decimal(row[22]) if len(row) > 22 else "", 
+                            test_method_23=Decimal(row[23]) if len(row) > 23 else "", 
+                            test_method_24=Decimal(row[24]) if len(row) > 24 else "", 
+                            test_method_25=Decimal(row[25]) if len(row) > 25 else "", 
+                            test_method_26=Decimal(row[26]) if len(row) > 26 else "", 
+                            test_method_27=Decimal(row[27]) if len(row) > 27 else "", 
+                            test_method_28=Decimal(row[28]) if len(row) > 28 else "", 
+                            test_method_29=Decimal(row[29]) if len(row) > 29 else "", 
+                            test_method_30=Decimal(row[30]) if len(row) > 30 else "", 
+                            test_method_31=Decimal(row[31]) if len(row) > 31 else "", 
+                            test_method_32=Decimal(row[32]) if len(row) > 32 else "", 
+                            test_method_33=Decimal(row[33]) if len(row) > 33 else "", 
+                            test_method_34=Decimal(row[34]) if len(row) > 34 else "", 
+                            test_method_35=Decimal(row[35]) if len(row) > 35 else "", 
+                            test_method_36=Decimal(row[36]) if len(row) > 36 else "", 
+                            test_method_37=Decimal(row[37]) if len(row) > 37 else "", 
+                            test_method_38=Decimal(row[38]) if len(row) > 38 else "", 
+                            test_method_39=Decimal(row[39]) if len(row) > 39 else "", 
+                            test_method_40=Decimal(row[40]) if len(row) > 40 else "", 
+                            test_method_41=Decimal(row[41]) if len(row) > 41 else "", 
+                            test_method_42=Decimal(row[42]) if len(row) > 42 else ""
+                        ))
+                models.StrainData.objects.bulk_create(data_list)    
                 os.remove(settings.MEDIA_ROOT + file_name)
         if 'tilt_required' in request.POST.keys():
             models.TiltData.objects.all().delete()
@@ -474,7 +429,7 @@ def importCsv(request):
                 f.write(columns)
                 f.close()
 
-                # data_list = []
+                data_list = []
 
                 # Initialize a flag to skip the first row
                 skip_first_row = True
@@ -485,95 +440,67 @@ def importCsv(request):
                         continue  # Skip the first row
                     if not row[0]:
                         break
-                    models.TiltData.objects.create(
-                        date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), 
-                        test_method_1=Decimal(row[1]) if len(row) > 1 else None, 
-                        test_method_2=Decimal(row[2]) if len(row) > 2 else None, 
-                        test_method_3=Decimal(row[3]) if len(row) > 3 else None, 
-                        test_method_4=Decimal(row[4]) if len(row) > 4 else None, 
-                        test_method_5=Decimal(row[5]) if len(row) > 5 else None, 
-                        test_method_6=Decimal(row[6]) if len(row) > 6 else None, 
-                        test_method_7=Decimal(row[7]) if len(row) > 7 else None, 
-                        test_method_8=Decimal(row[8]) if len(row) > 8 else None, 
-                        test_method_9=Decimal(row[9]) if len(row) > 9 else None, 
-                        test_method_10=Decimal(row[10]) if len(row) > 10 else None, 
-                        test_method_11=Decimal(row[11]) if len(row) > 11 else None, 
-                        test_method_12=Decimal(row[12]) if len(row) > 12 else None, 
-                        test_method_13=Decimal(row[13]) if len(row) > 13 else None, 
-                        test_method_14=Decimal(row[14]) if len(row) > 14 else None, 
-                        test_method_15=Decimal(row[15]) if len(row) > 15 else None, 
-                        test_method_16=Decimal(row[16]) if len(row) > 16 else None, 
-                        test_method_17=Decimal(row[17]) if len(row) > 17 else None, 
-                        test_method_18=Decimal(row[18]) if len(row) > 18 else None, 
-                        test_method_19=Decimal(row[19]) if len(row) > 19 else None, 
-                        test_method_20=Decimal(row[20]) if len(row) > 20 else None, 
-                        test_method_21=Decimal(row[21]) if len(row) > 21 else None, 
-                        test_method_22=Decimal(row[22]) if len(row) > 22 else None, 
-                        test_method_23=Decimal(row[23]) if len(row) > 23 else None, 
-                        test_method_24=Decimal(row[24]) if len(row) > 24 else None, 
-                        test_method_25=Decimal(row[25]) if len(row) > 25 else None
-                    )
-                #     if len(data_list) > 1000:
-                #         models.TiltData.objects.bulk_create(data_list)
-                #         data_list = []
-                #         data_list.append(models.TiltData(
-                #             date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), 
-                #             test_method_1=Decimal(row[1]) if len(row) > 1 else None, 
-                #             test_method_2=Decimal(row[2]) if len(row) > 2 else None, 
-                #             test_method_3=Decimal(row[3]) if len(row) > 3 else None, 
-                #             test_method_4=Decimal(row[4]) if len(row) > 4 else None, 
-                #             test_method_5=Decimal(row[5]) if len(row) > 5 else None, 
-                #             test_method_6=Decimal(row[6]) if len(row) > 6 else None, 
-                #             test_method_7=Decimal(row[7]) if len(row) > 7 else None, 
-                #             test_method_8=Decimal(row[8]) if len(row) > 8 else None, 
-                #             test_method_9=Decimal(row[9]) if len(row) > 9 else None, 
-                #             test_method_10=Decimal(row[10]) if len(row) > 10 else None, 
-                #             test_method_11=Decimal(row[11]) if len(row) > 11 else None, 
-                #             test_method_12=Decimal(row[12]) if len(row) > 12 else None, 
-                #             test_method_13=Decimal(row[13]) if len(row) > 13 else None, 
-                #             test_method_14=Decimal(row[14]) if len(row) > 14 else None, 
-                #             test_method_15=Decimal(row[15]) if len(row) > 15 else None, 
-                #             test_method_16=Decimal(row[16]) if len(row) > 16 else None, 
-                #             test_method_17=Decimal(row[17]) if len(row) > 17 else None, 
-                #             test_method_18=Decimal(row[18]) if len(row) > 18 else None, 
-                #             test_method_19=Decimal(row[19]) if len(row) > 19 else None, 
-                #             test_method_20=Decimal(row[20]) if len(row) > 20 else None, 
-                #             test_method_21=Decimal(row[21]) if len(row) > 21 else None, 
-                #             test_method_22=Decimal(row[22]) if len(row) > 22 else None, 
-                #             test_method_23=Decimal(row[23]) if len(row) > 23 else None, 
-                #             test_method_24=Decimal(row[24]) if len(row) > 24 else None, 
-                #             test_method_25=Decimal(row[25]) if len(row) > 25 else None
-                #         ))
-                #     else:
-                #         data_list.append(models.TiltData(
-                #             date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), 
-                #             test_method_1=Decimal(row[1]) if len(row) > 1 else None, 
-                #             test_method_2=Decimal(row[2]) if len(row) > 2 else None, 
-                #             test_method_3=Decimal(row[3]) if len(row) > 3 else None, 
-                #             test_method_4=Decimal(row[4]) if len(row) > 4 else None, 
-                #             test_method_5=Decimal(row[5]) if len(row) > 5 else None, 
-                #             test_method_6=Decimal(row[6]) if len(row) > 6 else None, 
-                #             test_method_7=Decimal(row[7]) if len(row) > 7 else None, 
-                #             test_method_8=Decimal(row[8]) if len(row) > 8 else None, 
-                #             test_method_9=Decimal(row[9]) if len(row) > 9 else None, 
-                #             test_method_10=Decimal(row[10]) if len(row) > 10 else None, 
-                #             test_method_11=Decimal(row[11]) if len(row) > 11 else None, 
-                #             test_method_12=Decimal(row[12]) if len(row) > 12 else None, 
-                #             test_method_13=Decimal(row[13]) if len(row) > 13 else None, 
-                #             test_method_14=Decimal(row[14]) if len(row) > 14 else None, 
-                #             test_method_15=Decimal(row[15]) if len(row) > 15 else None, 
-                #             test_method_16=Decimal(row[16]) if len(row) > 16 else None, 
-                #             test_method_17=Decimal(row[17]) if len(row) > 17 else None, 
-                #             test_method_18=Decimal(row[18]) if len(row) > 18 else None, 
-                #             test_method_19=Decimal(row[19]) if len(row) > 19 else None, 
-                #             test_method_20=Decimal(row[20]) if len(row) > 20 else None, 
-                #             test_method_21=Decimal(row[21]) if len(row) > 21 else None, 
-                #             test_method_22=Decimal(row[22]) if len(row) > 22 else None, 
-                #             test_method_23=Decimal(row[23]) if len(row) > 23 else None, 
-                #             test_method_24=Decimal(row[24]) if len(row) > 24 else None, 
-                #             test_method_25=Decimal(row[25]) if len(row) > 25 else None
-                #         ))
-                # models.TiltData.objects.bulk_create(data_list)
+                    if len(data_list) > 1000:
+                        models.TiltData.objects.bulk_create(data_list)
+                        data_list = []
+                        data_list.append(models.TiltData(
+                            date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), 
+                            test_method_1=Decimal(row[1]) if len(row) > 1 else "", 
+                            test_method_2=Decimal(row[2]) if len(row) > 2 else "", 
+                            test_method_3=Decimal(row[3]) if len(row) > 3 else "", 
+                            test_method_4=Decimal(row[4]) if len(row) > 4 else "", 
+                            test_method_5=Decimal(row[5]) if len(row) > 5 else "", 
+                            test_method_6=Decimal(row[6]) if len(row) > 6 else "", 
+                            test_method_7=Decimal(row[7]) if len(row) > 7 else "", 
+                            test_method_8=Decimal(row[8]) if len(row) > 8 else "", 
+                            test_method_9=Decimal(row[9]) if len(row) > 9 else "", 
+                            test_method_10=Decimal(row[10]) if len(row) > 10 else "", 
+                            test_method_11=Decimal(row[11]) if len(row) > 11 else "", 
+                            test_method_12=Decimal(row[12]) if len(row) > 12 else "", 
+                            test_method_13=Decimal(row[13]) if len(row) > 13 else "", 
+                            test_method_14=Decimal(row[14]) if len(row) > 14 else "", 
+                            test_method_15=Decimal(row[15]) if len(row) > 15 else "", 
+                            test_method_16=Decimal(row[16]) if len(row) > 16 else "", 
+                            test_method_17=Decimal(row[17]) if len(row) > 17 else "", 
+                            test_method_18=Decimal(row[18]) if len(row) > 18 else "", 
+                            test_method_19=Decimal(row[19]) if len(row) > 19 else "", 
+                            test_method_20=Decimal(row[20]) if len(row) > 20 else "", 
+                            test_method_21=Decimal(row[21]) if len(row) > 21 else "", 
+                            test_method_22=Decimal(row[22]) if len(row) > 22 else "", 
+                            test_method_23=Decimal(row[23]) if len(row) > 23 else "", 
+                            test_method_24=Decimal(row[24]) if len(row) > 24 else "", 
+                            test_method_25=Decimal(row[25]) if len(row) > 25 else ""
+                        ))
+                    else:
+                        data_list.append(models.TiltData(
+                            date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), 
+                            test_method_1=Decimal(row[1]) if len(row) > 1 else "", 
+                            test_method_2=Decimal(row[2]) if len(row) > 2 else "", 
+                            test_method_3=Decimal(row[3]) if len(row) > 3 else "", 
+                            test_method_4=Decimal(row[4]) if len(row) > 4 else "", 
+                            test_method_5=Decimal(row[5]) if len(row) > 5 else "", 
+                            test_method_6=Decimal(row[6]) if len(row) > 6 else "", 
+                            test_method_7=Decimal(row[7]) if len(row) > 7 else "", 
+                            test_method_8=Decimal(row[8]) if len(row) > 8 else "", 
+                            test_method_9=Decimal(row[9]) if len(row) > 9 else "", 
+                            test_method_10=Decimal(row[10]) if len(row) > 10 else "", 
+                            test_method_11=Decimal(row[11]) if len(row) > 11 else "", 
+                            test_method_12=Decimal(row[12]) if len(row) > 12 else "", 
+                            test_method_13=Decimal(row[13]) if len(row) > 13 else "", 
+                            test_method_14=Decimal(row[14]) if len(row) > 14 else "", 
+                            test_method_15=Decimal(row[15]) if len(row) > 15 else "", 
+                            test_method_16=Decimal(row[16]) if len(row) > 16 else "", 
+                            test_method_17=Decimal(row[17]) if len(row) > 17 else "", 
+                            test_method_18=Decimal(row[18]) if len(row) > 18 else "", 
+                            test_method_19=Decimal(row[19]) if len(row) > 19 else "", 
+                            test_method_20=Decimal(row[20]) if len(row) > 20 else "", 
+                            test_method_21=Decimal(row[21]) if len(row) > 21 else "", 
+                            test_method_22=Decimal(row[22]) if len(row) > 22 else "", 
+                            test_method_23=Decimal(row[23]) if len(row) > 23 else "", 
+                            test_method_24=Decimal(row[24]) if len(row) > 24 else "", 
+                            test_method_25=Decimal(row[25]) if len(row) > 25 else ""
+                        ))
+                models.TiltData.objects.bulk_create(data_list)
                 os.remove(settings.MEDIA_ROOT + file_name)
         if 'displacement_required' in request.POST.keys():
             models.DisplacementData.objects.all().delete()
@@ -604,7 +531,7 @@ def importCsv(request):
                 f.write(columns)
                 f.close()
 
-                # data_list = []
+                data_list = []
 
                 # Initialize a flag to skip the first row
                 skip_first_row = True
@@ -615,95 +542,67 @@ def importCsv(request):
                         continue  # Skip the first row
                     if not row[0]:
                         break
-                    models.DisplacementData.objects.create(
-                        date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), 
-                        test_method_1=Decimal(row[1]) if len(row) > 1 else None, 
-                        test_method_2=Decimal(row[2]) if len(row) > 2 else None, 
-                        test_method_3=Decimal(row[3]) if len(row) > 3 else None, 
-                        test_method_4=Decimal(row[4]) if len(row) > 4 else None, 
-                        test_method_5=Decimal(row[5]) if len(row) > 5 else None, 
-                        test_method_6=Decimal(row[6]) if len(row) > 6 else None, 
-                        test_method_7=Decimal(row[7]) if len(row) > 7 else None, 
-                        test_method_8=Decimal(row[8]) if len(row) > 8 else None, 
-                        test_method_9=Decimal(row[9]) if len(row) > 9 else None, 
-                        test_method_10=Decimal(row[10]) if len(row) > 10 else None, 
-                        test_method_11=Decimal(row[11]) if len(row) > 11 else None, 
-                        test_method_12=Decimal(row[12]) if len(row) > 12 else None, 
-                        test_method_13=Decimal(row[13]) if len(row) > 13 else None, 
-                        test_method_14=Decimal(row[14]) if len(row) > 14 else None, 
-                        test_method_15=Decimal(row[15]) if len(row) > 15 else None, 
-                        test_method_16=Decimal(row[16]) if len(row) > 16 else None, 
-                        test_method_17=Decimal(row[17]) if len(row) > 17 else None, 
-                        test_method_18=Decimal(row[18]) if len(row) > 18 else None, 
-                        test_method_19=Decimal(row[19]) if len(row) > 19 else None, 
-                        test_method_20=Decimal(row[20]) if len(row) > 20 else None, 
-                        test_method_21=Decimal(row[21]) if len(row) > 21 else None, 
-                        test_method_22=Decimal(row[22]) if len(row) > 22 else None, 
-                        test_method_23=Decimal(row[23]) if len(row) > 23 else None, 
-                        test_method_24=Decimal(row[24]) if len(row) > 24 else None, 
-                        test_method_25=Decimal(row[25]) if len(row) > 25 else None
-                    )
-                #     if len(data_list) > 1000:
-                #         models.DisplacementData.objects.bulk_create(data_list)
-                #         data_list = []
-                #         data_list.append(models.DisplacementData(
-                #             date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), 
-                #             test_method_1=Decimal(row[1]) if len(row) > 1 else None, 
-                #             test_method_2=Decimal(row[2]) if len(row) > 2 else None, 
-                #             test_method_3=Decimal(row[3]) if len(row) > 3 else None, 
-                #             test_method_4=Decimal(row[4]) if len(row) > 4 else None, 
-                #             test_method_5=Decimal(row[5]) if len(row) > 5 else None, 
-                #             test_method_6=Decimal(row[6]) if len(row) > 6 else None, 
-                #             test_method_7=Decimal(row[7]) if len(row) > 7 else None, 
-                #             test_method_8=Decimal(row[8]) if len(row) > 8 else None, 
-                #             test_method_9=Decimal(row[9]) if len(row) > 9 else None, 
-                #             test_method_10=Decimal(row[10]) if len(row) > 10 else None, 
-                #             test_method_11=Decimal(row[11]) if len(row) > 11 else None, 
-                #             test_method_12=Decimal(row[12]) if len(row) > 12 else None, 
-                #             test_method_13=Decimal(row[13]) if len(row) > 13 else None, 
-                #             test_method_14=Decimal(row[14]) if len(row) > 14 else None, 
-                #             test_method_15=Decimal(row[15]) if len(row) > 15 else None, 
-                #             test_method_16=Decimal(row[16]) if len(row) > 16 else None, 
-                #             test_method_17=Decimal(row[17]) if len(row) > 17 else None, 
-                #             test_method_18=Decimal(row[18]) if len(row) > 18 else None, 
-                #             test_method_19=Decimal(row[19]) if len(row) > 19 else None, 
-                #             test_method_20=Decimal(row[20]) if len(row) > 20 else None, 
-                #             test_method_21=Decimal(row[21]) if len(row) > 21 else None, 
-                #             test_method_22=Decimal(row[22]) if len(row) > 22 else None, 
-                #             test_method_23=Decimal(row[23]) if len(row) > 23 else None, 
-                #             test_method_24=Decimal(row[24]) if len(row) > 24 else None, 
-                #             test_method_25=Decimal(row[25]) if len(row) > 25 else None
-                #         ))
-                #     else:
-                #         data_list.append(models.DisplacementData(
-                #             date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), 
-                #             test_method_1=Decimal(row[1]) if len(row) > 1 else None, 
-                #             test_method_2=Decimal(row[2]) if len(row) > 2 else None, 
-                #             test_method_3=Decimal(row[3]) if len(row) > 3 else None, 
-                #             test_method_4=Decimal(row[4]) if len(row) > 4 else None, 
-                #             test_method_5=Decimal(row[5]) if len(row) > 5 else None, 
-                #             test_method_6=Decimal(row[6]) if len(row) > 6 else None, 
-                #             test_method_7=Decimal(row[7]) if len(row) > 7 else None, 
-                #             test_method_8=Decimal(row[8]) if len(row) > 8 else None, 
-                #             test_method_9=Decimal(row[9]) if len(row) > 9 else None, 
-                #             test_method_10=Decimal(row[10]) if len(row) > 10 else None, 
-                #             test_method_11=Decimal(row[11]) if len(row) > 11 else None, 
-                #             test_method_12=Decimal(row[12]) if len(row) > 12 else None, 
-                #             test_method_13=Decimal(row[13]) if len(row) > 13 else None, 
-                #             test_method_14=Decimal(row[14]) if len(row) > 14 else None, 
-                #             test_method_15=Decimal(row[15]) if len(row) > 15 else None, 
-                #             test_method_16=Decimal(row[16]) if len(row) > 16 else None, 
-                #             test_method_17=Decimal(row[17]) if len(row) > 17 else None, 
-                #             test_method_18=Decimal(row[18]) if len(row) > 18 else None, 
-                #             test_method_19=Decimal(row[19]) if len(row) > 19 else None, 
-                #             test_method_20=Decimal(row[20]) if len(row) > 20 else None, 
-                #             test_method_21=Decimal(row[21]) if len(row) > 21 else None, 
-                #             test_method_22=Decimal(row[22]) if len(row) > 22 else None, 
-                #             test_method_23=Decimal(row[23]) if len(row) > 23 else None, 
-                #             test_method_24=Decimal(row[24]) if len(row) > 24 else None, 
-                #             test_method_25=Decimal(row[25]) if len(row) > 25 else None
-                #         ))
-                # models.DisplacementData.objects.bulk_create(data_list)
+                    if len(data_list) > 1000:
+                        models.DisplacementData.objects.bulk_create(data_list)
+                        data_list = []
+                        data_list.append(models.DisplacementData(
+                            date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), 
+                            test_method_1=Decimal(row[1]) if len(row) > 1 else "", 
+                            test_method_2=Decimal(row[2]) if len(row) > 2 else "", 
+                            test_method_3=Decimal(row[3]) if len(row) > 3 else "", 
+                            test_method_4=Decimal(row[4]) if len(row) > 4 else "", 
+                            test_method_5=Decimal(row[5]) if len(row) > 5 else "", 
+                            test_method_6=Decimal(row[6]) if len(row) > 6 else "", 
+                            test_method_7=Decimal(row[7]) if len(row) > 7 else "", 
+                            test_method_8=Decimal(row[8]) if len(row) > 8 else "", 
+                            test_method_9=Decimal(row[9]) if len(row) > 9 else "", 
+                            test_method_10=Decimal(row[10]) if len(row) > 10 else "", 
+                            test_method_11=Decimal(row[11]) if len(row) > 11 else "", 
+                            test_method_12=Decimal(row[12]) if len(row) > 12 else "", 
+                            test_method_13=Decimal(row[13]) if len(row) > 13 else "", 
+                            test_method_14=Decimal(row[14]) if len(row) > 14 else "", 
+                            test_method_15=Decimal(row[15]) if len(row) > 15 else "", 
+                            test_method_16=Decimal(row[16]) if len(row) > 16 else "", 
+                            test_method_17=Decimal(row[17]) if len(row) > 17 else "", 
+                            test_method_18=Decimal(row[18]) if len(row) > 18 else "", 
+                            test_method_19=Decimal(row[19]) if len(row) > 19 else "", 
+                            test_method_20=Decimal(row[20]) if len(row) > 20 else "", 
+                            test_method_21=Decimal(row[21]) if len(row) > 21 else "", 
+                            test_method_22=Decimal(row[22]) if len(row) > 22 else "", 
+                            test_method_23=Decimal(row[23]) if len(row) > 23 else "", 
+                            test_method_24=Decimal(row[24]) if len(row) > 24 else "", 
+                            test_method_25=Decimal(row[25]) if len(row) > 25 else ""
+                        ))
+                    else:
+                        data_list.append(models.DisplacementData(
+                            date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), 
+                            test_method_1=Decimal(row[1]) if len(row) > 1 else "", 
+                            test_method_2=Decimal(row[2]) if len(row) > 2 else "", 
+                            test_method_3=Decimal(row[3]) if len(row) > 3 else "", 
+                            test_method_4=Decimal(row[4]) if len(row) > 4 else "", 
+                            test_method_5=Decimal(row[5]) if len(row) > 5 else "", 
+                            test_method_6=Decimal(row[6]) if len(row) > 6 else "", 
+                            test_method_7=Decimal(row[7]) if len(row) > 7 else "", 
+                            test_method_8=Decimal(row[8]) if len(row) > 8 else "", 
+                            test_method_9=Decimal(row[9]) if len(row) > 9 else "", 
+                            test_method_10=Decimal(row[10]) if len(row) > 10 else "", 
+                            test_method_11=Decimal(row[11]) if len(row) > 11 else "", 
+                            test_method_12=Decimal(row[12]) if len(row) > 12 else "", 
+                            test_method_13=Decimal(row[13]) if len(row) > 13 else "", 
+                            test_method_14=Decimal(row[14]) if len(row) > 14 else "", 
+                            test_method_15=Decimal(row[15]) if len(row) > 15 else "", 
+                            test_method_16=Decimal(row[16]) if len(row) > 16 else "", 
+                            test_method_17=Decimal(row[17]) if len(row) > 17 else "", 
+                            test_method_18=Decimal(row[18]) if len(row) > 18 else "", 
+                            test_method_19=Decimal(row[19]) if len(row) > 19 else "", 
+                            test_method_20=Decimal(row[20]) if len(row) > 20 else "", 
+                            test_method_21=Decimal(row[21]) if len(row) > 21 else "", 
+                            test_method_22=Decimal(row[22]) if len(row) > 22 else "", 
+                            test_method_23=Decimal(row[23]) if len(row) > 23 else "", 
+                            test_method_24=Decimal(row[24]) if len(row) > 24 else "", 
+                            test_method_25=Decimal(row[25]) if len(row) > 25 else ""
+                        ))
+                models.DisplacementData.objects.bulk_create(data_list)
                 os.remove(settings.MEDIA_ROOT + file_name)
         if 'settlement_required' in request.POST.keys():
             models.SettlementData.objects.all().delete()
@@ -734,7 +633,7 @@ def importCsv(request):
                 f.write(columns)
                 f.close()
 
-                # data_list = []
+                data_list = []
 
                 # Initialize a flag to skip the first row
                 skip_first_row = True
@@ -745,95 +644,67 @@ def importCsv(request):
                         continue  # Skip the first row
                     if not row[0]:
                         break
-                    models.DisplacementData.objects.create(
-                        date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), 
-                        test_method_1=Decimal(row[1]) if len(row) > 1 else None, 
-                        test_method_2=Decimal(row[2]) if len(row) > 2 else None, 
-                        test_method_3=Decimal(row[3]) if len(row) > 3 else None, 
-                        test_method_4=Decimal(row[4]) if len(row) > 4 else None, 
-                        test_method_5=Decimal(row[5]) if len(row) > 5 else None, 
-                        test_method_6=Decimal(row[6]) if len(row) > 6 else None, 
-                        test_method_7=Decimal(row[7]) if len(row) > 7 else None, 
-                        test_method_8=Decimal(row[8]) if len(row) > 8 else None, 
-                        test_method_9=Decimal(row[9]) if len(row) > 9 else None, 
-                        test_method_10=Decimal(row[10]) if len(row) > 10 else None, 
-                        test_method_11=Decimal(row[11]) if len(row) > 11 else None, 
-                        test_method_12=Decimal(row[12]) if len(row) > 12 else None, 
-                        test_method_13=Decimal(row[13]) if len(row) > 13 else None, 
-                        test_method_14=Decimal(row[14]) if len(row) > 14 else None, 
-                        test_method_15=Decimal(row[15]) if len(row) > 15 else None, 
-                        test_method_16=Decimal(row[16]) if len(row) > 16 else None, 
-                        test_method_17=Decimal(row[17]) if len(row) > 17 else None, 
-                        test_method_18=Decimal(row[18]) if len(row) > 18 else None, 
-                        test_method_19=Decimal(row[19]) if len(row) > 19 else None, 
-                        test_method_20=Decimal(row[20]) if len(row) > 20 else None, 
-                        test_method_21=Decimal(row[21]) if len(row) > 21 else None, 
-                        test_method_22=Decimal(row[22]) if len(row) > 22 else None, 
-                        test_method_23=Decimal(row[23]) if len(row) > 23 else None, 
-                        test_method_24=Decimal(row[24]) if len(row) > 24 else None, 
-                        test_method_25=Decimal(row[25]) if len(row) > 25 else None
-                    )
-                #     if len(data_list) > 1000:
-                #         models.SettlementData.objects.bulk_create(data_list)
-                #         data_list = []
-                #         data_list.append(models.SettlementData(
-                #             date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), 
-                #             test_method_1=Decimal(row[1]) if len(row) > 1 else None, 
-                #             test_method_2=Decimal(row[2]) if len(row) > 2 else None, 
-                #             test_method_3=Decimal(row[3]) if len(row) > 3 else None, 
-                #             test_method_4=Decimal(row[4]) if len(row) > 4 else None, 
-                #             test_method_5=Decimal(row[5]) if len(row) > 5 else None, 
-                #             test_method_6=Decimal(row[6]) if len(row) > 6 else None, 
-                #             test_method_7=Decimal(row[7]) if len(row) > 7 else None, 
-                #             test_method_8=Decimal(row[8]) if len(row) > 8 else None, 
-                #             test_method_9=Decimal(row[9]) if len(row) > 9 else None, 
-                #             test_method_10=Decimal(row[10]) if len(row) > 10 else None, 
-                #             test_method_11=Decimal(row[11]) if len(row) > 11 else None, 
-                #             test_method_12=Decimal(row[12]) if len(row) > 12 else None, 
-                #             test_method_13=Decimal(row[13]) if len(row) > 13 else None, 
-                #             test_method_14=Decimal(row[14]) if len(row) > 14 else None, 
-                #             test_method_15=Decimal(row[15]) if len(row) > 15 else None, 
-                #             test_method_16=Decimal(row[16]) if len(row) > 16 else None, 
-                #             test_method_17=Decimal(row[17]) if len(row) > 17 else None, 
-                #             test_method_18=Decimal(row[18]) if len(row) > 18 else None, 
-                #             test_method_19=Decimal(row[19]) if len(row) > 19 else None, 
-                #             test_method_20=Decimal(row[20]) if len(row) > 20 else None, 
-                #             test_method_21=Decimal(row[21]) if len(row) > 21 else None, 
-                #             test_method_22=Decimal(row[22]) if len(row) > 22 else None, 
-                #             test_method_23=Decimal(row[23]) if len(row) > 23 else None, 
-                #             test_method_24=Decimal(row[24]) if len(row) > 24 else None, 
-                #             test_method_25=Decimal(row[25]) if len(row) > 25 else None
-                #         ))
-                #     else:
-                #         data_list.append(models.SettlementData(
-                #             date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), 
-                #             test_method_1=Decimal(row[1]) if len(row) > 1 else None, 
-                #             test_method_2=Decimal(row[2]) if len(row) > 2 else None, 
-                #             test_method_3=Decimal(row[3]) if len(row) > 3 else None, 
-                #             test_method_4=Decimal(row[4]) if len(row) > 4 else None, 
-                #             test_method_5=Decimal(row[5]) if len(row) > 5 else None, 
-                #             test_method_6=Decimal(row[6]) if len(row) > 6 else None, 
-                #             test_method_7=Decimal(row[7]) if len(row) > 7 else None, 
-                #             test_method_8=Decimal(row[8]) if len(row) > 8 else None, 
-                #             test_method_9=Decimal(row[9]) if len(row) > 9 else None, 
-                #             test_method_10=Decimal(row[10]) if len(row) > 10 else None, 
-                #             test_method_11=Decimal(row[11]) if len(row) > 11 else None, 
-                #             test_method_12=Decimal(row[12]) if len(row) > 12 else None, 
-                #             test_method_13=Decimal(row[13]) if len(row) > 13 else None, 
-                #             test_method_14=Decimal(row[14]) if len(row) > 14 else None, 
-                #             test_method_15=Decimal(row[15]) if len(row) > 15 else None, 
-                #             test_method_16=Decimal(row[16]) if len(row) > 16 else None, 
-                #             test_method_17=Decimal(row[17]) if len(row) > 17 else None, 
-                #             test_method_18=Decimal(row[18]) if len(row) > 18 else None, 
-                #             test_method_19=Decimal(row[19]) if len(row) > 19 else None, 
-                #             test_method_20=Decimal(row[20]) if len(row) > 20 else None, 
-                #             test_method_21=Decimal(row[21]) if len(row) > 21 else None, 
-                #             test_method_22=Decimal(row[22]) if len(row) > 22 else None, 
-                #             test_method_23=Decimal(row[23]) if len(row) > 23 else None, 
-                #             test_method_24=Decimal(row[24]) if len(row) > 24 else None, 
-                #             test_method_25=Decimal(row[25]) if len(row) > 25 else None
-                #         ))
-                # models.SettlementData.objects.bulk_create(data_list)
+                    if len(data_list) > 1000:
+                        models.SettlementData.objects.bulk_create(data_list)
+                        data_list = []
+                        data_list.append(models.SettlementData(
+                            date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), 
+                            test_method_1=Decimal(row[1]) if len(row) > 1 else "", 
+                            test_method_2=Decimal(row[2]) if len(row) > 2 else "", 
+                            test_method_3=Decimal(row[3]) if len(row) > 3 else "", 
+                            test_method_4=Decimal(row[4]) if len(row) > 4 else "", 
+                            test_method_5=Decimal(row[5]) if len(row) > 5 else "", 
+                            test_method_6=Decimal(row[6]) if len(row) > 6 else "", 
+                            test_method_7=Decimal(row[7]) if len(row) > 7 else "", 
+                            test_method_8=Decimal(row[8]) if len(row) > 8 else "", 
+                            test_method_9=Decimal(row[9]) if len(row) > 9 else "", 
+                            test_method_10=Decimal(row[10]) if len(row) > 10 else "", 
+                            test_method_11=Decimal(row[11]) if len(row) > 11 else "", 
+                            test_method_12=Decimal(row[12]) if len(row) > 12 else "", 
+                            test_method_13=Decimal(row[13]) if len(row) > 13 else "", 
+                            test_method_14=Decimal(row[14]) if len(row) > 14 else "", 
+                            test_method_15=Decimal(row[15]) if len(row) > 15 else "", 
+                            test_method_16=Decimal(row[16]) if len(row) > 16 else "", 
+                            test_method_17=Decimal(row[17]) if len(row) > 17 else "", 
+                            test_method_18=Decimal(row[18]) if len(row) > 18 else "", 
+                            test_method_19=Decimal(row[19]) if len(row) > 19 else "", 
+                            test_method_20=Decimal(row[20]) if len(row) > 20 else "", 
+                            test_method_21=Decimal(row[21]) if len(row) > 21 else "", 
+                            test_method_22=Decimal(row[22]) if len(row) > 22 else "", 
+                            test_method_23=Decimal(row[23]) if len(row) > 23 else "", 
+                            test_method_24=Decimal(row[24]) if len(row) > 24 else "", 
+                            test_method_25=Decimal(row[25]) if len(row) > 25 else ""
+                        ))
+                    else:
+                        data_list.append(models.SettlementData(
+                            date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), 
+                            test_method_1=Decimal(row[1]) if len(row) > 1 else "", 
+                            test_method_2=Decimal(row[2]) if len(row) > 2 else "", 
+                            test_method_3=Decimal(row[3]) if len(row) > 3 else "", 
+                            test_method_4=Decimal(row[4]) if len(row) > 4 else "", 
+                            test_method_5=Decimal(row[5]) if len(row) > 5 else "", 
+                            test_method_6=Decimal(row[6]) if len(row) > 6 else "", 
+                            test_method_7=Decimal(row[7]) if len(row) > 7 else "", 
+                            test_method_8=Decimal(row[8]) if len(row) > 8 else "", 
+                            test_method_9=Decimal(row[9]) if len(row) > 9 else "", 
+                            test_method_10=Decimal(row[10]) if len(row) > 10 else "", 
+                            test_method_11=Decimal(row[11]) if len(row) > 11 else "", 
+                            test_method_12=Decimal(row[12]) if len(row) > 12 else "", 
+                            test_method_13=Decimal(row[13]) if len(row) > 13 else "", 
+                            test_method_14=Decimal(row[14]) if len(row) > 14 else "", 
+                            test_method_15=Decimal(row[15]) if len(row) > 15 else "", 
+                            test_method_16=Decimal(row[16]) if len(row) > 16 else "", 
+                            test_method_17=Decimal(row[17]) if len(row) > 17 else "", 
+                            test_method_18=Decimal(row[18]) if len(row) > 18 else "", 
+                            test_method_19=Decimal(row[19]) if len(row) > 19 else "", 
+                            test_method_20=Decimal(row[20]) if len(row) > 20 else "", 
+                            test_method_21=Decimal(row[21]) if len(row) > 21 else "", 
+                            test_method_22=Decimal(row[22]) if len(row) > 22 else "", 
+                            test_method_23=Decimal(row[23]) if len(row) > 23 else "", 
+                            test_method_24=Decimal(row[24]) if len(row) > 24 else "", 
+                            test_method_25=Decimal(row[25]) if len(row) > 25 else ""
+                        ))
+                models.SettlementData.objects.bulk_create(data_list)
                 os.remove(settings.MEDIA_ROOT + file_name)
         if 'vibration_required' in request.POST.keys():
             models.VibrationData.objects.all().delete()
@@ -864,7 +735,7 @@ def importCsv(request):
                 f.write(columns)
                 f.close()
 
-                # data_list = []
+                data_list = []
 
                 # Initialize a flag to skip the first row
                 skip_first_row = True
@@ -875,95 +746,67 @@ def importCsv(request):
                         continue  # Skip the first row
                     if not row[0]:
                         break
-                    models.VibrationData.objects.create(
-                        date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), 
-                        test_method_1=Decimal(row[1]) if len(row) > 1 else None, 
-                        test_method_2=Decimal(row[2]) if len(row) > 2 else None, 
-                        test_method_3=Decimal(row[3]) if len(row) > 3 else None, 
-                        test_method_4=Decimal(row[4]) if len(row) > 4 else None, 
-                        test_method_5=Decimal(row[5]) if len(row) > 5 else None, 
-                        test_method_6=Decimal(row[6]) if len(row) > 6 else None, 
-                        test_method_7=Decimal(row[7]) if len(row) > 7 else None, 
-                        test_method_8=Decimal(row[8]) if len(row) > 8 else None, 
-                        test_method_9=Decimal(row[9]) if len(row) > 9 else None, 
-                        test_method_10=Decimal(row[10]) if len(row) > 10 else None, 
-                        test_method_11=Decimal(row[11]) if len(row) > 11 else None, 
-                        test_method_12=Decimal(row[12]) if len(row) > 12 else None, 
-                        test_method_13=Decimal(row[13]) if len(row) > 13 else None, 
-                        test_method_14=Decimal(row[14]) if len(row) > 14 else None, 
-                        test_method_15=Decimal(row[15]) if len(row) > 15 else None, 
-                        test_method_16=Decimal(row[16]) if len(row) > 16 else None, 
-                        test_method_17=Decimal(row[17]) if len(row) > 17 else None, 
-                        test_method_18=Decimal(row[18]) if len(row) > 18 else None, 
-                        test_method_19=Decimal(row[19]) if len(row) > 19 else None, 
-                        test_method_20=Decimal(row[20]) if len(row) > 20 else None, 
-                        test_method_21=Decimal(row[21]) if len(row) > 21 else None, 
-                        test_method_22=Decimal(row[22]) if len(row) > 22 else None, 
-                        test_method_23=Decimal(row[23]) if len(row) > 23 else None, 
-                        test_method_24=Decimal(row[24]) if len(row) > 24 else None, 
-                        test_method_25=Decimal(row[25]) if len(row) > 25 else None
-                    )
-                #     if len(data_list) > 1000:
-                #         models.VibrationData.objects.bulk_create(data_list)
-                #         data_list = []
-                #         data_list.append(models.VibrationData(
-                #             date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), 
-                #             test_method_1=Decimal(row[1]) if len(row) > 1 else None, 
-                #             test_method_2=Decimal(row[2]) if len(row) > 2 else None, 
-                #             test_method_3=Decimal(row[3]) if len(row) > 3 else None, 
-                #             test_method_4=Decimal(row[4]) if len(row) > 4 else None, 
-                #             test_method_5=Decimal(row[5]) if len(row) > 5 else None, 
-                #             test_method_6=Decimal(row[6]) if len(row) > 6 else None, 
-                #             test_method_7=Decimal(row[7]) if len(row) > 7 else None, 
-                #             test_method_8=Decimal(row[8]) if len(row) > 8 else None, 
-                #             test_method_9=Decimal(row[9]) if len(row) > 9 else None, 
-                #             test_method_10=Decimal(row[10]) if len(row) > 10 else None, 
-                #             test_method_11=Decimal(row[11]) if len(row) > 11 else None, 
-                #             test_method_12=Decimal(row[12]) if len(row) > 12 else None, 
-                #             test_method_13=Decimal(row[13]) if len(row) > 13 else None, 
-                #             test_method_14=Decimal(row[14]) if len(row) > 14 else None, 
-                #             test_method_15=Decimal(row[15]) if len(row) > 15 else None, 
-                #             test_method_16=Decimal(row[16]) if len(row) > 16 else None, 
-                #             test_method_17=Decimal(row[17]) if len(row) > 17 else None, 
-                #             test_method_18=Decimal(row[18]) if len(row) > 18 else None, 
-                #             test_method_19=Decimal(row[19]) if len(row) > 19 else None, 
-                #             test_method_20=Decimal(row[20]) if len(row) > 20 else None, 
-                #             test_method_21=Decimal(row[21]) if len(row) > 21 else None, 
-                #             test_method_22=Decimal(row[22]) if len(row) > 22 else None, 
-                #             test_method_23=Decimal(row[23]) if len(row) > 23 else None, 
-                #             test_method_24=Decimal(row[24]) if len(row) > 24 else None, 
-                #             test_method_25=Decimal(row[25]) if len(row) > 25 else None
-                #         ))
-                #     else:
-                #         data_list.append(models.VibrationData(
-                #             date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), 
-                #             test_method_1=Decimal(row[1]) if len(row) > 1 else None, 
-                #             test_method_2=Decimal(row[2]) if len(row) > 2 else None, 
-                #             test_method_3=Decimal(row[3]) if len(row) > 3 else None, 
-                #             test_method_4=Decimal(row[4]) if len(row) > 4 else None, 
-                #             test_method_5=Decimal(row[5]) if len(row) > 5 else None, 
-                #             test_method_6=Decimal(row[6]) if len(row) > 6 else None, 
-                #             test_method_7=Decimal(row[7]) if len(row) > 7 else None, 
-                #             test_method_8=Decimal(row[8]) if len(row) > 8 else None, 
-                #             test_method_9=Decimal(row[9]) if len(row) > 9 else None, 
-                #             test_method_10=Decimal(row[10]) if len(row) > 10 else None, 
-                #             test_method_11=Decimal(row[11]) if len(row) > 11 else None, 
-                #             test_method_12=Decimal(row[12]) if len(row) > 12 else None, 
-                #             test_method_13=Decimal(row[13]) if len(row) > 13 else None, 
-                #             test_method_14=Decimal(row[14]) if len(row) > 14 else None, 
-                #             test_method_15=Decimal(row[15]) if len(row) > 15 else None, 
-                #             test_method_16=Decimal(row[16]) if len(row) > 16 else None, 
-                #             test_method_17=Decimal(row[17]) if len(row) > 17 else None, 
-                #             test_method_18=Decimal(row[18]) if len(row) > 18 else None, 
-                #             test_method_19=Decimal(row[19]) if len(row) > 19 else None, 
-                #             test_method_20=Decimal(row[20]) if len(row) > 20 else None, 
-                #             test_method_21=Decimal(row[21]) if len(row) > 21 else None, 
-                #             test_method_22=Decimal(row[22]) if len(row) > 22 else None, 
-                #             test_method_23=Decimal(row[23]) if len(row) > 23 else None, 
-                #             test_method_24=Decimal(row[24]) if len(row) > 24 else None, 
-                #             test_method_25=Decimal(row[25]) if len(row) > 25 else None
-                #         ))
-                # models.VibrationData.objects.bulk_create(data_list)
+                    if len(data_list) > 1000:
+                        models.VibrationData.objects.bulk_create(data_list)
+                        data_list = []
+                        data_list.append(models.VibrationData(
+                            date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), 
+                            test_method_1=Decimal(row[1]) if len(row) > 1 else "", 
+                            test_method_2=Decimal(row[2]) if len(row) > 2 else "", 
+                            test_method_3=Decimal(row[3]) if len(row) > 3 else "", 
+                            test_method_4=Decimal(row[4]) if len(row) > 4 else "", 
+                            test_method_5=Decimal(row[5]) if len(row) > 5 else "", 
+                            test_method_6=Decimal(row[6]) if len(row) > 6 else "", 
+                            test_method_7=Decimal(row[7]) if len(row) > 7 else "", 
+                            test_method_8=Decimal(row[8]) if len(row) > 8 else "", 
+                            test_method_9=Decimal(row[9]) if len(row) > 9 else "", 
+                            test_method_10=Decimal(row[10]) if len(row) > 10 else "", 
+                            test_method_11=Decimal(row[11]) if len(row) > 11 else "", 
+                            test_method_12=Decimal(row[12]) if len(row) > 12 else "", 
+                            test_method_13=Decimal(row[13]) if len(row) > 13 else "", 
+                            test_method_14=Decimal(row[14]) if len(row) > 14 else "", 
+                            test_method_15=Decimal(row[15]) if len(row) > 15 else "", 
+                            test_method_16=Decimal(row[16]) if len(row) > 16 else "", 
+                            test_method_17=Decimal(row[17]) if len(row) > 17 else "", 
+                            test_method_18=Decimal(row[18]) if len(row) > 18 else "", 
+                            test_method_19=Decimal(row[19]) if len(row) > 19 else "", 
+                            test_method_20=Decimal(row[20]) if len(row) > 20 else "", 
+                            test_method_21=Decimal(row[21]) if len(row) > 21 else "", 
+                            test_method_22=Decimal(row[22]) if len(row) > 22 else "", 
+                            test_method_23=Decimal(row[23]) if len(row) > 23 else "", 
+                            test_method_24=Decimal(row[24]) if len(row) > 24 else "", 
+                            test_method_25=Decimal(row[25]) if len(row) > 25 else ""
+                        ))
+                    else:
+                        data_list.append(models.VibrationData(
+                            date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), 
+                            test_method_1=Decimal(row[1]) if len(row) > 1 else "", 
+                            test_method_2=Decimal(row[2]) if len(row) > 2 else "", 
+                            test_method_3=Decimal(row[3]) if len(row) > 3 else "", 
+                            test_method_4=Decimal(row[4]) if len(row) > 4 else "", 
+                            test_method_5=Decimal(row[5]) if len(row) > 5 else "", 
+                            test_method_6=Decimal(row[6]) if len(row) > 6 else "", 
+                            test_method_7=Decimal(row[7]) if len(row) > 7 else "", 
+                            test_method_8=Decimal(row[8]) if len(row) > 8 else "", 
+                            test_method_9=Decimal(row[9]) if len(row) > 9 else "", 
+                            test_method_10=Decimal(row[10]) if len(row) > 10 else "", 
+                            test_method_11=Decimal(row[11]) if len(row) > 11 else "", 
+                            test_method_12=Decimal(row[12]) if len(row) > 12 else "", 
+                            test_method_13=Decimal(row[13]) if len(row) > 13 else "", 
+                            test_method_14=Decimal(row[14]) if len(row) > 14 else "", 
+                            test_method_15=Decimal(row[15]) if len(row) > 15 else "", 
+                            test_method_16=Decimal(row[16]) if len(row) > 16 else "", 
+                            test_method_17=Decimal(row[17]) if len(row) > 17 else "", 
+                            test_method_18=Decimal(row[18]) if len(row) > 18 else "", 
+                            test_method_19=Decimal(row[19]) if len(row) > 19 else "", 
+                            test_method_20=Decimal(row[20]) if len(row) > 20 else "", 
+                            test_method_21=Decimal(row[21]) if len(row) > 21 else "", 
+                            test_method_22=Decimal(row[22]) if len(row) > 22 else "", 
+                            test_method_23=Decimal(row[23]) if len(row) > 23 else "", 
+                            test_method_24=Decimal(row[24]) if len(row) > 24 else "", 
+                            test_method_25=Decimal(row[25]) if len(row) > 25 else ""
+                        ))
+                models.VibrationData.objects.bulk_create(data_list)
                 os.remove(settings.MEDIA_ROOT + file_name)
         # Delete all messages by popping them from the list
         try:
