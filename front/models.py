@@ -1,8 +1,9 @@
 from django.db import models
+from django.utils.timezone import now
 
 # Create your models here.
 class StrainData(models.Model):
-    date_time = models.DateTimeField(use_tz=True, blank=True, null=True)
+    date_time = models.DateTimeField(default=now)
     test_method_1 = models.DecimalField(max_digits=10, decimal_places=5, blank=True, null=True)
     test_method_2 = models.DecimalField(max_digits=10, decimal_places=5, blank=True, null=True)
     test_method_3 = models.DecimalField(max_digits=10, decimal_places=5, blank=True, null=True)
@@ -56,7 +57,7 @@ class StrainData(models.Model):
 
 
 class TiltData(models.Model):
-    date_time = models.DateTimeField(use_tz=True, blank=True, null=True)
+    date_time = models.DateTimeField(default=now)
     test_method_1 = models.DecimalField(max_digits=10, decimal_places=5, blank=True, null=True)
     test_method_2 = models.DecimalField(max_digits=10, decimal_places=5, blank=True, null=True)
     test_method_3 = models.DecimalField(max_digits=10, decimal_places=5, blank=True, null=True)
@@ -93,7 +94,7 @@ class TiltData(models.Model):
 
 
 class DisplacementData(models.Model):
-    date_time = models.DateTimeField(use_tz=True, blank=True, null=True)
+    date_time = models.DateTimeField(default=now)
     test_method_1 = models.DecimalField(max_digits=10, decimal_places=5, blank=True, null=True)
     test_method_2 = models.DecimalField(max_digits=10, decimal_places=5, blank=True, null=True)
     test_method_3 = models.DecimalField(max_digits=10, decimal_places=5, blank=True, null=True)
@@ -130,7 +131,7 @@ class DisplacementData(models.Model):
 
 
 class SettlementData(models.Model):
-    date_time = models.DateTimeField(use_tz=True, blank=True, null=True)
+    date_time = models.DateTimeField(default=now)
     test_method_1 = models.DecimalField(max_digits=10, decimal_places=5, blank=True, null=True)
     test_method_2 = models.DecimalField(max_digits=10, decimal_places=5, blank=True, null=True)
     test_method_3 = models.DecimalField(max_digits=10, decimal_places=5, blank=True, null=True)
@@ -167,7 +168,7 @@ class SettlementData(models.Model):
 
 
 class VibrationData(models.Model):
-    date_time = models.DateTimeField(use_tz=True, blank=True, null=True)
+    date_time = models.DateTimeField(default=now)
     test_method_1 = models.DecimalField(max_digits=10, decimal_places=5, blank=True, null=True)
     test_method_2 = models.DecimalField(max_digits=10, decimal_places=5, blank=True, null=True)
     test_method_3 = models.DecimalField(max_digits=10, decimal_places=5, blank=True, null=True)
