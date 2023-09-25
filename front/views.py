@@ -198,7 +198,7 @@ def index(request):
         except:
             pass
         messages.error(request, 'No Strain Data Is Present.')
-        return redirect('importCsv')
+        return redirect('importExcel')
     tilt_data = models.TiltData.objects.count()
     if tilt_data == 0:
         # Delete all messages by popping them from the list
@@ -210,7 +210,7 @@ def index(request):
         except:
             pass
         messages.error(request, 'No Tilt Data Is Present.')
-        return redirect('importCsv')
+        return redirect('importExcel')
     displacement_data = models.DisplacementData.objects.count()
     if displacement_data == 0:
         # Delete all messages by popping them from the list
@@ -222,7 +222,7 @@ def index(request):
         except:
             pass
         messages.error(request, 'No Displacement Data Is Present.')
-        return redirect('importCsv')
+        return redirect('importExcel')
     settlement_data = models.SettlementData.objects.count()
     if settlement_data == 0:
         # Delete all messages by popping them from the list
@@ -234,7 +234,7 @@ def index(request):
         except:
             pass
         messages.error(request, 'No Settlement Data Is Present.')
-        return redirect('importCsv')
+        return redirect('importExcel')
     vibration_data = models.VibrationData.objects.count()
     if vibration_data == 0:
         # Delete all messages by popping them from the list
@@ -246,7 +246,7 @@ def index(request):
         except:
             pass
         messages.error(request, 'No Vibration Data Is Present.')
-        return redirect('importCsv')
+        return redirect('importExcel')
     # strain_sensor_counts = getSensorCounts('strain')
     # tilt_sensor_counts = getSensorCounts('tilt')
     # displacement_sensor_counts = getSensorCounts('displacement')
@@ -263,16 +263,16 @@ def index(request):
     return render(request, 'front/index.html', context)
 
 
-def importCsv(request):
+def importExcel(request):
     if request.method == "POST":
         if 'strain_required' in request.POST.keys():
             models.StrainData.objects.all().delete()
             if request.FILES.get('strain_gauge', None):
                 file = request.FILES['strain_gauge']
                 tmpname = str(datetime.now().microsecond) + os.path.splitext(str(file))[1]
-                fs = FileSystemStorage(settings.MEDIA_ROOT + "csv/", settings.MEDIA_ROOT + "/csv/")
+                fs = FileSystemStorage(settings.MEDIA_ROOT + "excel/", settings.MEDIA_ROOT + "/excel/")
                 fs.save(tmpname, file)
-                file_name = "csv/" + tmpname
+                file_name = "excel/" + tmpname
 
                 wb = openpyxl.load_workbook(settings.MEDIA_ROOT + file_name, data_only=True)
                 ws = wb.active
@@ -405,9 +405,9 @@ def importCsv(request):
             if request.FILES.get('tilt', None):
                 file = request.FILES['tilt']
                 tmpname = str(datetime.now().microsecond) + os.path.splitext(str(file))[1]
-                fs = FileSystemStorage(settings.MEDIA_ROOT + "csv/", settings.MEDIA_ROOT + "/csv/")
+                fs = FileSystemStorage(settings.MEDIA_ROOT + "excel/", settings.MEDIA_ROOT + "/excel/")
                 fs.save(tmpname, file)
-                file_name = "csv/" + tmpname
+                file_name = "excel/" + tmpname
 
                 wb = openpyxl.load_workbook(settings.MEDIA_ROOT + file_name, data_only=True)
                 ws = wb.active
@@ -507,9 +507,9 @@ def importCsv(request):
             if request.FILES.get('displacement', None):
                 file = request.FILES['displacement']
                 tmpname = str(datetime.now().microsecond) + os.path.splitext(str(file))[1]
-                fs = FileSystemStorage(settings.MEDIA_ROOT + "csv/", settings.MEDIA_ROOT + "/csv/")
+                fs = FileSystemStorage(settings.MEDIA_ROOT + "excel/", settings.MEDIA_ROOT + "/excel/")
                 fs.save(tmpname, file)
-                file_name = "csv/" + tmpname
+                file_name = "excel/" + tmpname
 
                 wb = openpyxl.load_workbook(settings.MEDIA_ROOT + file_name, data_only=True)
                 ws = wb.active
@@ -609,9 +609,9 @@ def importCsv(request):
             if request.FILES.get('settlement', None):
                 file = request.FILES['settlement']
                 tmpname = str(datetime.now().microsecond) + os.path.splitext(str(file))[1]
-                fs = FileSystemStorage(settings.MEDIA_ROOT + "csv/", settings.MEDIA_ROOT + "/csv/")
+                fs = FileSystemStorage(settings.MEDIA_ROOT + "excel/", settings.MEDIA_ROOT + "/excel/")
                 fs.save(tmpname, file)
-                file_name = "csv/" + tmpname
+                file_name = "excel/" + tmpname
 
                 wb = openpyxl.load_workbook(settings.MEDIA_ROOT + file_name, data_only=True)
                 ws = wb.active
@@ -711,9 +711,9 @@ def importCsv(request):
             if request.FILES.get('vibration', None):
                 file = request.FILES['vibration']
                 tmpname = str(datetime.now().microsecond) + os.path.splitext(str(file))[1]
-                fs = FileSystemStorage(settings.MEDIA_ROOT + "csv/", settings.MEDIA_ROOT + "/csv/")
+                fs = FileSystemStorage(settings.MEDIA_ROOT + "excel/", settings.MEDIA_ROOT + "/excel/")
                 fs.save(tmpname, file)
-                file_name = "csv/" + tmpname
+                file_name = "excel/" + tmpname
 
                 wb = openpyxl.load_workbook(settings.MEDIA_ROOT + file_name, data_only=True)
                 ws = wb.active
