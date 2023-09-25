@@ -29,6 +29,56 @@ context['project_name'] = env("PROJECT_NAME")
 context['client_name'] = env("CLIENT_NAME")
 
 # Create your views here.
+def downloadExcel(request, sensor_type):
+    if sensor_type == 'strain':
+        file_path = (settings.MEDIA_ROOT +
+                     "sample/" + "Strain Data.xlsx")
+        if os.path.exists(file_path):
+            with open(file_path, 'rb') as fh:
+                response = HttpResponse(
+                    fh.read(), content_type="application/vnd.ms-excel")
+                response['Content-Disposition'] = 'attachment; filename=' + \
+                    os.path.basename(file_path)
+                return response
+    elif sensor_type == 'tilt':
+        file_path = (settings.MEDIA_ROOT + "sample/" + "Tilt Data.xlsx")
+        if os.path.exists(file_path):
+            with open(file_path, 'rb') as fh:
+                response = HttpResponse(
+                    fh.read(), content_type="application/vnd.ms-excel")
+                response['Content-Disposition'] = 'attachment; filename=' + \
+                    os.path.basename(file_path)
+                return response
+    elif sensor_type == 'displacement':
+        file_path = (settings.MEDIA_ROOT + "sample/" +
+                     "Displacement Data.xlsx")
+        if os.path.exists(file_path):
+            with open(file_path, 'rb') as fh:
+                response = HttpResponse(
+                    fh.read(), content_type="application/vnd.ms-excel")
+                response['Content-Disposition'] = 'attachment; filename=' + \
+                    os.path.basename(file_path)
+                return response
+    elif sensor_type == 'settlement':
+        file_path = (settings.MEDIA_ROOT + "sample/" +
+                     "Settlement Data.xlsx")
+        if os.path.exists(file_path):
+            with open(file_path, 'rb') as fh:
+                response = HttpResponse(
+                    fh.read(), content_type="application/vnd.ms-excel")
+                response['Content-Disposition'] = 'attachment; filename=' + \
+                    os.path.basename(file_path)
+                return response
+    elif sensor_type == 'vibration':
+        file_path = (settings.MEDIA_ROOT +
+                     "sample/" + "Vibration Data.xlsx")
+        if os.path.exists(file_path):
+            with open(file_path, 'rb') as fh:
+                response = HttpResponse(
+                    fh.read(), content_type="application/vnd.ms-excel")
+                response['Content-Disposition'] = 'attachment; filename=' + \
+                    os.path.basename(file_path)
+                return response
 
 
 def get_constants(sensor_type):
@@ -571,58 +621,6 @@ def find_key_by_value(dictionary, value_to_find):
     return None  # or raise ValueError("Value not found")
 
 
-def downloadExcel(request, sensor_type):
-    if sensor_type == 'strain':
-        file_path = (settings.MEDIA_ROOT +
-                     "sample/" + "Strain Data.xlsx")
-        if os.path.exists(file_path):
-            with open(file_path, 'rb') as fh:
-                response = HttpResponse(
-                    fh.read(), content_type="application/vnd.ms-excel")
-                response['Content-Disposition'] = 'attachment; filename=' + \
-                    os.path.basename(file_path)
-                return response
-    elif sensor_type == 'tilt':
-        file_path = (settings.MEDIA_ROOT + "sample/" + "Tilt Data.xlsx")
-        if os.path.exists(file_path):
-            with open(file_path, 'rb') as fh:
-                response = HttpResponse(
-                    fh.read(), content_type="application/vnd.ms-excel")
-                response['Content-Disposition'] = 'attachment; filename=' + \
-                    os.path.basename(file_path)
-                return response
-    elif sensor_type == 'displacement':
-        file_path = (settings.MEDIA_ROOT + "sample/" +
-                     "Displacement Data.xlsx")
-        if os.path.exists(file_path):
-            with open(file_path, 'rb') as fh:
-                response = HttpResponse(
-                    fh.read(), content_type="application/vnd.ms-excel")
-                response['Content-Disposition'] = 'attachment; filename=' + \
-                    os.path.basename(file_path)
-                return response
-    elif sensor_type == 'settlement':
-        file_path = (settings.MEDIA_ROOT + "sample/" +
-                     "Settlement Data.xlsx")
-        if os.path.exists(file_path):
-            with open(file_path, 'rb') as fh:
-                response = HttpResponse(
-                    fh.read(), content_type="application/vnd.ms-excel")
-                response['Content-Disposition'] = 'attachment; filename=' + \
-                    os.path.basename(file_path)
-                return response
-    elif sensor_type == 'vibration':
-        file_path = (settings.MEDIA_ROOT +
-                     "sample/" + "Vibration Data.xlsx")
-        if os.path.exists(file_path):
-            with open(file_path, 'rb') as fh:
-                response = HttpResponse(
-                    fh.read(), content_type="application/vnd.ms-excel")
-                response['Content-Disposition'] = 'attachment; filename=' + \
-                    os.path.basename(file_path)
-                return response
-
-
 def getChartData(request):
     if request.method == "POST":
         sensor_type = request.POST['sensor_type']
@@ -739,3 +737,72 @@ def getChartData(request):
             'status': "ERROR",
             'message': "There should be ajax method."
         })
+
+
+def compare(request):
+    strain_data = models.StrainData.objects.count()
+    if strain_data == 0:
+        # Delete all messages by popping them from the list
+        try:
+            storage = get_messages(request)
+            for message in storage:
+                message = ''
+            storage.used = False
+        except:
+            pass
+        messages.error(request, 'No Strain Data Is Present.')
+        return redirect('importExcel')
+    tilt_data = models.TiltData.objects.count()
+    if tilt_data == 0:
+        # Delete all messages by popping them from the list
+        try:
+            storage = get_messages(request)
+            for message in storage:
+                message = ''
+            storage.used = False
+        except:
+            pass
+        messages.error(request, 'No Tilt Data Is Present.')
+        return redirect('importExcel')
+    displacement_data = models.DisplacementData.objects.count()
+    if displacement_data == 0:
+        # Delete all messages by popping them from the list
+        try:
+            storage = get_messages(request)
+            for message in storage:
+                message = ''
+            storage.used = False
+        except:
+            pass
+        messages.error(request, 'No Displacement Data Is Present.')
+        return redirect('importExcel')
+    settlement_data = models.SettlementData.objects.count()
+    if settlement_data == 0:
+        # Delete all messages by popping them from the list
+        try:
+            storage = get_messages(request)
+            for message in storage:
+                message = ''
+            storage.used = False
+        except:
+            pass
+        messages.error(request, 'No Settlement Data Is Present.')
+        return redirect('importExcel')
+    vibration_data = models.VibrationData.objects.count()
+    if vibration_data == 0:
+        # Delete all messages by popping them from the list
+        try:
+            storage = get_messages(request)
+            for message in storage:
+                message = ''
+            storage.used = False
+        except:
+            pass
+        messages.error(request, 'No Vibration Data Is Present.')
+        return redirect('importExcel')
+    sensor_types = {
+        'keys': list(constants.sensor_types.keys()),
+        'values': list(constants.sensor_types.values())
+    }
+    context.update({'sensor_types': sensor_types})
+    return render(request, 'front/compare.html', context)
