@@ -3,7 +3,7 @@ from datetime import datetime
 from decimal import Decimal
 from dataBridge import settings
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.core.files.storage import FileSystemStorage
 from . import models
 from . import constants
@@ -328,11 +328,11 @@ def importExcel(request):
                     if len(data_list) > 1000:
                         models.StrainData.objects.bulk_create(data_list)
                         data_list = []
-                        data_list.append(models.StrainData(date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), test_method_1=row[1] if len(row) > 1 else None, test_method_2=row[2] if len(row) > 2 else None, test_method_3=row[3] if len(row) > 3 else None, test_method_4=row[4] if len(row) > 4 else None, test_method_5=row[5] if len(row) > 5 else None, test_method_6=row[6] if len(row) > 6 else None, test_method_7=row[7] if len(row) > 7 else None, test_method_8=row[8] if len(row) > 8 else None, test_method_9=row[9] if len(row) > 9 else None, test_method_10=row[10] if len(row) > 10 else None, test_method_11=row[11] if len(row) > 11 else None, test_method_12=row[12] if len(row) > 12 else None, test_method_13=row[13] if len(row) > 13 else None, test_method_14=row[14] if len(row) > 14 else None, test_method_15=row[15] if len(row) > 15 else None, test_method_16=row[16] if len(row) > 16 else None, test_method_17=row[17] if len(row) > 17 else None, test_method_18=row[18] if len(row) > 18 else None, test_method_19=row[19] if len(row) > 19 else None, test_method_20=row[20] if len(row) > 20 else None, test_method_21=
-                            row[21] if len(row) > 21 else None, test_method_22=row[22] if len(row) > 22 else None, test_method_23=row[23] if len(row) > 23 else None, test_method_24=row[24] if len(row) > 24 else None, test_method_25=row[25] if len(row) > 25 else None, test_method_26=row[26] if len(row) > 26 else None, test_method_27=row[27] if len(row) > 27 else None, test_method_28=row[28] if len(row) > 28 else None, test_method_29=row[29] if len(row) > 29 else None, test_method_30=row[30] if len(row) > 30 else None, test_method_31=row[31] if len(row) > 31 else None, test_method_32=row[32] if len(row) > 32 else None, test_method_33=row[33] if len(row) > 33 else None, test_method_34=row[34] if len(row) > 34 else None, test_method_35=row[35] if len(row) > 35 else None, test_method_36=row[36] if len(row) > 36 else None, test_method_37=row[37] if len(row) > 37 else None, test_method_38=row[38] if len(row) > 38 else None, test_method_39=row[39] if len(row) > 39 else None, test_method_40=row[40] if len(row) > 40 else None, test_method_41=row[41] if len(row) > 41 else None, test_method_42=row[42] if len(row) > 42 else None))
+                        data_list.append(models.StrainData(date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), test_method_1=row[1] if len(row) > 1 else None, test_method_2=row[2] if len(row) > 2 else None, test_method_3=row[3] if len(row) > 3 else None, test_method_4=row[4] if len(row) > 4 else None, test_method_5=row[5] if len(row) > 5 else None, test_method_6=row[6] if len(row) > 6 else None, test_method_7=row[7] if len(row) > 7 else None, test_method_8=row[8] if len(row) > 8 else None, test_method_9=row[9] if len(row) > 9 else None, test_method_10=row[10] if len(row) > 10 else None, test_method_11=row[11] if len(row) > 11 else None, test_method_12=row[12] if len(row) > 12 else None, test_method_13=row[13] if len(row) > 13 else None, test_method_14=row[14] if len(row) > 14 else None, test_method_15=row[15] if len(row) > 15 else None, test_method_16=row[16] if len(row) > 16 else None, test_method_17=row[17] if len(row) > 17 else None, test_method_18=row[18] if len(row) > 18 else None, test_method_19=row[19] if len(row) > 19 else None, test_method_20=row[20] if len(row) > 20 else None, test_method_21=row[21] if len(
+                            row) > 21 else None, test_method_22=row[22] if len(row) > 22 else None, test_method_23=row[23] if len(row) > 23 else None, test_method_24=row[24] if len(row) > 24 else None, test_method_25=row[25] if len(row) > 25 else None, test_method_26=row[26] if len(row) > 26 else None, test_method_27=row[27] if len(row) > 27 else None, test_method_28=row[28] if len(row) > 28 else None, test_method_29=row[29] if len(row) > 29 else None, test_method_30=row[30] if len(row) > 30 else None, test_method_31=row[31] if len(row) > 31 else None, test_method_32=row[32] if len(row) > 32 else None, test_method_33=row[33] if len(row) > 33 else None, test_method_34=row[34] if len(row) > 34 else None, test_method_35=row[35] if len(row) > 35 else None, test_method_36=row[36] if len(row) > 36 else None, test_method_37=row[37] if len(row) > 37 else None, test_method_38=row[38] if len(row) > 38 else None, test_method_39=row[39] if len(row) > 39 else None, test_method_40=row[40] if len(row) > 40 else None, test_method_41=row[41] if len(row) > 41 else None, test_method_42=row[42] if len(row) > 42 else None))
                     else:
-                        data_list.append(models.StrainData(date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), test_method_1=row[1] if len(row) > 1 else None, test_method_2=row[2] if len(row) > 2 else None, test_method_3=row[3] if len(row) > 3 else None, test_method_4=row[4] if len(row) > 4 else None, test_method_5=row[5] if len(row) > 5 else None, test_method_6=row[6] if len(row) > 6 else None, test_method_7=row[7] if len(row) > 7 else None, test_method_8=row[8] if len(row) > 8 else None, test_method_9=row[9] if len(row) > 9 else None, test_method_10=row[10] if len(row) > 10 else None, test_method_11=row[11] if len(row) > 11 else None, test_method_12=row[12] if len(row) > 12 else None, test_method_13=row[13] if len(row) > 13 else None, test_method_14=row[14] if len(row) > 14 else None, test_method_15=row[15] if len(row) > 15 else None, test_method_16=row[16] if len(row) > 16 else None, test_method_17=row[17] if len(row) > 17 else None, test_method_18=row[18] if len(row) > 18 else None, test_method_19=row[19] if len(row) > 19 else None, test_method_20=row[20] if len(row) > 20 else None, test_method_21=
-                            row[21] if len(row) > 21 else None, test_method_22=row[22] if len(row) > 22 else None, test_method_23=row[23] if len(row) > 23 else None, test_method_24=row[24] if len(row) > 24 else None, test_method_25=row[25] if len(row) > 25 else None, test_method_26=row[26] if len(row) > 26 else None, test_method_27=row[27] if len(row) > 27 else None, test_method_28=row[28] if len(row) > 28 else None, test_method_29=row[29] if len(row) > 29 else None, test_method_30=row[30] if len(row) > 30 else None, test_method_31=row[31] if len(row) > 31 else None, test_method_32=row[32] if len(row) > 32 else None, test_method_33=row[33] if len(row) > 33 else None, test_method_34=row[34] if len(row) > 34 else None, test_method_35=row[35] if len(row) > 35 else None, test_method_36=row[36] if len(row) > 36 else None, test_method_37=row[37] if len(row) > 37 else None, test_method_38=row[38] if len(row) > 38 else None, test_method_39=row[39] if len(row) > 39 else None, test_method_40=row[40] if len(row) > 40 else None, test_method_41=row[41] if len(row) > 41 else None, test_method_42=row[42] if len(row) > 42 else None))
+                        data_list.append(models.StrainData(date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), test_method_1=row[1] if len(row) > 1 else None, test_method_2=row[2] if len(row) > 2 else None, test_method_3=row[3] if len(row) > 3 else None, test_method_4=row[4] if len(row) > 4 else None, test_method_5=row[5] if len(row) > 5 else None, test_method_6=row[6] if len(row) > 6 else None, test_method_7=row[7] if len(row) > 7 else None, test_method_8=row[8] if len(row) > 8 else None, test_method_9=row[9] if len(row) > 9 else None, test_method_10=row[10] if len(row) > 10 else None, test_method_11=row[11] if len(row) > 11 else None, test_method_12=row[12] if len(row) > 12 else None, test_method_13=row[13] if len(row) > 13 else None, test_method_14=row[14] if len(row) > 14 else None, test_method_15=row[15] if len(row) > 15 else None, test_method_16=row[16] if len(row) > 16 else None, test_method_17=row[17] if len(row) > 17 else None, test_method_18=row[18] if len(row) > 18 else None, test_method_19=row[19] if len(row) > 19 else None, test_method_20=row[20] if len(row) > 20 else None, test_method_21=row[21] if len(
+                            row) > 21 else None, test_method_22=row[22] if len(row) > 22 else None, test_method_23=row[23] if len(row) > 23 else None, test_method_24=row[24] if len(row) > 24 else None, test_method_25=row[25] if len(row) > 25 else None, test_method_26=row[26] if len(row) > 26 else None, test_method_27=row[27] if len(row) > 27 else None, test_method_28=row[28] if len(row) > 28 else None, test_method_29=row[29] if len(row) > 29 else None, test_method_30=row[30] if len(row) > 30 else None, test_method_31=row[31] if len(row) > 31 else None, test_method_32=row[32] if len(row) > 32 else None, test_method_33=row[33] if len(row) > 33 else None, test_method_34=row[34] if len(row) > 34 else None, test_method_35=row[35] if len(row) > 35 else None, test_method_36=row[36] if len(row) > 36 else None, test_method_37=row[37] if len(row) > 37 else None, test_method_38=row[38] if len(row) > 38 else None, test_method_39=row[39] if len(row) > 39 else None, test_method_40=row[40] if len(row) > 40 else None, test_method_41=row[41] if len(row) > 41 else None, test_method_42=row[42] if len(row) > 42 else None))
                 models.StrainData.objects.bulk_create(data_list)
                 os.remove(settings.MEDIA_ROOT + file_name)
         if 'tilt_required' in request.POST.keys():
@@ -569,6 +569,58 @@ def find_key_by_value(dictionary, value_to_find):
             return key
     # If the value is not found, you can return None or raise an exception.
     return None  # or raise ValueError("Value not found")
+
+
+def downloadExcel(request, sensor_type):
+    if sensor_type == 'strain':
+        file_path = (settings.MEDIA_ROOT +
+                     "sample/" + "Strain Data.xlsx")
+        if os.path.exists(file_path):
+            with open(file_path, 'rb') as fh:
+                response = HttpResponse(
+                    fh.read(), content_type="application/vnd.ms-excel")
+                response['Content-Disposition'] = 'attachment; filename=' + \
+                    os.path.basename(file_path)
+                return response
+    elif sensor_type == 'tilt':
+        file_path = (settings.MEDIA_ROOT + "sample/" + "Tilt Data.xlsx")
+        if os.path.exists(file_path):
+            with open(file_path, 'rb') as fh:
+                response = HttpResponse(
+                    fh.read(), content_type="application/vnd.ms-excel")
+                response['Content-Disposition'] = 'attachment; filename=' + \
+                    os.path.basename(file_path)
+                return response
+    elif sensor_type == 'displacement':
+        file_path = (settings.MEDIA_ROOT + "sample/" +
+                     "Displacement Data.xlsx")
+        if os.path.exists(file_path):
+            with open(file_path, 'rb') as fh:
+                response = HttpResponse(
+                    fh.read(), content_type="application/vnd.ms-excel")
+                response['Content-Disposition'] = 'attachment; filename=' + \
+                    os.path.basename(file_path)
+                return response
+    elif sensor_type == 'settlement':
+        file_path = (settings.MEDIA_ROOT + "sample/" +
+                     "Settlement Data.xlsx")
+        if os.path.exists(file_path):
+            with open(file_path, 'rb') as fh:
+                response = HttpResponse(
+                    fh.read(), content_type="application/vnd.ms-excel")
+                response['Content-Disposition'] = 'attachment; filename=' + \
+                    os.path.basename(file_path)
+                return response
+    elif sensor_type == 'vibration':
+        file_path = (settings.MEDIA_ROOT +
+                     "sample/" + "Vibration Data.xlsx")
+        if os.path.exists(file_path):
+            with open(file_path, 'rb') as fh:
+                response = HttpResponse(
+                    fh.read(), content_type="application/vnd.ms-excel")
+                response['Content-Disposition'] = 'attachment; filename=' + \
+                    os.path.basename(file_path)
+                return response
 
 
 def getChartData(request):
