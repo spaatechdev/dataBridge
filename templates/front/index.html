@@ -109,6 +109,25 @@
         </div>
 
         <div class="col-md-12 col-sm-12 col-lg-12 col-xl-12 col-12">
+            {% if messages %}
+            {% for message in messages %}
+            {% if forloop.counter == 1 %}
+            {% if message.tags == 'error' %}
+            <div class="bg-danger text-white text-center">
+                <div class="{{ message.tags }}" style="height: 30px;">{{ message }}</div>
+            </div>
+            {% elif message.tags == 'success' %}
+            <div class="bg-success text-white text-center">
+                <div class="{{ message.tags }}" style="height: 30px;">{{ message }}</div>
+            </div>
+            {% else %}
+            <div class="text-center">
+                <div class="{{ message.tags }}" style="height: 30px;">{{ message }}</div>
+            </div>
+            {% endif %}
+            {% endif %}
+            {% endfor %}
+            {% endif %}
             <form action="#" id="chart_details_form">
                 <div class="row" style="border: 1px solid #f7f7f7; box-shadow: 2px 3px 9px #979797;">
                     <div class="col-md-3 col-sm-12 col-lg-3 col-xl-3 col-12 left-bg">
@@ -148,16 +167,18 @@
                             </div>
                         </div>
 
-                        <div class="col-md-6 col-sm-6 col-lg-6 col-xl-6 col-6 mb-4">
-                            <div class="form-group">
-                                <button type="submit" class="btn btn-sm btn-success submit_btn"
-                                    style="margin-top: 3rem;">Submit</button>
+                        <div class="row">
+                            <div class="col-md-6 col-sm-6 col-lg-6 col-xl-6 col-6 mb-4">
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-sm btn-success submit_btn"
+                                        style="margin-top: 3rem;">Submit</button>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-6 col-sm-6 col-lg-6 col-xl-6 col-6 reset_btn" style="display: none;">
-                            <div class="form-group">
-                                <a href="{% url 'index' %}" class="btn btn-sm btn-warning"
-                                    style="margin-top: 3rem;">Reset</a>
+                            <div class="col-md-6 col-sm-6 col-lg-6 col-xl-6 col-6 reset_btn" style="display: none;">
+                                <div class="form-group">
+                                    <a href="{% url 'index' %}" class="btn btn-sm btn-warning"
+                                        style="margin-top: 3rem;">Reset</a>
+                                </div>
                             </div>
                         </div>
                     </div>
