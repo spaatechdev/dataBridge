@@ -15,6 +15,7 @@ import csv
 import environ
 import time
 import json
+import random
 import openpyxl
 from django.db import connections
 from django.contrib.messages import get_messages
@@ -57,6 +58,18 @@ def createMilisecondsByDate(date_string):
     # Calculate the milliseconds since the Unix epoch
     milliseconds = int(time.mktime(datetime_tuple) * 1000) + timezone_milliseconds
     return milliseconds
+
+
+def random_color_code():
+    # Generate random values for red, green, and blue components
+    r = random.randint(0, 255)
+    g = random.randint(0, 255)
+    b = random.randint(0, 255)
+    
+    # Convert the RGB values to a hexadecimal color code
+    color_code = "#{:02X}{:02X}{:02X}".format(r, g, b)
+    
+    return color_code
 
 
 def downloadExcel(request, sensor_type):
@@ -687,7 +700,7 @@ def getChartData(request):
                     dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
             for index, elem in enumerate(request.POST.getlist('method')):
                 series.append(
-                    {'name': columns[elem], 'data': dynamic_vars[elem]})
+                    {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
         if sensor_type == 'tilt':
             data = models.TiltData.objects.filter(
                 date_time__range=(from_time, to_time)).order_by('id')
@@ -704,7 +717,7 @@ def getChartData(request):
                     dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
             for index, elem in enumerate(request.POST.getlist('method')):
                 series.append(
-                    {'name': columns[elem], 'data': dynamic_vars[elem]})
+                    {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
         if sensor_type == 'displacement':
             data = models.DisplacementData.objects.filter(
                 date_time__range=(from_time, to_time)).order_by('id')
@@ -721,7 +734,7 @@ def getChartData(request):
                     dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
             for index, elem in enumerate(request.POST.getlist('method')):
                 series.append(
-                    {'name': columns[elem], 'data': dynamic_vars[elem]})
+                    {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
         if sensor_type == 'settlement':
             data = models.SettlementData.objects.filter(
                 date_time__range=(from_time, to_time)).order_by('id')
@@ -738,7 +751,7 @@ def getChartData(request):
                     dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
             for index, elem in enumerate(request.POST.getlist('method')):
                 series.append(
-                    {'name': columns[elem], 'data': dynamic_vars[elem]})
+                    {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
         if sensor_type == 'vibration':
             data = models.VibrationData.objects.filter(
                 date_time__range=(from_time, to_time)).order_by('id')
@@ -755,7 +768,7 @@ def getChartData(request):
                     dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
             for index, elem in enumerate(request.POST.getlist('method')):
                 series.append(
-                    {'name': columns[elem], 'data': dynamic_vars[elem]})
+                    {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
         return JsonResponse({
             'code': 200,
             'status': "SUCCESS",
@@ -987,7 +1000,7 @@ def getCompareOneChartData(request):
                     for method in dynamic_vars:
                         dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
                 if sensor_data in columns.keys():
-                    series.append({'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
+                    series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
             if elem == 'tilt':
                 data = models.TiltData.objects.filter(date_time__range=(from_time, to_time)).order_by('id')
                 sensor_counts = getSensorCounts(elem)
@@ -1000,7 +1013,7 @@ def getCompareOneChartData(request):
                     for method in dynamic_vars:
                         dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
                 if sensor_data in columns.keys():
-                    series.append({'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
+                    series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
             if elem == 'displacement':
                 data = models.DisplacementData.objects.filter(date_time__range=(from_time, to_time)).order_by('id')
                 sensor_counts = getSensorCounts(elem)
@@ -1013,7 +1026,7 @@ def getCompareOneChartData(request):
                     for method in dynamic_vars:
                         dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
                 if sensor_data in columns.keys():
-                    series.append({'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
+                    series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
             if elem == 'settlement':
                 data = models.SettlementData.objects.filter(date_time__range=(from_time, to_time)).order_by('id')
                 sensor_counts = getSensorCounts(elem)
@@ -1026,7 +1039,7 @@ def getCompareOneChartData(request):
                     for method in dynamic_vars:
                         dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
                 if sensor_data in columns.keys():
-                    series.append({'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
+                    series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
             if elem == 'vibration':
                 data = models.VibrationData.objects.filter(date_time__range=(from_time, to_time)).order_by('id')
                 sensor_counts = getSensorCounts(elem)
@@ -1039,7 +1052,7 @@ def getCompareOneChartData(request):
                     for method in dynamic_vars:
                         dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
                 if sensor_data in columns.keys():
-                    series.append({'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
+                    series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
         return JsonResponse({
             'code': 200,
             'status': "SUCCESS",
@@ -1081,7 +1094,7 @@ def getCompareChartData(request):
                     for method in dynamic_vars:
                         dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
                 if sensor_data in columns.keys():
-                    series.append({'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
+                    series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
                 all_data[elem] = series
             if elem == 'tilt':
                 series = []
@@ -1096,7 +1109,7 @@ def getCompareChartData(request):
                     for method in dynamic_vars:
                         dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
                 if sensor_data in columns.keys():
-                    series.append({'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
+                    series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
                 all_data[elem] = series
             if elem == 'displacement':
                 series = []
@@ -1111,7 +1124,7 @@ def getCompareChartData(request):
                     for method in dynamic_vars:
                         dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
                 if sensor_data in columns.keys():
-                    series.append({'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
+                    series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
                 all_data[elem] = series
             if elem == 'settlement':
                 series = []
@@ -1126,7 +1139,7 @@ def getCompareChartData(request):
                     for method in dynamic_vars:
                         dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
                 if sensor_data in columns.keys():
-                    series.append({'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
+                    series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
                 all_data[elem] = series
             if elem == 'vibration':
                 series = []
@@ -1141,7 +1154,7 @@ def getCompareChartData(request):
                     for method in dynamic_vars:
                         dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
                 if sensor_data in columns.keys():
-                    series.append({'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
+                    series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
                 all_data[elem] = series
         return JsonResponse({
             'code': 200,
