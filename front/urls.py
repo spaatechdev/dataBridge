@@ -9,5 +9,7 @@ urlpatterns = [
     path('get-sensors-by-types', csrf_exempt(views.getSensorsByTypes), name='getSensorsByTypes'),
     path('getChartData', csrf_exempt(views.getChartData), name='getChartData'),
 
-    path('compare', csrf_exempt(views.compare), name='compare')
+    path('compare', csrf_exempt(views.compare), name='compare'),
+    path('getCompareTimeDetails', csrf_exempt(views.getCompareTimeDetails), name='getCompareTimeDetails'),
+    path('getCompareChartData', csrf_exempt(views.getCompareChartData), name='getCompareChartData')
 ]

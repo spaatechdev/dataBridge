@@ -13,6 +13,7 @@ import math
 import pathlib
 import csv
 import environ
+import time
 import json
 import openpyxl
 from django.db import connections
@@ -29,6 +30,35 @@ context['project_name'] = env("PROJECT_NAME")
 context['client_name'] = env("CLIENT_NAME")
 
 # Create your views here.
+def removeSeconds(timestamp):
+    # Split the timestamp into date and time parts
+    date_part, time_part = timestamp.split('T')
+
+    # Remove the seconds from the time part
+    time_part_without_seconds = time_part[:5]
+
+    # Recombine the date and time parts
+    converted_timestamp = f"{date_part}T{time_part_without_seconds}"
+    return converted_timestamp
+
+
+def createMilisecondsByDate(date_string):
+    # Define the time duration
+    hours = 5
+    minutes = 30
+
+    # Calculate the total milliseconds
+    timezone_milliseconds = (hours * 3600 * 1000) + (minutes * 60 * 1000)
+
+    # Parse the datetime string manually
+    year, month, day, hour, minute, second = map(int, date_string.split('T')[0].split('-') + date_string.split('T')[1].split(':'))
+    datetime_tuple = (year, month, day, hour, minute, second, 0, 0, 0)
+
+    # Calculate the milliseconds since the Unix epoch
+    milliseconds = int(time.mktime(datetime_tuple) * 1000) + timezone_milliseconds
+    return milliseconds
+
+
 def downloadExcel(request, sensor_type):
     if sensor_type == 'strain':
         file_path = (settings.MEDIA_ROOT +
@@ -170,8 +200,8 @@ def getSensorsByTypes(request):
             'code': 200,
             'status': "SUCCESS",
             'columns': columns,
-            'min_time': min_time,
-            'max_time': max_time
+            'min_time': removeSeconds(min_time),
+            'max_time': removeSeconds(max_time)
         })
     else:
         return JsonResponse({
@@ -632,7 +662,7 @@ def getChartData(request):
             to_time).timestamp() * 1000)
         if from_miliseconds > to_miliseconds:
             return JsonResponse({
-                'code': 503,
+                'code': 505,
                 'status': "ERROR",
                 'message': "From time should not exceeds To time "
             })
@@ -649,8 +679,7 @@ def getChartData(request):
                 dynamic_vars[f"test_method_{index}"] = []
             for row_data in data:
                 for method in dynamic_vars:
-                    dynamic_vars[method].append([int(datetime.fromisoformat(
-                        str(row_data.date_time)).timestamp() * 1000), float(getattr(row_data, method))])
+                    dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
             for index, elem in enumerate(request.POST.getlist('method')):
                 series.append(
                     {'name': columns[elem], 'data': dynamic_vars[elem]})
@@ -667,8 +696,7 @@ def getChartData(request):
                 dynamic_vars[f"test_method_{index}"] = []
             for row_data in data:
                 for method in dynamic_vars:
-                    dynamic_vars[method].append([int(datetime.fromisoformat(
-                        str(row_data.date_time)).timestamp() * 1000), float(getattr(row_data, method))])
+                    dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
             for index, elem in enumerate(request.POST.getlist('method')):
                 series.append(
                     {'name': columns[elem], 'data': dynamic_vars[elem]})
@@ -685,8 +713,7 @@ def getChartData(request):
                 dynamic_vars[f"test_method_{index}"] = []
             for row_data in data:
                 for method in dynamic_vars:
-                    dynamic_vars[method].append([int(datetime.fromisoformat(
-                        str(row_data.date_time)).timestamp() * 1000), float(getattr(row_data, method))])
+                    dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
             for index, elem in enumerate(request.POST.getlist('method')):
                 series.append(
                     {'name': columns[elem], 'data': dynamic_vars[elem]})
@@ -703,8 +730,7 @@ def getChartData(request):
                 dynamic_vars[f"test_method_{index}"] = []
             for row_data in data:
                 for method in dynamic_vars:
-                    dynamic_vars[method].append([int(datetime.fromisoformat(
-                        str(row_data.date_time)).timestamp() * 1000), float(getattr(row_data, method))])
+                    dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
             for index, elem in enumerate(request.POST.getlist('method')):
                 series.append(
                     {'name': columns[elem], 'data': dynamic_vars[elem]})
@@ -721,8 +747,7 @@ def getChartData(request):
                 dynamic_vars[f"test_method_{index}"] = []
             for row_data in data:
                 for method in dynamic_vars:
-                    dynamic_vars[method].append([int(datetime.fromisoformat(
-                        str(row_data.date_time)).timestamp() * 1000), float(getattr(row_data, method))])
+                    dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
             for index, elem in enumerate(request.POST.getlist('method')):
                 series.append(
                     {'name': columns[elem], 'data': dynamic_vars[elem]})
@@ -806,3 +831,149 @@ def compare(request):
     }
     context.update({'sensor_types': sensor_types})
     return render(request, 'front/compare.html', context)
+
+
+def getCompareTimeDetails(request):
+    if request.method == "POST":
+        sensor_types = request.POST.getlist('sensor_types[]')
+        min_times = []
+        max_times = []
+        if 'strain' in sensor_types:
+            min_times.append((models.StrainData.objects.all().order_by(
+                'date_time')[0].date_time).strftime("%Y-%m-%dT%H:%M:%S"))
+            max_times.append((models.StrainData.objects.all().order_by(
+                '-date_time')[0].date_time).strftime("%Y-%m-%dT%H:%M:%S"))
+        if 'tilt' in sensor_types:
+            min_times.append((models.TiltData.objects.all().order_by(
+                'date_time')[0].date_time).strftime("%Y-%m-%dT%H:%M:%S"))
+            max_times.append((models.TiltData.objects.all().order_by(
+                '-date_time')[0].date_time).strftime("%Y-%m-%dT%H:%M:%S"))
+        if 'displacement' in sensor_types:
+            min_times.append((models.DisplacementData.objects.all().order_by(
+                'date_time')[0].date_time).strftime("%Y-%m-%dT%H:%M:%S"))
+            max_times.append((models.DisplacementData.objects.all().order_by(
+                '-date_time')[0].date_time).strftime("%Y-%m-%dT%H:%M:%S"))
+        if 'settlement' in sensor_types:
+            min_times.append((models.SettlementData.objects.all().order_by(
+                'date_time')[0].date_time).strftime("%Y-%m-%dT%H:%M:%S"))
+            max_times.append((models.SettlementData.objects.all().order_by(
+                '-date_time')[0].date_time).strftime("%Y-%m-%dT%H:%M:%S"))
+        if 'vibration' in sensor_types:
+            min_times.append((models.VibrationData.objects.all().order_by(
+                'date_time')[0].date_time).strftime("%Y-%m-%dT%H:%M:%S"))
+            max_times.append((models.VibrationData.objects.all().order_by(
+                '-date_time')[0].date_time).strftime("%Y-%m-%dT%H:%M:%S"))
+        # min_date_objects = [date_string for date_string in min_times]
+        # Find the maximum datetime object
+        min_time = max(min_times)
+
+        # max_date_objects = [date_string for date_string in max_times]
+        # Find the minimum datetime object
+        max_time = min(max_times)
+
+        return JsonResponse({
+            'code': 200,
+            'status': "SUCCESS",
+            'min_time': removeSeconds(min_time),
+            'max_time': removeSeconds(max_time)
+        })
+    else:
+        return JsonResponse({
+            'code': 504,
+            'status': "ERROR",
+            'message': "There should be ajax method."
+        })
+
+
+def getCompareChartData(request):
+    if request.method == "POST":
+        sensor_types = request.POST.getlist('sensor_type')
+        from_time = request.POST['from_time']
+        to_time = request.POST['to_time']
+        from_miliseconds = int(datetime.fromisoformat(from_time).timestamp() * 1000)
+        to_miliseconds = int(datetime.fromisoformat(to_time).timestamp() * 1000)
+        if from_miliseconds > to_miliseconds:
+            return JsonResponse({
+                'code': 507,
+                'status': "ERROR",
+                'message': "From time should not exceeds To time "
+            })
+        series = []
+        for index, elem in enumerate(request.POST.getlist('sensor_type')):
+            sensor_data = request.POST.getlist('method')[index]
+            if elem == 'strain':
+                data = models.StrainData.objects.filter(date_time__range=(from_time, to_time)).order_by('id')
+                sensor_counts = getSensorCounts(elem)
+                sensor_names = get_constants(elem)
+                columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                dynamic_vars = {}
+                for i, element in enumerate(sensor_counts, start=1):
+                    dynamic_vars[f"test_method_{i}"] = []
+                for row_data in data:
+                    for method in dynamic_vars:
+                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
+                if sensor_data in columns.keys():
+                    series.append({'name': elem + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
+            if elem == 'tilt':
+                data = models.TiltData.objects.filter(date_time__range=(from_time, to_time)).order_by('id')
+                sensor_counts = getSensorCounts(elem)
+                sensor_names = get_constants(elem)
+                columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                dynamic_vars = {}
+                for i, element in enumerate(sensor_counts, start=1):
+                    dynamic_vars[f"test_method_{i}"] = []
+                for row_data in data:
+                    for method in dynamic_vars:
+                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
+                if sensor_data in columns.keys():
+                    series.append({'name': elem + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
+            if elem == 'displacement':
+                data = models.DisplacementData.objects.filter(date_time__range=(from_time, to_time)).order_by('id')
+                sensor_counts = getSensorCounts(elem)
+                sensor_names = get_constants(elem)
+                columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                dynamic_vars = {}
+                for i, element in enumerate(sensor_counts, start=1):
+                    dynamic_vars[f"test_method_{i}"] = []
+                for row_data in data:
+                    for method in dynamic_vars:
+                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
+                if sensor_data in columns.keys():
+                    series.append({'name': elem + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
+            if elem == 'settlement':
+                data = models.SettlementData.objects.filter(date_time__range=(from_time, to_time)).order_by('id')
+                sensor_counts = getSensorCounts(elem)
+                sensor_names = get_constants(elem)
+                columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                dynamic_vars = {}
+                for i, element in enumerate(sensor_counts, start=1):
+                    dynamic_vars[f"test_method_{i}"] = []
+                for row_data in data:
+                    for method in dynamic_vars:
+                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
+                if sensor_data in columns.keys():
+                    series.append({'name': elem + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
+            if elem == 'vibration':
+                data = models.VibrationData.objects.filter(date_time__range=(from_time, to_time)).order_by('id')
+                sensor_counts = getSensorCounts(elem)
+                sensor_names = get_constants(elem)
+                columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                dynamic_vars = {}
+                for i, element in enumerate(sensor_counts, start=1):
+                    dynamic_vars[f"test_method_{i}"] = []
+                for row_data in data:
+                    for method in dynamic_vars:
+                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
+                if sensor_data in columns.keys():
+                    series.append({'name': elem + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
+        return JsonResponse({
+            'code': 200,
+            'status': "SUCCESS",
+            'result': {'series': series},
+        })
+    else:
+        return JsonResponse({
+            'code': 506,
+            'status': "ERROR",
+            'message': "There should be ajax method."
+        })

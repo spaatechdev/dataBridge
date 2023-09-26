@@ -13,6 +13,8 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="{% static 'select2/select2.min.css' %}">
+    <script src="{% static 'js/jquery.min.js' %}"></script>
     <title>Multiple Sensors Data</title>
     <style>
         #container {
@@ -93,8 +95,6 @@
             }
         }
     </style>
-    <link rel="stylesheet" href="{% static 'select2/select2.min.css' %}">
-    <script src="{% static 'js/jquery.min.js' %}"></script>
 </head>
 
 <body>
@@ -104,7 +104,7 @@
                 <h2 style="font-weight: 600;">SPAAViz</h2>
             </div>
             <div class="col-md-2 col-sm-2 col-lg-2 col-xl-2 col-2">
-                <!-- <a href="{% url 'compare' %}" class="btn btn-sm btn-info">Compare</a> -->
+                <a href="{% url 'compare' %}" class="btn btn-sm btn-info">Compare</a>
             </div>
             <div class="col-md-2 col-sm-2 col-lg-2 col-xl-2 col-2">
                 <a href="{% url 'importExcel' %}" class="btn btn-sm btn-info">Import Data</a>
@@ -158,14 +158,14 @@
 
                         <div class="col-md-12 col-sm-12 col-lg-12 col-xl-12 col-12">
                             <div class="form-group">
-                                <label>From Time</label>
+                                <label for="from_time">From Time</label>
                                 <input name="from_time" type="datetime-local" id="from_time" class="form-control"
                                     required>
                             </div>
                         </div>
                         <div class="col-md-12 col-sm-12 col-lg-12 col-xl-12 col-12">
                             <div class="form-group">
-                                <label>To Time</label>
+                                <label for="to_time">To Time</label>
                                 <input name="to_time" type="datetime-local" id="to_time" class="form-control" required>
                             </div>
                         </div>
@@ -196,7 +196,6 @@
     </div>
 
 
-
     <script src="{% static 'select2/select2.min.js' %}"></script>
     <script src="{% static 'js/highcharts/js/highcharts.js' %}"></script>
 
@@ -224,8 +223,10 @@
                         $("#method").html(sensors_text);
 
                         // Convert the data to a JavaScript Date object
-                        const minTime = new Date(response.min_time).toISOString().slice(0, 16);
-                        const maxTime = new Date(response.max_time).toISOString().slice(0, 16);
+                        // const minTime = new Date(response.min_time).toISOString().slice(0, 16);
+                        // const maxTime = new Date(response.max_time).toISOString().slice(0, 16);
+                        var minTime = response.min_time;
+                        var maxTime = response.max_time;
 
                         // Set the min and max attributes of the input element
                         $('#from_time').attr('min', minTime);
