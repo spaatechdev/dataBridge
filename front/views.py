@@ -913,7 +913,7 @@ def getCompareChartData(request):
                     for method in dynamic_vars:
                         dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
                 if sensor_data in columns.keys():
-                    series.append({'name': sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
+                    series.append({'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
             if elem == 'tilt':
                 data = models.TiltData.objects.filter(date_time__range=(from_time, to_time)).order_by('id')
                 sensor_counts = getSensorCounts(elem)
@@ -926,7 +926,7 @@ def getCompareChartData(request):
                     for method in dynamic_vars:
                         dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
                 if sensor_data in columns.keys():
-                    series.append({'name': sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
+                    series.append({'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
             if elem == 'displacement':
                 data = models.DisplacementData.objects.filter(date_time__range=(from_time, to_time)).order_by('id')
                 sensor_counts = getSensorCounts(elem)
@@ -939,7 +939,7 @@ def getCompareChartData(request):
                     for method in dynamic_vars:
                         dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
                 if sensor_data in columns.keys():
-                    series.append({'name': sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
+                    series.append({'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
             if elem == 'settlement':
                 data = models.SettlementData.objects.filter(date_time__range=(from_time, to_time)).order_by('id')
                 sensor_counts = getSensorCounts(elem)
@@ -952,7 +952,7 @@ def getCompareChartData(request):
                     for method in dynamic_vars:
                         dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
                 if sensor_data in columns.keys():
-                    series.append({'name': sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
+                    series.append({'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
             if elem == 'vibration':
                 data = models.VibrationData.objects.filter(date_time__range=(from_time, to_time)).order_by('id')
                 sensor_counts = getSensorCounts(elem)
@@ -965,7 +965,7 @@ def getCompareChartData(request):
                     for method in dynamic_vars:
                         dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
                 if sensor_data in columns.keys():
-                    series.append({'name': sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
+                    series.append({'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
         return JsonResponse({
             'code': 200,
             'status': "SUCCESS",
