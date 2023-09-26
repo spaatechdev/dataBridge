@@ -44,7 +44,7 @@
         {% endif %}
         {% endfor %}
         {% endif %}
-        <form action="#" id="chart_details_form" enctype="multipart/form-data">
+        <form action="#" id="comparative_chart_details_form" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="row">
                 <div class="col-md-6 parent_form">
@@ -192,7 +192,7 @@
             placeholder: ''
         });
 
-        $(document).on('submit', '#chart_details_form', async function (e) {
+        $(document).on('submit', '#comparative_chart_details_form', async function (e) {
             e.preventDefault();
             $('.submit_btn').text('Submitting...');
             $('.submit_btn').prop('disabled', true);

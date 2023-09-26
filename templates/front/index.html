@@ -11,90 +11,11 @@
     <link rel="shortcut icon" href="{% static 'images/favicon.png' %}" />
     <link href="{% static 'images/favicon.png' %}" rel="apple-touch-icon">
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="{% static 'bootstrap/bootstrap.min.css' %}" rel="stylesheet">
+    <script src="{% static 'bootstrap/bootstrap.bundle.min.js' %}"></script>
     <link rel="stylesheet" href="{% static 'select2/select2.min.css' %}">
     <script src="{% static 'js/jquery.min.js' %}"></script>
-    <title>Multiple Sensors Data</title>
-    <style>
-        #container {
-            max-width: 800px;
-            margin: auto;
-        }
-
-        .highcharts-figure,
-        .highcharts-data-table table {
-            min-width: 360px;
-            max-width: 800px;
-            margin: 1em auto;
-        }
-
-        .highcharts-data-table table {
-            font-family: Verdana, sans-serif;
-            border-collapse: collapse;
-            border: 1px solid #ebebeb;
-            margin: 10px auto;
-            text-align: center;
-            width: 100%;
-            max-width: 500px;
-        }
-
-        .highcharts-data-table caption {
-            padding: 1em 0;
-            font-size: 1.2em;
-            color: #555;
-        }
-
-        .highcharts-data-table th {
-            font-weight: 600;
-            padding: 0.5em;
-        }
-
-        .highcharts-data-table td,
-        .highcharts-data-table th,
-        .highcharts-data-table caption {
-            padding: 0.5em;
-        }
-
-        .highcharts-data-table thead tr,
-        .highcharts-data-table tr:nth-child(even) {
-            background: #f8f8f8;
-        }
-
-        .highcharts-data-table tr:hover {
-            background: #f1f7ff;
-        }
-
-        .left-bg {
-            background: aliceblue;
-            padding-top: 35px;
-        }
-
-
-        @media only screen and (max-width: 1200px) {
-            body {
-                width: 100%;
-            }
-        }
-
-        @media only screen and (max-width: 992px) {
-            body {
-                width: 100%;
-            }
-        }
-
-        @media only screen and (max-width: 768px) {
-            body {
-                width: 100%;
-            }
-        }
-
-        @media only screen and (max-width: 576px) {
-            body {
-                width: 100%;
-            }
-        }
-    </style>
+    <title>Visualize Sensors Data</title>
 </head>
 
 <body>
@@ -103,9 +24,9 @@
             <div class="col-md-8 col-sm-8 col-lg-8 col-xl-8 col-8">
                 <h2 style="font-weight: 600;">SPAAViz</h2>
             </div>
-            <div class="col-md-2 col-sm-2 col-lg-2 col-xl-2 col-2">
+            <!-- <div class="col-md-2 col-sm-2 col-lg-2 col-xl-2 col-2">
                 <a href="{% url 'compare' %}" class="btn btn-sm btn-info">Compare</a>
-            </div>
+            </div> -->
             <div class="col-md-2 col-sm-2 col-lg-2 col-xl-2 col-2">
                 <a href="{% url 'importExcel' %}" class="btn btn-sm btn-info">Import Data</a>
             </div>
@@ -131,14 +52,19 @@
             {% endif %}
             {% endfor %}
             {% endif %}
-            <form action="#" id="chart_details_form">
-                <div class="row" style="border: 1px solid #f7f7f7; box-shadow: 2px 3px 9px #979797;">
-                    <div class="col-md-3 col-sm-12 col-lg-3 col-xl-3 col-12 left-bg">
-                        <div class="col-md-12 col-sm-12 col-lg-12 col-xl-12 col-12">
+            <label class="radio-inline">
+                <input type="radio" name="chart_option" value="normal" checked>Normal(Single Sensor) Data Analysis
+            </label>
+            <label class="radio-inline">
+                <input type="radio" name="chart_option" value="comparative">Comparative Data Analysis
+            </label>
+            <div class="normal">
+                <form action="#" id="normal_chart_details_form">
+                    <div class="row">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label>Select Sensor Type</label>
-                                <select name="sensor_type" id="sensor_type"
-                                    class="sensor_type form-control selectpicker" required>
+                                <select name="sensor_type" id="sensor_type" class="form-control selectpicker" required>
                                     <option value="">Select One</option>
                                     {% for i in sensor_types.keys %}
                                     <option value="{{i}}">
@@ -147,7 +73,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-12 col-sm-12 col-lg-12 col-xl-12 col-12">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label>Select Sensors (Multiple)</label>
                                 <select name="method" id="method" class="form-control selectpicker" required multiple>
@@ -155,43 +81,122 @@
                                 </select>
                             </div>
                         </div>
-
-                        <div class="col-md-12 col-sm-12 col-lg-12 col-xl-12 col-12">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label for="from_time">From Time</label>
-                                <input name="from_time" type="datetime-local" id="from_time" class="form-control"
+                                <input name="from_time" type="datetime-local" id="normal_from_time" class="form-control"
                                     required>
                             </div>
                         </div>
-                        <div class="col-md-12 col-sm-12 col-lg-12 col-xl-12 col-12">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label for="to_time">To Time</label>
-                                <input name="to_time" type="datetime-local" id="to_time" class="form-control" required>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 col-sm-6 col-lg-6 col-xl-6 col-6 mb-4">
-                                <div class="form-group">
-                                    <button type="submit" class="btn btn-sm btn-success submit_btn"
-                                        style="margin-top: 3rem;">Submit</button>
-                                </div>
-                            </div>
-                            <div class="col-md-6 col-sm-6 col-lg-6 col-xl-6 col-6 reset_btn" style="display: none;">
-                                <div class="form-group">
-                                    <a href="{% url 'index' %}" class="btn btn-sm btn-warning"
-                                        style="margin-top: 3rem;">Reset</a>
-                                </div>
+                                <input name="to_time" type="datetime-local" id="normal_to_time" class="form-control" required>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-9 col-sm-12 col-lg-9 col-xl-9 col-12">
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mt-4">
+                                <button type="submit" class="btn btn-sm btn-success normal_submit_btn">Submit</button>
+                            </div>
+                        </div>
+                        <div class="col-md-6 normal_reset_btn" style="display: none;">
+                            <div class="form-group mt-4">
+                                <a href="{% url 'index' %}" class="btn btn-sm btn-warning">Reset</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
                         <figure class="highcharts-figure">
                             <div id="chartContainer"></div>
                         </figure>
                     </div>
-                </div>
-            </form>
+                </form>
+            </div>
+            <div class="comparative" style="display: none;">
+                <form action="#" id="comparative_chart_details_form" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6 parent_form">
+                            <div class="form-group">
+                                <label>Select Sensor Type</label>
+                                <select name="sensor_type" class="sensor_type form-control" required>
+                                    <option value="">Select One</option>
+                                    {% for i in sensor_types.keys %}
+                                    <option value="{{i}}">
+                                        {{sensor_types.values|get_list2_value:forloop.counter0}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Select Sensor</label>
+                                <select name="method" class="method form-control" required>
+                                    <option value="">Select Sensor Type</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6 parent_form">
+                            <div class="form-group">
+                                <label>Select Sensor Type</label>
+                                <select name="sensor_type" class="sensor_type form-control" required>
+                                    <option value="">Select One</option>
+                                    {% for i in sensor_types.keys %}
+                                    <option value="{{i}}">
+                                        {{sensor_types.values|get_list2_value:forloop.counter0}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Select Sensor</label>
+                                <select name="method" class="method form-control" required>
+                                    <option value="">Select Sensor Type</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="from_time">From Time</label>
+                                <input name="from_time" type="datetime-local" id="comparative_from_time" class="form-control"
+                                    required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="to_time">To Time</label>
+                                <input name="to_time" type="datetime-local" id="comparative_to_time" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group mt-4">
+                                <button type="submit" class="btn btn-success comparative_submit_btn">Submit</button>
+                            </div>
+                        </div>
+                        <div class="col-md-3 comparative_reset_btn" style="display: none;">
+                            <div class="form-group mt-4">
+                                <a href="{% url 'compare' %}" class="btn btn-warning">Reset</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <figure class="highcharts-figure">
+                            <div id="chartFirstContainer"></div>
+                        </figure>
+                    </div>
+                    <div class="col-md-12">
+                        <figure class="highcharts-figure">
+                            <div id="chartSecondContainer"></div>
+                        </figure>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -208,6 +213,10 @@
     <script src="{% static 'js/highcharts/js/accessibility.js' %}"></script>
 
     <script>
+        $('.selectpicker').select2({
+            placeholder: ''
+        });
+
         $(document).on('change', '#sensor_type', function () {
             let sensor_type = $(this).val();
             $.ajax({
@@ -229,12 +238,12 @@
                         var maxTime = response.max_time;
 
                         // Set the min and max attributes of the input element
-                        $('#from_time').attr('min', minTime);
-                        $('#from_time').attr('max', maxTime);
+                        $('#normal_from_time').attr('min', minTime);
+                        $('#normal_from_time').attr('max', maxTime);
 
                         // Set the min and max attributes of the input element
-                        $('#to_time').attr('min', minTime);
-                        $('#to_time').attr('max', maxTime);
+                        $('#normal_to_time').attr('min', minTime);
+                        $('#normal_to_time').attr('max', maxTime);
                     } else {
                         alert(response.message);
                     }
@@ -242,14 +251,10 @@
             });
         })
 
-        $('.selectpicker').select2({
-            placeholder: ''
-        });
-
-        $(document).on('submit', '#chart_details_form', async function (e) {
+        $(document).on('submit', '#normal_chart_details_form', async function (e) {
             e.preventDefault();
-            $('.submit_btn').text('Submitting...');
-            $('.submit_btn').prop('disabled', true);
+            $('.normal_submit_btn').text('Submitting...');
+            $('.normal_submit_btn').prop('disabled', true);
             // if (parseInt($('#from_hour').val()) > parseInt($('#to_hour').val())) {
             //     alert("From hour should not exceeds To hour");
             // } else {
@@ -262,10 +267,10 @@
                 url: "{% url 'getChartData' %}",
                 data: formData,
                 success: function (response) {
-                    $('.submit_btn').text('Submit');
-                    $('.submit_btn').prop('disabled', false);
+                    $('.normal_submit_btn').text('Submit');
+                    $('.normal_submit_btn').prop('disabled', false);
                     if (response.code == 200) {
-                        $('.reset_btn').css('display', 'block')
+                        $('.normal_reset_btn').css('display', 'block')
                         result = response.result;
                         renderLineChart(result);
                     } else {
@@ -310,6 +315,167 @@
             });
         }
 
+    </script>
+
+    <script>
+        $(document).on('change', '.sensor_type', function () {
+            let elem = $(this);
+            let sensor_type = elem.val();
+            $.ajax({
+                url: "{% url 'getSensorsByTypes' %}",
+                type: 'post',
+                data: ({ sensor_type: sensor_type }),
+                success: function (response) {
+                    if (response.code == 200) {
+                        var sensors_text = `<option value="">Select Sensor</option>`;
+                        for (const key in response.columns) {
+                            sensors_text += `<option value="${key}">${response.columns[key]}</option>`;
+                        }
+                        elem.parents('.parent_form').find('.method').html(sensors_text);
+                    } else {
+                        alert(response.message);
+                    }
+                },
+            });
+
+            let sensor_types = [];
+            $('.sensor_type').each(function () {
+                sensor_types.push($(this).val());
+            })
+
+            $.ajax({
+                url: "{% url 'getCompareTimeDetails' %}",
+                type: 'post',
+                data: ({ sensor_types: sensor_types }),
+                success: function (response) {
+                    if (response.code == 200) {
+                        // Convert the data to a JavaScript Date object
+                        // const minTime = new Date(response.min_time).toISOString().slice(0, 16);
+                        // const maxTime = new Date(response.max_time).toISOString().slice(0, 16);
+                        var minTime = response.min_time;
+                        var maxTime = response.max_time;
+
+                        // Set the min and max attributes of the input element
+                        $('#comparative_from_time').attr('min', minTime);
+                        $('#comparative_from_time').attr('max', maxTime);
+
+                        // Set the min and max attributes of the input element
+                        $('#comparative_to_time').attr('min', minTime);
+                        $('#comparative_to_time').attr('max', maxTime);
+                    } else {
+                        alert(response.message);
+                    }
+                },
+            });
+        })
+
+        $(document).on('submit', '#comparative_chart_details_form', async function (e) {
+            e.preventDefault();
+            $('.comparative_submit_btn').text('Submitting...');
+            $('.comparative_submit_btn').prop('disabled', true);
+            var formData = new FormData(this);
+            await $.ajax({
+                type: "POST",
+                evalScripts: true,
+                contentType: false,
+                processData: false,
+                url: "{% url 'getCompareChartData' %}",
+                data: formData,
+                success: function (response) {
+                    $('.comparative_submit_btn').text('Submit');
+                    $('.comparative_submit_btn').prop('disabled', false);
+                    if (response.code == 200) {
+                        $('.comparative_reset_btn').css('display', 'block')
+                        result = response.result;
+                        renderFirstLineChart(result[Object.keys(result)[0]]);
+                        renderSecondLineChart(result[Object.keys(result)[1]]);
+                    } else {
+                        alert(response.message)
+                    }
+                }
+            });
+        });
+
+        function renderFirstLineChart(result) {
+            // Create the chart
+            Highcharts.chart('chartFirstContainer', {
+
+                chart: {
+                    zoomType: 'x',
+                    // height: 500
+                },
+                credits: {
+                    enabled: false
+                },
+                title: {
+                    text: 'Comparative Data Analysis'
+                },
+
+                accessibility: {
+                    screenReaderSection: {
+                        beforeChartFormat: '<{headingTagName}>{chartTitle}</{headingTagName}><div>{chartSubtitle}</div><div>{chartLongdesc}</div><div>{xAxisDescription}</div><div>{yAxisDescription}</div>'
+                    }
+                },
+
+                tooltip: {
+                    valueDecimals: 5
+                },
+
+                xAxis: {
+                    type: 'datetime'
+                },
+
+                series: result
+
+            });
+        }
+
+        function renderSecondLineChart(result) {
+            // Create the chart
+            Highcharts.chart('chartSecondContainer', {
+
+                chart: {
+                    zoomType: 'x',
+                    // height: 500
+                },
+                credits: {
+                    enabled: false
+                },
+                title: {
+                    text: 'Comparative Data Analysis'
+                },
+
+                accessibility: {
+                    screenReaderSection: {
+                        beforeChartFormat: '<{headingTagName}>{chartTitle}</{headingTagName}><div>{chartSubtitle}</div><div>{chartLongdesc}</div><div>{xAxisDescription}</div><div>{yAxisDescription}</div>'
+                    }
+                },
+
+                tooltip: {
+                    valueDecimals: 5
+                },
+
+                xAxis: {
+                    type: 'datetime'
+                },
+
+                series: result
+
+            });
+        }
+    </script>
+
+    <script>
+        $(document).on('click', 'input[name=chart_option]:checked', function () {
+            chart_option = $(this).val();
+            if (chart_option == 'normal') {
+                $('.normal').css('display', 'block');
+                $('.comparative').css('display', 'none');
+            } else if (chart_option == 'comparative') {
+                $('.comparative').css('display', 'block');
+                $('.normal').css('display', 'none');
+            }
+        })
     </script>
 </body>
 
