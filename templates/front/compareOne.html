@@ -213,8 +213,7 @@
                     if (response.code == 200) {
                         $('.reset_btn').css('display', 'block')
                         result = response.result;
-                        renderFirstLineChart(result[Object.keys(result)[0]]);
-                        renderSecondLineChart(result[Object.keys(result)[1]]);
+                        renderLineChart(result);
                     } else {
                         alert(response.message)
                     }
@@ -222,9 +221,9 @@
             });
         });
 
-        function renderFirstLineChart(result) {
+        function renderLineChart(result) {
             // Create the chart
-            Highcharts.chart('chartFirstContainer', {
+            Highcharts.chart('chartContainer', {
 
                 chart: {
                     zoomType: 'x',
@@ -251,41 +250,7 @@
                     type: 'datetime'
                 },
 
-                series: result
-
-            });
-        }
-
-        function renderSecondLineChart(result) {
-            // Create the chart
-            Highcharts.chart('chartSecondContainer', {
-
-                chart: {
-                    zoomType: 'x',
-                    // height: 500
-                },
-                credits: {
-                    enabled: false
-                },
-                title: {
-                    text: 'Comparative Data Analysis'
-                },
-
-                accessibility: {
-                    screenReaderSection: {
-                        beforeChartFormat: '<{headingTagName}>{chartTitle}</{headingTagName}><div>{chartSubtitle}</div><div>{chartLongdesc}</div><div>{xAxisDescription}</div><div>{yAxisDescription}</div>'
-                    }
-                },
-
-                tooltip: {
-                    valueDecimals: 5
-                },
-
-                xAxis: {
-                    type: 'datetime'
-                },
-
-                series: result
+                series: result.series
 
             });
         }

@@ -385,7 +385,8 @@ def importExcel(request):
                 # Removing Date Time Column
                 del column_names[0]
 
-                strain_columns = get_constants('strain')
+                # strain_columns = get_constants('strain')
+                strain_columns = constants.strain_columns
                 for index, column in enumerate(column_names):
                     strain_columns[list(strain_columns.keys())[index]] = column
 
@@ -437,7 +438,8 @@ def importExcel(request):
                 # Removing Date Time Column
                 del column_names[0]
 
-                tilt_columns = get_constants('tilt')
+                # tilt_columns = get_constants('tilt')
+                tilt_columns = constants.tilt_columns
 
                 for index, column in enumerate(column_names):
                     tilt_columns[list(tilt_columns.keys())[index]] = column
@@ -490,7 +492,8 @@ def importExcel(request):
                 # Removing Date Time Column
                 del column_names[0]
 
-                displacement_columns = get_constants('displacement')
+                # displacement_columns = get_constants('displacement')
+                displacement_columns = constants.displacement_columns
 
                 for index, column in enumerate(column_names):
                     displacement_columns[list(displacement_columns.keys())[
@@ -544,7 +547,8 @@ def importExcel(request):
                 # Removing Date Time Column
                 del column_names[0]
 
-                settlement_columns = get_constants('settlement')
+                # settlement_columns = get_constants('settlement')
+                settlement_columns = constants.settlement_columns
 
                 for index, column in enumerate(column_names):
                     settlement_columns[list(settlement_columns.keys())[
@@ -598,7 +602,8 @@ def importExcel(request):
                 # Removing Date Time Column
                 del column_names[0]
 
-                vibration_columns = get_constants('vibration')
+                # vibration_columns = get_constants('vibration')
+                vibration_columns = constants.vibration_columns
 
                 for index, column in enumerate(column_names):
                     vibration_columns[list(vibration_columns.keys())[
@@ -833,6 +838,75 @@ def compare(request):
     return render(request, 'front/compare.html', context)
 
 
+def compareOne(request):
+    strain_data = models.StrainData.objects.count()
+    if strain_data == 0:
+        # Delete all messages by popping them from the list
+        try:
+            storage = get_messages(request)
+            for message in storage:
+                message = ''
+            storage.used = False
+        except:
+            pass
+        messages.error(request, 'No Strain Data Is Present.')
+        return redirect('importExcel')
+    tilt_data = models.TiltData.objects.count()
+    if tilt_data == 0:
+        # Delete all messages by popping them from the list
+        try:
+            storage = get_messages(request)
+            for message in storage:
+                message = ''
+            storage.used = False
+        except:
+            pass
+        messages.error(request, 'No Tilt Data Is Present.')
+        return redirect('importExcel')
+    displacement_data = models.DisplacementData.objects.count()
+    if displacement_data == 0:
+        # Delete all messages by popping them from the list
+        try:
+            storage = get_messages(request)
+            for message in storage:
+                message = ''
+            storage.used = False
+        except:
+            pass
+        messages.error(request, 'No Displacement Data Is Present.')
+        return redirect('importExcel')
+    settlement_data = models.SettlementData.objects.count()
+    if settlement_data == 0:
+        # Delete all messages by popping them from the list
+        try:
+            storage = get_messages(request)
+            for message in storage:
+                message = ''
+            storage.used = False
+        except:
+            pass
+        messages.error(request, 'No Settlement Data Is Present.')
+        return redirect('importExcel')
+    vibration_data = models.VibrationData.objects.count()
+    if vibration_data == 0:
+        # Delete all messages by popping them from the list
+        try:
+            storage = get_messages(request)
+            for message in storage:
+                message = ''
+            storage.used = False
+        except:
+            pass
+        messages.error(request, 'No Vibration Data Is Present.')
+        return redirect('importExcel')
+    sensor_types = {
+        'keys': list(constants.sensor_types.keys()),
+        'values': list(constants.sensor_types.values())
+    }
+    context.update({'sensor_types': sensor_types})
+    return render(request, 'front/compare.html', context)
+
+
 def getCompareTimeDetails(request):
     if request.method == "POST":
         sensor_types = request.POST.getlist('sensor_types[]')
@@ -885,7 +959,7 @@ def getCompareTimeDetails(request):
         })
 
 
-def getCompareChartData(request):
+def getCompareOneChartData(request):
     if request.method == "POST":
         sensor_types = request.POST.getlist('sensor_type')
         from_time = request.POST['from_time']
@@ -970,6 +1044,109 @@ def getCompareChartData(request):
             'code': 200,
             'status': "SUCCESS",
             'result': {'series': series},
+        })
+    else:
+        return JsonResponse({
+            'code': 506,
+            'status': "ERROR",
+            'message': "There should be ajax method."
+        })
+
+
+def getCompareChartData(request):
+    if request.method == "POST":
+        from_time = request.POST['from_time']
+        to_time = request.POST['to_time']
+        from_miliseconds = int(datetime.fromisoformat(from_time).timestamp() * 1000)
+        to_miliseconds = int(datetime.fromisoformat(to_time).timestamp() * 1000)
+        if from_miliseconds > to_miliseconds:
+            return JsonResponse({
+                'code': 507,
+                'status': "ERROR",
+                'message': "From time should not exceeds To time "
+            })
+        all_data = {}
+        for index, elem in enumerate(request.POST.getlist('sensor_type')):
+            sensor_data = request.POST.getlist('method')[index]
+            if elem == 'strain':
+                series = []
+                data = models.StrainData.objects.filter(date_time__range=(from_time, to_time)).order_by('id')
+                sensor_counts = getSensorCounts(elem)
+                sensor_names = get_constants(elem)
+                columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                dynamic_vars = {}
+                for i, element in enumerate(sensor_counts, start=1):
+                    dynamic_vars[f"test_method_{i}"] = []
+                for row_data in data:
+                    for method in dynamic_vars:
+                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
+                if sensor_data in columns.keys():
+                    series.append({'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
+                all_data[elem] = series
+            if elem == 'tilt':
+                series = []
+                data = models.TiltData.objects.filter(date_time__range=(from_time, to_time)).order_by('id')
+                sensor_counts = getSensorCounts(elem)
+                sensor_names = get_constants(elem)
+                columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                dynamic_vars = {}
+                for i, element in enumerate(sensor_counts, start=1):
+                    dynamic_vars[f"test_method_{i}"] = []
+                for row_data in data:
+                    for method in dynamic_vars:
+                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
+                if sensor_data in columns.keys():
+                    series.append({'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
+                all_data[elem] = series
+            if elem == 'displacement':
+                series = []
+                data = models.DisplacementData.objects.filter(date_time__range=(from_time, to_time)).order_by('id')
+                sensor_counts = getSensorCounts(elem)
+                sensor_names = get_constants(elem)
+                columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                dynamic_vars = {}
+                for i, element in enumerate(sensor_counts, start=1):
+                    dynamic_vars[f"test_method_{i}"] = []
+                for row_data in data:
+                    for method in dynamic_vars:
+                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
+                if sensor_data in columns.keys():
+                    series.append({'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
+                all_data[elem] = series
+            if elem == 'settlement':
+                series = []
+                data = models.SettlementData.objects.filter(date_time__range=(from_time, to_time)).order_by('id')
+                sensor_counts = getSensorCounts(elem)
+                sensor_names = get_constants(elem)
+                columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                dynamic_vars = {}
+                for i, element in enumerate(sensor_counts, start=1):
+                    dynamic_vars[f"test_method_{i}"] = []
+                for row_data in data:
+                    for method in dynamic_vars:
+                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
+                if sensor_data in columns.keys():
+                    series.append({'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
+                all_data[elem] = series
+            if elem == 'vibration':
+                series = []
+                data = models.VibrationData.objects.filter(date_time__range=(from_time, to_time)).order_by('id')
+                sensor_counts = getSensorCounts(elem)
+                sensor_names = get_constants(elem)
+                columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                dynamic_vars = {}
+                for i, element in enumerate(sensor_counts, start=1):
+                    dynamic_vars[f"test_method_{i}"] = []
+                for row_data in data:
+                    for method in dynamic_vars:
+                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
+                if sensor_data in columns.keys():
+                    series.append({'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
+                all_data[elem] = series
+        return JsonResponse({
+            'code': 200,
+            'status': "SUCCESS",
+            'result': all_data,
         })
     else:
         return JsonResponse({
