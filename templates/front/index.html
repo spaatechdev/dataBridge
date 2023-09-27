@@ -153,7 +153,7 @@
                         <div class="col-md-6 parent_form">
                             <div class="form-group">
                                 <label>Select Sensor Type</label>
-                                <select name="sensor_type" class="sensor_type form-control selectpicker" required>
+                                <select name="sensor_type" id="first_sensor_type" class="sensor_type form-control selectpicker" required>
                                     <option value="">Select One</option>
                                     {% for i in sensor_types.keys %}
                                     <option value="{{i}}">
@@ -171,7 +171,7 @@
                         <div class="col-md-6 parent_form">
                             <div class="form-group">
                                 <label>Select Sensor Type</label>
-                                <select name="sensor_type" class="sensor_type form-control selectpicker" required>
+                                <select name="sensor_type" id="second_sensor_type"  class="sensor_type form-control selectpicker" required>
                                     <option value="">Select One</option>
                                     {% for i in sensor_types.keys %}
                                     <option value="{{i}}">
@@ -578,6 +578,18 @@
             $('.selectpicker').select2({
                 placeholder: ''
             });
+        })
+
+        $(document).on('change', "#first_sensor_type", function () {
+            chosen_senor = $(this).val();
+            updated_sensor_types_text = `<option value="">Select One</option>`;
+            {% for i in sensor_types.keys %}
+            if (chosen_senor != '{{i}}') {
+                updated_sensor_types_text += `<option value="{{i}}">{{sensor_types.values|get_list2_value:forloop.counter0}}</option>`;
+            }
+            {% endfor %}
+
+            $("#second_sensor_type").html(updated_sensor_types_text);
         })
     </script>
 </body>
