@@ -121,11 +121,6 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-12">
-                        <figure class="highcharts-figure">
-                            <div id="chartContainer"></div>
-                        </figure>
-                    </div>
                 </form>
             </div>
             <div class="comparative" style="display: none;">
@@ -135,7 +130,7 @@
                         <div class="col-md-6 parent_form">
                             <div class="form-group">
                                 <label>Select Sensor Type</label>
-                                <select name="sensor_type" class="sensor_type form-control" required>
+                                <select name="sensor_type" class="sensor_type form-control selectpicker" required>
                                     <option value="">Select One</option>
                                     {% for i in sensor_types.keys %}
                                     <option value="{{i}}">
@@ -145,7 +140,7 @@
                             </div>
                             <div class="form-group">
                                 <label>Select Sensor</label>
-                                <select name="method" class="method form-control" required>
+                                <select name="method" class="method form-control selectpicker" required multiple>
                                     <option value="">Select Sensor Type</option>
                                 </select>
                             </div>
@@ -153,7 +148,7 @@
                         <div class="col-md-6 parent_form">
                             <div class="form-group">
                                 <label>Select Sensor Type</label>
-                                <select name="sensor_type" class="sensor_type form-control" required>
+                                <select name="sensor_type" class="sensor_type form-control selectpicker" required>
                                     <option value="">Select One</option>
                                     {% for i in sensor_types.keys %}
                                     <option value="{{i}}">
@@ -163,7 +158,7 @@
                             </div>
                             <div class="form-group">
                                 <label>Select Sensor</label>
-                                <select name="method" class="method form-control" required>
+                                <select name="method" class="method form-control selectpicker" required multiple>
                                     <option value="">Select Sensor Type</option>
                                 </select>
                             </div>
@@ -193,21 +188,52 @@
                         </div>
                         <div class="col-md-3 comparative_reset_btn" style="display: none;">
                             <div class="form-group mt-4">
-                                <a href="{% url 'compare' %}" class="btn btn-warning">Reset</a>
+                                <a href="{% url 'index' %}" class="btn btn-warning">Reset</a>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-12">
-                        <figure class="highcharts-figure">
-                            <div id="chartFirstContainer"></div>
-                        </figure>
-                    </div>
-                    <div class="col-md-12">
-                        <figure class="highcharts-figure">
-                            <div id="chartSecondContainer"></div>
-                        </figure>
-                    </div>
                 </form>
+            </div>
+            <div class="mt-4">
+                <div class="normalChart" style="display: none;">
+                    <div class="col-md-12">
+                        <figure class="highcharts-figure">
+                            <div id="chartContainer"></div>
+                        </figure>
+                    </div>
+                </div>
+                <div class="comparativeChart" style="display: none;">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#individual">Individual</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#combine">Combine</a>
+                        </li>
+                    </ul>
+                    <!-- Tab panes -->
+                    <div class="tab-content">
+                        <div id="individual" class="container tab-pane active"><br>
+                            <div class="col-md-12">
+                                <figure class="highcharts-figure">
+                                    <div id="chartFirstContainer"></div>
+                                </figure>
+                            </div>
+                            <div class="col-md-12">
+                                <figure class="highcharts-figure">
+                                    <div id="chartSecondContainer"></div>
+                                </figure>
+                            </div>
+                        </div>
+                        <div id="combine" class="container tab-pane fade"><br>
+                            <div class="col-md-12">
+                                <figure class="highcharts-figure">
+                                    <div id="combineChartContainer"></div>
+                                </figure>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -282,9 +308,11 @@
                     $('.normal_submit_btn').text('Submit');
                     $('.normal_submit_btn').prop('disabled', false);
                     if (response.code == 200) {
-                        $('.normal_reset_btn').css('display', 'block')
+                        $('.normal_reset_btn').css('display', 'block');
                         result = response.result;
-                        renderLineChart(result);
+                        $('.normalChart').css('display', 'block');
+                        $('.comparativeChart').css('display', 'none');
+                        renderNormalLineChart(result);
                     } else {
                         alert(response.message)
                     }
@@ -293,7 +321,7 @@
             // }
         });
 
-        function renderLineChart(result) {
+        function renderNormalLineChart(result) {
             // Create the chart
             Highcharts.chart('chartContainer', {
 
@@ -341,7 +369,7 @@
                     if (response.code == 200) {
                         var sensors_text = `<option value="">Select Sensor</option>`;
                         for (const key in response.columns) {
-                            sensors_text += `<option value="${key}">${response.columns[key]}</option>`;
+                            sensors_text += `<option value="${sensor_type + "~~" + key}">${response.columns[key]}</option>`;
                         }
                         elem.parents('.parent_form').find('.method').html(sensors_text);
                     } else {
@@ -399,8 +427,11 @@
                     if (response.code == 200) {
                         $('.comparative_reset_btn').css('display', 'block')
                         result = response.result;
-                        renderFirstLineChart(result[Object.keys(result)[0]]);
-                        renderSecondLineChart(result[Object.keys(result)[1]]);
+                        $('.normalChart').css('display', 'none');
+                        $('.comparativeChart').css('display', 'block');
+                        renderCombineLineChart(result.combine_data);
+                        renderCombineFirstLineChart(result.all_data[Object.keys(result.all_data)[0]]);
+                        renderCombineSecondLineChart(result.all_data[Object.keys(result.all_data)[1]]);
                     } else {
                         alert(response.message)
                     }
@@ -408,7 +439,41 @@
             });
         });
 
-        function renderFirstLineChart(result) {
+        function renderCombineLineChart(result) {
+            // Create the chart
+            Highcharts.chart('combineChartContainer', {
+
+                chart: {
+                    zoomType: 'x',
+                    // height: 500
+                },
+                credits: {
+                    enabled: false
+                },
+                title: {
+                    text: 'Combined Comparative Data Analysis'
+                },
+
+                accessibility: {
+                    screenReaderSection: {
+                        beforeChartFormat: '<{headingTagName}>{chartTitle}</{headingTagName}><div>{chartSubtitle}</div><div>{chartLongdesc}</div><div>{xAxisDescription}</div><div>{yAxisDescription}</div>'
+                    }
+                },
+
+                tooltip: {
+                    valueDecimals: 5
+                },
+
+                xAxis: {
+                    type: 'datetime'
+                },
+
+                series: result
+
+            });
+        }
+
+        function renderCombineFirstLineChart(result) {
             // Create the chart
             Highcharts.chart('chartFirstContainer', {
 
@@ -420,7 +485,7 @@
                     enabled: false
                 },
                 title: {
-                    text: 'Comparative Data Analysis'
+                    text: result.header
                 },
 
                 accessibility: {
@@ -437,12 +502,12 @@
                     type: 'datetime'
                 },
 
-                series: result
+                series: result.data
 
             });
         }
 
-        function renderSecondLineChart(result) {
+        function renderCombineSecondLineChart(result) {
             // Create the chart
             Highcharts.chart('chartSecondContainer', {
 
@@ -454,7 +519,7 @@
                     enabled: false
                 },
                 title: {
-                    text: 'Comparative Data Analysis'
+                    text: result.header
                 },
 
                 accessibility: {
@@ -471,7 +536,7 @@
                     type: 'datetime'
                 },
 
-                series: result
+                series: result.data
 
             });
         }
@@ -483,10 +548,17 @@
             if (chart_option == 'normal') {
                 $('.normal').css('display', 'block');
                 $('.comparative').css('display', 'none');
+                $('.normalChart').css('display', 'none');
+                $('.comparativeChart').css('display', 'none');
             } else if (chart_option == 'comparative') {
                 $('.comparative').css('display', 'block');
                 $('.normal').css('display', 'none');
+                $('.normalChart').css('display', 'none');
+                $('.comparativeChart').css('display', 'none');
             }
+            $('.selectpicker').select2({
+                placeholder: ''
+            });
         })
     </script>
 </body>

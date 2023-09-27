@@ -851,7 +851,7 @@ def compare(request):
     return render(request, 'front/compare.html', context)
 
 
-def compareOne(request):
+def compareCombine(request):
     strain_data = models.StrainData.objects.count()
     if strain_data == 0:
         # Delete all messages by popping them from the list
@@ -972,99 +972,96 @@ def getCompareTimeDetails(request):
         })
 
 
-def getCompareOneChartData(request):
-    if request.method == "POST":
-        sensor_types = request.POST.getlist('sensor_type')
-        from_time = request.POST['from_time']
-        to_time = request.POST['to_time']
-        from_miliseconds = int(datetime.fromisoformat(from_time).timestamp() * 1000)
-        to_miliseconds = int(datetime.fromisoformat(to_time).timestamp() * 1000)
-        if from_miliseconds > to_miliseconds:
-            return JsonResponse({
-                'code': 507,
-                'status': "ERROR",
-                'message': "From time should not exceeds To time "
-            })
-        series = []
-        for index, elem in enumerate(request.POST.getlist('sensor_type')):
-            sensor_data = request.POST.getlist('method')[index]
-            if elem == 'strain':
-                data = models.StrainData.objects.filter(date_time__range=(from_time, to_time)).order_by('id')
-                sensor_counts = getSensorCounts(elem)
-                sensor_names = get_constants(elem)
-                columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
-                dynamic_vars = {}
-                for i, element in enumerate(sensor_counts, start=1):
-                    dynamic_vars[f"test_method_{i}"] = []
-                for row_data in data:
-                    for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
-                if sensor_data in columns.keys():
-                    series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
-            if elem == 'tilt':
-                data = models.TiltData.objects.filter(date_time__range=(from_time, to_time)).order_by('id')
-                sensor_counts = getSensorCounts(elem)
-                sensor_names = get_constants(elem)
-                columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
-                dynamic_vars = {}
-                for i, element in enumerate(sensor_counts, start=1):
-                    dynamic_vars[f"test_method_{i}"] = []
-                for row_data in data:
-                    for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
-                if sensor_data in columns.keys():
-                    series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
-            if elem == 'displacement':
-                data = models.DisplacementData.objects.filter(date_time__range=(from_time, to_time)).order_by('id')
-                sensor_counts = getSensorCounts(elem)
-                sensor_names = get_constants(elem)
-                columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
-                dynamic_vars = {}
-                for i, element in enumerate(sensor_counts, start=1):
-                    dynamic_vars[f"test_method_{i}"] = []
-                for row_data in data:
-                    for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
-                if sensor_data in columns.keys():
-                    series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
-            if elem == 'settlement':
-                data = models.SettlementData.objects.filter(date_time__range=(from_time, to_time)).order_by('id')
-                sensor_counts = getSensorCounts(elem)
-                sensor_names = get_constants(elem)
-                columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
-                dynamic_vars = {}
-                for i, element in enumerate(sensor_counts, start=1):
-                    dynamic_vars[f"test_method_{i}"] = []
-                for row_data in data:
-                    for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
-                if sensor_data in columns.keys():
-                    series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
-            if elem == 'vibration':
-                data = models.VibrationData.objects.filter(date_time__range=(from_time, to_time)).order_by('id')
-                sensor_counts = getSensorCounts(elem)
-                sensor_names = get_constants(elem)
-                columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
-                dynamic_vars = {}
-                for i, element in enumerate(sensor_counts, start=1):
-                    dynamic_vars[f"test_method_{i}"] = []
-                for row_data in data:
-                    for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
-                if sensor_data in columns.keys():
-                    series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
+def getCompareCombineChartData(post_data):
+    from_time = post_data['from_time']
+    to_time = post_data['to_time']
+    from_miliseconds = int(datetime.fromisoformat(from_time).timestamp() * 1000)
+    to_miliseconds = int(datetime.fromisoformat(to_time).timestamp() * 1000)
+    if from_miliseconds > to_miliseconds:
         return JsonResponse({
-            'code': 200,
-            'status': "SUCCESS",
-            'result': {'series': series},
-        })
-    else:
-        return JsonResponse({
-            'code': 506,
+            'code': 507,
             'status': "ERROR",
-            'message': "There should be ajax method."
+            'message': "From time should not exceeds To time "
         })
-
+    series = []
+    for index, elem in enumerate(post_data.getlist('sensor_type')):
+        if elem == 'strain':
+            sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist('method') if elem + '~~' in sensor]
+            data = models.StrainData.objects.filter(date_time__range=(from_time, to_time)).order_by('id')
+            sensor_counts = getSensorCounts(elem)
+            sensor_names = get_constants(elem)
+            columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+            dynamic_vars = {}
+            for i, element in enumerate(sensor_counts, start=1):
+                dynamic_vars[f"test_method_{i}"] = []
+            for row_data in data:
+                for method in dynamic_vars:
+                    dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
+            for each in sensor_data:
+                if each in columns.keys():
+                    series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
+        if elem == 'tilt':
+            sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist('method') if elem + '~~' in sensor]
+            data = models.TiltData.objects.filter(date_time__range=(from_time, to_time)).order_by('id')
+            sensor_counts = getSensorCounts(elem)
+            sensor_names = get_constants(elem)
+            columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+            dynamic_vars = {}
+            for i, element in enumerate(sensor_counts, start=1):
+                dynamic_vars[f"test_method_{i}"] = []
+            for row_data in data:
+                for method in dynamic_vars:
+                    dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
+            for each in sensor_data:
+                if each in columns.keys():
+                    series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
+        if elem == 'displacement':
+            sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist('method') if elem + '~~' in sensor]
+            data = models.DisplacementData.objects.filter(date_time__range=(from_time, to_time)).order_by('id')
+            sensor_counts = getSensorCounts(elem)
+            sensor_names = get_constants(elem)
+            columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+            dynamic_vars = {}
+            for i, element in enumerate(sensor_counts, start=1):
+                dynamic_vars[f"test_method_{i}"] = []
+            for row_data in data:
+                for method in dynamic_vars:
+                    dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
+            for each in sensor_data:
+                if each in columns.keys():
+                    series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
+        if elem == 'settlement':
+            sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist('method') if elem + '~~' in sensor]
+            data = models.SettlementData.objects.filter(date_time__range=(from_time, to_time)).order_by('id')
+            sensor_counts = getSensorCounts(elem)
+            sensor_names = get_constants(elem)
+            columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+            dynamic_vars = {}
+            for i, element in enumerate(sensor_counts, start=1):
+                dynamic_vars[f"test_method_{i}"] = []
+            for row_data in data:
+                for method in dynamic_vars:
+                    dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
+            for each in sensor_data:
+                if each in columns.keys():
+                    series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
+        if elem == 'vibration':
+            sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist('method') if elem + '~~' in sensor]
+            data = models.VibrationData.objects.filter(date_time__range=(from_time, to_time)).order_by('id')
+            sensor_counts = getSensorCounts(elem)
+            sensor_names = get_constants(elem)
+            columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+            dynamic_vars = {}
+            for i, element in enumerate(sensor_counts, start=1):
+                dynamic_vars[f"test_method_{i}"] = []
+            for row_data in data:
+                for method in dynamic_vars:
+                    dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
+            for each in sensor_data:
+                if each in columns.keys():
+                    series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
+    return series
+    
 
 def getCompareChartData(request):
     if request.method == "POST":
@@ -1080,8 +1077,8 @@ def getCompareChartData(request):
             })
         all_data = {}
         for index, elem in enumerate(request.POST.getlist('sensor_type')):
-            sensor_data = request.POST.getlist('method')[index]
             if elem == 'strain':
+                sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist('method') if elem + '~~' in sensor]
                 series = []
                 data = models.StrainData.objects.filter(date_time__range=(from_time, to_time)).order_by('id')
                 sensor_counts = getSensorCounts(elem)
@@ -1093,10 +1090,14 @@ def getCompareChartData(request):
                 for row_data in data:
                     for method in dynamic_vars:
                         dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
-                if sensor_data in columns.keys():
-                    series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
-                all_data[elem] = series
+                for each in sensor_data:
+                    if each in columns.keys():
+                        series.append({'color': random_color_code(), 'name': columns[each], 'data': dynamic_vars[each]})
+                all_data[elem] = {}
+                all_data[elem]['header'] = "Comparative Data Analysis (" + constants.sensor_types[elem] +  ")"
+                all_data[elem]['data'] = series
             if elem == 'tilt':
+                sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist('method') if elem + '~~' in sensor]
                 series = []
                 data = models.TiltData.objects.filter(date_time__range=(from_time, to_time)).order_by('id')
                 sensor_counts = getSensorCounts(elem)
@@ -1108,10 +1109,14 @@ def getCompareChartData(request):
                 for row_data in data:
                     for method in dynamic_vars:
                         dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
-                if sensor_data in columns.keys():
-                    series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
-                all_data[elem] = series
+                for each in sensor_data:
+                    if each in columns.keys():
+                        series.append({'color': random_color_code(), 'name': columns[each], 'data': dynamic_vars[each]})
+                all_data[elem] = {}
+                all_data[elem]['header'] = "Comparative Data Analysis (" + constants.sensor_types[elem] +  ")"
+                all_data[elem]['data'] = series
             if elem == 'displacement':
+                sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist('method') if elem + '~~' in sensor]
                 series = []
                 data = models.DisplacementData.objects.filter(date_time__range=(from_time, to_time)).order_by('id')
                 sensor_counts = getSensorCounts(elem)
@@ -1123,10 +1128,14 @@ def getCompareChartData(request):
                 for row_data in data:
                     for method in dynamic_vars:
                         dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
-                if sensor_data in columns.keys():
-                    series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
-                all_data[elem] = series
+                for each in sensor_data:
+                    if each in columns.keys():
+                        series.append({'color': random_color_code(), 'name': columns[each], 'data': dynamic_vars[each]})
+                all_data[elem] = {}
+                all_data[elem]['header'] = "Comparative Data Analysis (" + constants.sensor_types[elem] +  ")"
+                all_data[elem]['data'] = series
             if elem == 'settlement':
+                sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist('method') if elem + '~~' in sensor]
                 series = []
                 data = models.SettlementData.objects.filter(date_time__range=(from_time, to_time)).order_by('id')
                 sensor_counts = getSensorCounts(elem)
@@ -1138,10 +1147,14 @@ def getCompareChartData(request):
                 for row_data in data:
                     for method in dynamic_vars:
                         dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
-                if sensor_data in columns.keys():
-                    series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
-                all_data[elem] = series
+                for each in sensor_data:
+                    if each in columns.keys():
+                        series.append({'color': random_color_code(), 'name': columns[each], 'data': dynamic_vars[each]})
+                all_data[elem] = {}
+                all_data[elem]['header'] = "Comparative Data Analysis (" + constants.sensor_types[elem] +  ")"
+                all_data[elem]['data'] = series
             if elem == 'vibration':
+                sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist('method') if elem + '~~' in sensor]
                 series = []
                 data = models.VibrationData.objects.filter(date_time__range=(from_time, to_time)).order_by('id')
                 sensor_counts = getSensorCounts(elem)
@@ -1153,13 +1166,17 @@ def getCompareChartData(request):
                 for row_data in data:
                     for method in dynamic_vars:
                         dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
-                if sensor_data in columns.keys():
-                    series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[sensor_data], 'data': dynamic_vars[sensor_data]})
-                all_data[elem] = series
+                for each in sensor_data:
+                    if each in columns.keys():
+                        series.append({'color': random_color_code(), 'name': columns[each], 'data': dynamic_vars[each]})
+                all_data[elem] = {}
+                all_data[elem]['header'] = "Comparative Data Analysis (" + constants.sensor_types[elem] +  ")"
+                all_data[elem]['data'] = series
+        combine_data = getCompareCombineChartData(request.POST)
         return JsonResponse({
             'code': 200,
             'status': "SUCCESS",
-            'result': all_data,
+            'result': {'all_data': all_data, 'combine_data': combine_data},
         })
     else:
         return JsonResponse({

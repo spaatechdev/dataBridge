@@ -13,6 +13,6 @@ urlpatterns = [
     path('getCompareTimeDetails', csrf_exempt(views.getCompareTimeDetails), name='getCompareTimeDetails'),
     path('getCompareChartData', csrf_exempt(views.getCompareChartData), name='getCompareChartData'),
 
-    path('compareone', csrf_exempt(views.compareOne), name='compareOne'),
-    path('getCompareOneChartData', csrf_exempt(views.getCompareOneChartData), name='getCompareOneChartData')
+    path('compare-combine', csrf_exempt(views.compareCombine), name='compareCombine'),
+    path('getCompareCombineChartData', csrf_exempt(views.getCompareCombineChartData), name='getCompareCombineChartData')
 ]
