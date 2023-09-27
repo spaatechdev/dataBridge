@@ -45,8 +45,8 @@ def removeSeconds(timestamp):
 
 def createMilisecondsByDate(date_string):
     # Define the time duration
-    hours = 5
-    minutes = 30
+    hours = 0
+    minutes = 0
 
     # Calculate the total milliseconds
     timezone_milliseconds = (hours * 3600 * 1000) + (minutes * 60 * 1000)
