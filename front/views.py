@@ -1060,6 +1060,7 @@ def getCompareCombineChartData(post_data):
             for each in sensor_data:
                 if each in columns.keys():
                     series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
+    random.shuffle(series)
     return series
     
 
