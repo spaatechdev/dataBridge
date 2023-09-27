@@ -45,7 +45,7 @@ def removeSeconds(timestamp):
 
 def createMilisecondsByDate(date_string):
     # Define the time duration
-    hours = 0
+    hours = -6
     minutes = 0
 
     # Calculate the total milliseconds
