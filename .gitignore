@@ -3,4 +3,3 @@ env/
 dataBridge/.env
 */__pycache__/
 */migrations/
-templates/constants/strain_columns.txt
