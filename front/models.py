@@ -48,7 +48,7 @@ class StrainData(models.Model):
     test_method_42 = models.DecimalField(max_digits=10, decimal_places=5, blank=True, null=True)
 
     def __str__(self):
-        return self.date_time
+        return str(self.date_time)
 
     class Meta:
         managed = True
@@ -85,7 +85,7 @@ class TiltData(models.Model):
     test_method_25 = models.DecimalField(max_digits=10, decimal_places=5, blank=True, null=True)
 
     def __str__(self):
-        return self.date_time
+        return str(self.date_time)
 
     class Meta:
         managed = True
@@ -122,7 +122,7 @@ class DisplacementData(models.Model):
     test_method_25 = models.DecimalField(max_digits=10, decimal_places=5, blank=True, null=True)
 
     def __str__(self):
-        return self.date_time
+        return str(self.date_time)
 
     class Meta:
         managed = True
@@ -159,7 +159,7 @@ class SettlementData(models.Model):
     test_method_25 = models.DecimalField(max_digits=10, decimal_places=5, blank=True, null=True)
 
     def __str__(self):
-        return self.date_time
+        return str(self.date_time)
 
     class Meta:
         managed = True
@@ -196,7 +196,7 @@ class VibrationData(models.Model):
     test_method_25 = models.DecimalField(max_digits=10, decimal_places=5, blank=True, null=True)
 
     def __str__(self):
-        return self.date_time
+        return str(self.date_time)
 
     class Meta:
         managed = True

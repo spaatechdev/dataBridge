@@ -378,6 +378,9 @@ def importExcel(request):
     if request.method == "POST":
         if 'strain_required' in request.POST.keys():
             models.StrainData.objects.all().delete()
+            f = open("templates/constants/strain_columns.txt", "w+")
+            f.write("")
+            f.close()
             if request.FILES.get('strain_gauge', None):
                 file = request.FILES['strain_gauge']
                 tmpname = str(datetime.now().microsecond) + \
@@ -400,6 +403,7 @@ def importExcel(request):
 
                 # strain_columns = get_constants('strain')
                 strain_columns = constants.strain_columns
+
                 for index, column in enumerate(column_names):
                     strain_columns[list(strain_columns.keys())[index]] = column
 
@@ -431,6 +435,9 @@ def importExcel(request):
                 os.remove(settings.MEDIA_ROOT + file_name)
         if 'tilt_required' in request.POST.keys():
             models.TiltData.objects.all().delete()
+            f = open("templates/constants/tilt_columns.txt", "w+")
+            f.write("")
+            f.close()
             if request.FILES.get('tilt', None):
                 file = request.FILES['tilt']
                 tmpname = str(datetime.now().microsecond) + \
@@ -485,6 +492,9 @@ def importExcel(request):
                 os.remove(settings.MEDIA_ROOT + file_name)
         if 'displacement_required' in request.POST.keys():
             models.DisplacementData.objects.all().delete()
+            f = open("templates/constants/displacement_columns.txt", "w+")
+            f.write("")
+            f.close()
             if request.FILES.get('displacement', None):
                 file = request.FILES['displacement']
                 tmpname = str(datetime.now().microsecond) + \
@@ -540,6 +550,9 @@ def importExcel(request):
                 os.remove(settings.MEDIA_ROOT + file_name)
         if 'settlement_required' in request.POST.keys():
             models.SettlementData.objects.all().delete()
+            f = open("templates/constants/settlement_columns.txt", "w+")
+            f.write("")
+            f.close()
             if request.FILES.get('settlement', None):
                 file = request.FILES['settlement']
                 tmpname = str(datetime.now().microsecond) + \
@@ -595,6 +608,9 @@ def importExcel(request):
                 os.remove(settings.MEDIA_ROOT + file_name)
         if 'vibration_required' in request.POST.keys():
             models.VibrationData.objects.all().delete()
+            f = open("templates/constants/vibration_columns.txt", "w+")
+            f.write("")
+            f.close()
             if request.FILES.get('vibration', None):
                 file = request.FILES['vibration']
                 tmpname = str(datetime.now().microsecond) + \

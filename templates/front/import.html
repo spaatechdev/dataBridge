@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Import Excel</title>
+    <title>Import Files</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Favicons -->
@@ -15,131 +15,235 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'js/jquery.min.js' %}"></script>
+
+    <style>
+        html,
+        body {
+            overflow-x: hidden;
+            /* Prevent scroll on narrow devices */
+            overflow: hidden;
+        }
+
+        body {
+            padding-top: 10px;
+        }
+    </style>
 </head>
 
 <body>
-    <div class="container mt-5 mb-5">
-        <h2 class="text-center">Import Excel Files</h2>
-        <h5 class="text-center text-info">Please Maintain The Excel File As First Column In Date Time With "dd-mm-YYYY
-            HH:MM:SS" Format </h5>
-        <h5 class="text-center">Please Uncheck The Checkbox If Following File Not To Be Uploaded </h5>
 
-        {% if messages %}
-        {% for message in messages %}
-        {% if forloop.counter == 1 %}
-        {% if message.tags == 'error' %}
-        <div class="bg-danger text-white text-center">
-            <div class="{{ message.tags }}" style="height: 30px;">{{ message }}</div>
+    <main class="container">
+        <div class="container col-lg-12 col-md-12 col-sm-12 px-2 py-2">
+            <div class="row align-items-center g-lg-2 py-2">
+                <div class="col-lg-5 text-center text-lg-start">
+                    <h1 class="display-3 fw-bold lh-1 text-body-emphasis mb-2">Import Files</h1>
+                    <p class="col-lg-10 fs-5">Please Maintain The Excel File As First Column In Date Time With
+                        "dd-mm-YYYY HH:MM:SS" Format</p>
+                    <p class="col-lg-10 fs-6">Please Uncheck The Checkbox If Following File Not To Be Uploaded</p>
+                </div>
+
+                {% if messages %}
+                {% for message in messages %}
+                {% if forloop.counter == 1 %}
+                {% if message.tags == 'error' %}
+                <div class="bg-danger text-white text-center">
+                    <div class="{{ message.tags }}" style="height: 30px;">{{ message }}</div>
+                </div>
+                {% elif message.tags == 'success' %}
+                <div class="bg-success text-white text-center">
+                    <div class="{{ message.tags }}" style="height: 30px;">{{ message }}</div>
+                </div>
+                {% else %}
+                <div class="text-center">
+                    <div class="{{ message.tags }}" style="height: 30px;">{{ message }}</div>
+                </div>
+                {% endif %}
+                {% endif %}
+                {% endfor %}
+                {% endif %}
+
+                <div class="col-md-10 mx-auto col-lg-7">
+                    <form class="p-3 p-md-3 border rounded-4 bg-body-tertiary shadow" action="" method="post" id="submit_form"
+                        enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <article class="my-3">
+                            <div class="bd-heading align-self-start mt-2 mb-2 mt-xl-0 mb-xl-2">
+                                <div class="mb-3 form-check">
+                                    <label class="form-check-label" for="strain_gauge">Strain Gauge Excel</label>
+                                    <input type="checkbox" name="strain_required" checked id="strain_required"
+                                        class="check_required form-check-input">
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="bd-example-snippet bd-code-snippet">
+                                    <div class="bd-example m-0 border-0">
+                                        <div class="mb-3">
+                                            <div class="row">
+                                                <div class="col-lg-8">
+                                                    <input type="file" class="form-control form-control-sm"
+                                                        id="strain_gauge" name="strain_gauge"
+                                                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                                        required aria-label="Small file input example">
+                                                </div>
+                                                <div class="col-lg-4">
+                                                    <a class="btn btn-primary" href="{% url 'downloadExcel' 'strain' %}"
+                                                        role="button">Sample Data
+                                                        &raquo;</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="my-3">
+                            <div class="bd-heading align-self-start mt-2 mb-2 mt-xl-0 mb-xl-2">
+                                <div class="mb-3 form-check">
+                                    <label class="form-check-label" for="tilt">Tilt Excel</label>
+                                    <input type="checkbox" name="tilt_required" checked id="tilt_required"
+                                        class="check_required form-check-input">
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="bd-example-snippet bd-code-snippet">
+                                    <div class="bd-example m-0 border-0">
+                                        <div class="mb-3">
+                                            <div class="row">
+                                                <div class="col-lg-8">
+                                                    <input type="file" class="form-control form-control-sm" id="tilt"
+                                                        name="tilt"
+                                                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                                        required aria-label="Small file input example">
+                                                </div>
+                                                <div class="col-lg-4">
+                                                    <a class="btn btn-primary" href="{% url 'downloadExcel' 'tilt' %}"
+                                                        role="button">Sample Data
+                                                        &raquo;</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="my-3">
+                            <div class="bd-heading align-self-start mt-2 mb-2 mt-xl-0 mb-xl-2">
+                                <div class="mb-3 form-check">
+                                    <label for="displacement" class="form-check-label">Displacement Excel</label>
+                                    <input type="checkbox" name="displacement_required" checked
+                                        id="displacement_required" class="check_required form-check-input">
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="bd-example-snippet bd-code-snippet">
+                                    <div class="bd-example m-0 border-0">
+                                        <div class="mb-3">
+                                            <div class="row">
+                                                <div class="col-lg-8">
+                                                    <input type="file" class="form-control form-control-sm"
+                                                        id="displacement" name="displacement"
+                                                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                                        required aria-label="Small file input example">
+                                                </div>
+                                                <div class="col-lg-4">
+                                                    <a class="btn btn-primary"
+                                                        href="{% url 'downloadExcel' 'displacement' %}"
+                                                        role="button">Sample Data
+                                                        &raquo;</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="my-3">
+                            <div class="bd-heading align-self-start mt-2 mb-2 mt-xl-0 mb-xl-2">
+                                <div class="mb-3 form-check">
+                                    <label for="settlement" class="form-check-label">Settlement Excel</label>
+                                    <input type="checkbox" name="settlement_required" checked id="settlement_required"
+                                        class="check_required form-check-input">
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="bd-example-snippet bd-code-snippet">
+                                    <div class="bd-example m-0 border-0">
+                                        <div class="mb-3">
+                                            <div class="row">
+                                                <div class="col-lg-8">
+                                                    <input type="file" class="form-control form-control-sm"
+                                                        id="settlement" name="settlement"
+                                                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                                        required aria-label="Small file input example">
+                                                </div>
+                                                <div class="col-lg-4">
+                                                    <a class="btn btn-primary"
+                                                        href="{% url 'downloadExcel' 'settlement' %}"
+                                                        role="button">Sample Data
+                                                        &raquo;</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="my-3">
+                            <div class="bd-heading align-self-start mt-2 mb-2 mt-xl-0 mb-xl-2">
+                                <div class="mb-3 form-check">
+                                    <label for="vibration" class="form-check-label">Vibration Excel</label>
+                                    <input type="checkbox" name="vibration_required" checked id="vibration_required"
+                                        class="check_required form-check-input">
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="bd-example-snippet bd-code-snippet">
+                                    <div class="bd-example m-0 border-0">
+                                        <div class="mb-3">
+                                            <div class="row">
+                                                <div class="col-lg-8">
+                                                    <input type="file" class="form-control form-control-sm"
+                                                        id="vibration" name="vibration"
+                                                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                                        required aria-label="Small file input example">
+                                                </div>
+                                                <div class="col-lg-4">
+                                                    <a class="btn btn-primary"
+                                                        href="{% url 'downloadExcel' 'vibration' %}"
+                                                        role="button">Sample Data
+                                                        &raquo;</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+
+
+                        <div class="d-flex mt-4">
+                            <div class="me-2">
+                                <button type="submit" class="btn btn-success submit_btn">Upload &raquo;</button>
+                            </div>
+                            <div>
+                                <a href="{% url 'index' %}" class="btn btn-primary">Back &#8606;</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        {% elif message.tags == 'success' %}
-        <div class="bg-success text-white text-center">
-            <div class="{{ message.tags }}" style="height: 30px;">{{ message }}</div>
-        </div>
-        {% else %}
-        <div class="text-center">
-            <div class="{{ message.tags }}" style="height: 30px;">{{ message }}</div>
-        </div>
-        {% endif %}
-        {% endif %}
-        {% endfor %}
-        {% endif %}
-        <form action="" method="post" id="submit_form" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="form-group mb-3">
-                <label for="strain_gauge">Strain Gauge Excel: <input type="checkbox" name="strain_required" checked
-                        id="strain_required" class="check_required"></label>
-                <div class="row">
-                    <div class="col-md-10">
-                        <input type="file" class="form-control" id="strain_gauge" name="strain_gauge"
-                            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" required>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="col-md-10">
-                            <a href="{% url 'downloadExcel' 'strain' %}">
-                                Sample Data
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="form-group mb-3">
-                <label for="tilt">Tilt Excel: <input type="checkbox" name="tilt_required" checked id="tilt_required"
-                        class="check_required"></label>
-                <div class="row">
-                    <div class="col-md-10">
-                        <input type="file" class="form-control" id="tilt" name="tilt"
-                            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" required>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="col-md-10">
-                            <a href="{% url 'downloadExcel' 'tilt' %}">
-                                Sample Data
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="form-group mb-3">
-                <label for="displacement">Displacement Excel: <input type="checkbox" name="displacement_required"
-                        checked id="displacement_required" class="check_required"></label>
-                <div class="row">
-                    <div class="col-md-10">
-                        <input type="file" class="form-control" id="displacement" name="displacement"
-                            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" required>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="col-md-10">
-                            <a href="{% url 'downloadExcel' 'displacement' %}">
-                                Sample Data
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="form-group mb-3">
-                <label for="settlement">Settlement Excel: <input type="checkbox" name="settlement_required" checked
-                        id="settlement_required" class="check_required"></label>
-                <div class="row">
-                    <div class="col-md-10">
-                        <input type="file" class="form-control" id="settlement" name="settlement"
-                            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" required>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="col-md-10">
-                            <a href="{% url 'downloadExcel' 'settlement' %}">
-                                Sample Data
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="form-group mb-3">
-                <label for="vibration">Vibration Excel: <input type="checkbox" name="vibration_required" checked
-                        id="vibration_required" class="check_required"></label>
-                <div class="row">
-                    <div class="col-md-10">
-                        <input type="file" class="form-control" id="vibration" name="vibration"
-                            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" required>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="col-md-10">
-                            <a href="{% url 'downloadExcel' 'vibration' %}">
-                                Sample Data
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="d-flex mt-4">
-                <div class="me-2">
-                    <button type="submit" class="btn btn-success submit_btn">Upload</button>
-                </div>
-                <div>
-                    <a href="{% url 'index' %}" class="btn btn-info">Back</a>
-                </div>
-            </div>
-        </form>
-    </div>
+    </main>
 
     <script>
         $(document).on('submit', '#submit_form', function (e) {
@@ -155,6 +259,17 @@
                 elem.parents(".form-group").find("input[type=file]").removeAttr('required');
             }
         });
+    </script>
+
+    <script>
+        (() => {
+            'use strict'
+
+            document.querySelector('#navbarSideCollapse').addEventListener('click', () => {
+                document.querySelector('.offcanvas-collapse').classList.toggle('open')
+            })
+        })()
+
     </script>
 </body>
 
