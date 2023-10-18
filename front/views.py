@@ -8,6 +8,7 @@ from django.core.files.storage import FileSystemStorage
 from . import models
 from . import constants
 from django.db.models import Max, Min, Avg
+from django.db.models.functions import TruncDate
 import os
 import math
 import pathlib
@@ -687,6 +688,7 @@ def find_key_by_value(dictionary, value_to_find):
 
 def getChartData(request):
     if request.method == "POST":
+        chart_type = request.POST['chart_type']
         sensor_type = request.POST['sensor_type']
         from_time = request.POST['from_time']
         to_time = request.POST['to_time']
@@ -700,96 +702,796 @@ def getChartData(request):
                 'status': "ERROR",
                 'message': "From time should not exceeds To time "
             })
-        if sensor_type == 'strain':
-            data = models.StrainData.objects.filter(
-                date_time__range=(from_time, to_time)).order_by('id')
-            series = []
-            sensor_counts = getSensorCounts(sensor_type)
-            sensor_names = get_constants(sensor_type)
-            columns = {k: v for k, v in sensor_names.items(
-            ) if not v.startswith('test_method_')}
-            dynamic_vars = {}
-            for index, element in enumerate(sensor_counts, start=1):
-                dynamic_vars[f"test_method_{index}"] = []
-            for row_data in data:
-                for method in dynamic_vars:
-                    dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
-            for index, elem in enumerate(request.POST.getlist('method')):
-                series.append(
-                    {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
-        if sensor_type == 'tilt':
-            data = models.TiltData.objects.filter(
-                date_time__range=(from_time, to_time)).order_by('id')
-            series = []
-            sensor_counts = getSensorCounts(sensor_type)
-            sensor_names = get_constants(sensor_type)
-            columns = {k: v for k, v in sensor_names.items(
-            ) if not v.startswith('test_method_')}
-            dynamic_vars = {}
-            for index, element in enumerate(sensor_counts, start=1):
-                dynamic_vars[f"test_method_{index}"] = []
-            for row_data in data:
-                for method in dynamic_vars:
-                    dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
-            for index, elem in enumerate(request.POST.getlist('method')):
-                series.append(
-                    {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
-        if sensor_type == 'displacement':
-            data = models.DisplacementData.objects.filter(
-                date_time__range=(from_time, to_time)).order_by('id')
-            series = []
-            sensor_counts = getSensorCounts(sensor_type)
-            sensor_names = get_constants(sensor_type)
-            columns = {k: v for k, v in sensor_names.items(
-            ) if not v.startswith('test_method_')}
-            dynamic_vars = {}
-            for index, element in enumerate(sensor_counts, start=1):
-                dynamic_vars[f"test_method_{index}"] = []
-            for row_data in data:
-                for method in dynamic_vars:
-                    dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
-            for index, elem in enumerate(request.POST.getlist('method')):
-                series.append(
-                    {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
-        if sensor_type == 'settlement':
-            data = models.SettlementData.objects.filter(
-                date_time__range=(from_time, to_time)).order_by('id')
-            series = []
-            sensor_counts = getSensorCounts(sensor_type)
-            sensor_names = get_constants(sensor_type)
-            columns = {k: v for k, v in sensor_names.items(
-            ) if not v.startswith('test_method_')}
-            dynamic_vars = {}
-            for index, element in enumerate(sensor_counts, start=1):
-                dynamic_vars[f"test_method_{index}"] = []
-            for row_data in data:
-                for method in dynamic_vars:
-                    dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
-            for index, elem in enumerate(request.POST.getlist('method')):
-                series.append(
-                    {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
-        if sensor_type == 'vibration':
-            data = models.VibrationData.objects.filter(
-                date_time__range=(from_time, to_time)).order_by('id')
-            series = []
-            sensor_counts = getSensorCounts(sensor_type)
-            sensor_names = get_constants(sensor_type)
-            columns = {k: v for k, v in sensor_names.items(
-            ) if not v.startswith('test_method_')}
-            dynamic_vars = {}
-            for index, element in enumerate(sensor_counts, start=1):
-                dynamic_vars[f"test_method_{index}"] = []
-            for row_data in data:
-                for method in dynamic_vars:
-                    dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
-            for index, elem in enumerate(request.POST.getlist('method')):
-                series.append(
-                    {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
-        return JsonResponse({
-            'code': 200,
-            'status': "SUCCESS",
-            'result': {'series': series},
-        })
+        if chart_type == 'max':
+            if sensor_type == 'strain':
+                data = models.StrainData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                    test_method_1=Max('test_method_1'),
+                    test_method_2=Max('test_method_2'),
+                    test_method_3=Max('test_method_3'),
+                    test_method_4=Max('test_method_4'),
+                    test_method_5=Max('test_method_5'),
+                    test_method_6=Max('test_method_6'),
+                    test_method_7=Max('test_method_7'),
+                    test_method_8=Max('test_method_8'),
+                    test_method_9=Max('test_method_9'),
+                    test_method_10=Max('test_method_10'),
+                    test_method_11=Max('test_method_11'),
+                    test_method_12=Max('test_method_12'),
+                    test_method_13=Max('test_method_13'),
+                    test_method_14=Max('test_method_14'),
+                    test_method_15=Max('test_method_15'),
+                    test_method_16=Max('test_method_16'),
+                    test_method_17=Max('test_method_17'),
+                    test_method_18=Max('test_method_18'),
+                    test_method_19=Max('test_method_19'),
+                    test_method_20=Max('test_method_20'),
+                    test_method_21=Max('test_method_21'),
+                    test_method_22=Max('test_method_22'),
+                    test_method_23=Max('test_method_23'),
+                    test_method_24=Max('test_method_24'),
+                    test_method_25=Max('test_method_25'),
+                    test_method_26=Max('test_method_26'),
+                    test_method_27=Max('test_method_27'),
+                    test_method_28=Max('test_method_28'),
+                    test_method_29=Max('test_method_29'),
+                    test_method_30=Max('test_method_30'),
+                    test_method_31=Max('test_method_31'),
+                    test_method_32=Max('test_method_32'),
+                    test_method_33=Max('test_method_33'),
+                    test_method_34=Max('test_method_34'),
+                    test_method_35=Max('test_method_35'),
+                    test_method_36=Max('test_method_36'),
+                    test_method_37=Max('test_method_37'),
+                    test_method_38=Max('test_method_38'),
+                    test_method_39=Max('test_method_39'),
+                    test_method_40=Max('test_method_40'),
+                    test_method_41=Max('test_method_41'),
+                    test_method_42=Max('test_method_42')
+                )
+                series = []
+                sensor_counts = getSensorCounts(sensor_type)
+                sensor_names = get_constants(sensor_type)
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
+                dynamic_vars = {}
+                for index, element in enumerate(sensor_counts, start=1):
+                    dynamic_vars[f"test_method_{index}"] = []
+                for row_data in data:
+                    for method in dynamic_vars:
+                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                for index, elem in enumerate(request.POST.getlist('method')):
+                    series.append(
+                        {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
+            if sensor_type == 'tilt':
+                data = models.TiltData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                    test_method_1=Max('test_method_1'),
+                    test_method_2=Max('test_method_2'),
+                    test_method_3=Max('test_method_3'),
+                    test_method_4=Max('test_method_4'),
+                    test_method_5=Max('test_method_5'),
+                    test_method_6=Max('test_method_6'),
+                    test_method_7=Max('test_method_7'),
+                    test_method_8=Max('test_method_8'),
+                    test_method_9=Max('test_method_9'),
+                    test_method_10=Max('test_method_10'),
+                    test_method_11=Max('test_method_11'),
+                    test_method_12=Max('test_method_12'),
+                    test_method_13=Max('test_method_13'),
+                    test_method_14=Max('test_method_14'),
+                    test_method_15=Max('test_method_15'),
+                    test_method_16=Max('test_method_16'),
+                    test_method_17=Max('test_method_17'),
+                    test_method_18=Max('test_method_18'),
+                    test_method_19=Max('test_method_19'),
+                    test_method_20=Max('test_method_20'),
+                    test_method_21=Max('test_method_21'),
+                    test_method_22=Max('test_method_22'),
+                    test_method_23=Max('test_method_23'),
+                    test_method_24=Max('test_method_24'),
+                    test_method_25=Max('test_method_25')
+                )
+                series = []
+                sensor_counts = getSensorCounts(sensor_type)
+                sensor_names = get_constants(sensor_type)
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
+                dynamic_vars = {}
+                for index, element in enumerate(sensor_counts, start=1):
+                    dynamic_vars[f"test_method_{index}"] = []
+                for row_data in data:
+                    for method in dynamic_vars:
+                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                for index, elem in enumerate(request.POST.getlist('method')):
+                    series.append(
+                        {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
+            if sensor_type == 'displacement':
+                data = models.DisplacementData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                    test_method_1=Max('test_method_1'),
+                    test_method_2=Max('test_method_2'),
+                    test_method_3=Max('test_method_3'),
+                    test_method_4=Max('test_method_4'),
+                    test_method_5=Max('test_method_5'),
+                    test_method_6=Max('test_method_6'),
+                    test_method_7=Max('test_method_7'),
+                    test_method_8=Max('test_method_8'),
+                    test_method_9=Max('test_method_9'),
+                    test_method_10=Max('test_method_10'),
+                    test_method_11=Max('test_method_11'),
+                    test_method_12=Max('test_method_12'),
+                    test_method_13=Max('test_method_13'),
+                    test_method_14=Max('test_method_14'),
+                    test_method_15=Max('test_method_15'),
+                    test_method_16=Max('test_method_16'),
+                    test_method_17=Max('test_method_17'),
+                    test_method_18=Max('test_method_18'),
+                    test_method_19=Max('test_method_19'),
+                    test_method_20=Max('test_method_20'),
+                    test_method_21=Max('test_method_21'),
+                    test_method_22=Max('test_method_22'),
+                    test_method_23=Max('test_method_23'),
+                    test_method_24=Max('test_method_24'),
+                    test_method_25=Max('test_method_25')
+                )
+                series = []
+                sensor_counts = getSensorCounts(sensor_type)
+                sensor_names = get_constants(sensor_type)
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
+                dynamic_vars = {}
+                for index, element in enumerate(sensor_counts, start=1):
+                    dynamic_vars[f"test_method_{index}"] = []
+                for row_data in data:
+                    for method in dynamic_vars:
+                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                for index, elem in enumerate(request.POST.getlist('method')):
+                    series.append(
+                        {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
+            if sensor_type == 'settlement':
+                data = models.SettlementData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                    test_method_1=Max('test_method_1'),
+                    test_method_2=Max('test_method_2'),
+                    test_method_3=Max('test_method_3'),
+                    test_method_4=Max('test_method_4'),
+                    test_method_5=Max('test_method_5'),
+                    test_method_6=Max('test_method_6'),
+                    test_method_7=Max('test_method_7'),
+                    test_method_8=Max('test_method_8'),
+                    test_method_9=Max('test_method_9'),
+                    test_method_10=Max('test_method_10'),
+                    test_method_11=Max('test_method_11'),
+                    test_method_12=Max('test_method_12'),
+                    test_method_13=Max('test_method_13'),
+                    test_method_14=Max('test_method_14'),
+                    test_method_15=Max('test_method_15'),
+                    test_method_16=Max('test_method_16'),
+                    test_method_17=Max('test_method_17'),
+                    test_method_18=Max('test_method_18'),
+                    test_method_19=Max('test_method_19'),
+                    test_method_20=Max('test_method_20'),
+                    test_method_21=Max('test_method_21'),
+                    test_method_22=Max('test_method_22'),
+                    test_method_23=Max('test_method_23'),
+                    test_method_24=Max('test_method_24'),
+                    test_method_25=Max('test_method_25')
+                )
+                series = []
+                sensor_counts = getSensorCounts(sensor_type)
+                sensor_names = get_constants(sensor_type)
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
+                dynamic_vars = {}
+                for index, element in enumerate(sensor_counts, start=1):
+                    dynamic_vars[f"test_method_{index}"] = []
+                for row_data in data:
+                    for method in dynamic_vars:
+                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                for index, elem in enumerate(request.POST.getlist('method')):
+                    series.append(
+                        {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
+            if sensor_type == 'vibration':
+                data = models.VibrationData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                    test_method_1=Max('test_method_1'),
+                    test_method_2=Max('test_method_2'),
+                    test_method_3=Max('test_method_3'),
+                    test_method_4=Max('test_method_4'),
+                    test_method_5=Max('test_method_5'),
+                    test_method_6=Max('test_method_6'),
+                    test_method_7=Max('test_method_7'),
+                    test_method_8=Max('test_method_8'),
+                    test_method_9=Max('test_method_9'),
+                    test_method_10=Max('test_method_10'),
+                    test_method_11=Max('test_method_11'),
+                    test_method_12=Max('test_method_12'),
+                    test_method_13=Max('test_method_13'),
+                    test_method_14=Max('test_method_14'),
+                    test_method_15=Max('test_method_15'),
+                    test_method_16=Max('test_method_16'),
+                    test_method_17=Max('test_method_17'),
+                    test_method_18=Max('test_method_18'),
+                    test_method_19=Max('test_method_19'),
+                    test_method_20=Max('test_method_20'),
+                    test_method_21=Max('test_method_21'),
+                    test_method_22=Max('test_method_22'),
+                    test_method_23=Max('test_method_23'),
+                    test_method_24=Max('test_method_24'),
+                    test_method_25=Max('test_method_25')
+                )
+                series = []
+                sensor_counts = getSensorCounts(sensor_type)
+                sensor_names = get_constants(sensor_type)
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
+                dynamic_vars = {}
+                for index, element in enumerate(sensor_counts, start=1):
+                    dynamic_vars[f"test_method_{index}"] = []
+                for row_data in data:
+                    for method in dynamic_vars:
+                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                for index, elem in enumerate(request.POST.getlist('method')):
+                    series.append(
+                        {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
+            return JsonResponse({
+                'code': 200,
+                'status': "SUCCESS",
+                'result': {'series': series},
+            })
+        elif chart_type == 'min':
+            if sensor_type == 'strain':
+                data = models.StrainData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                    test_method_1=Min('test_method_1'),
+                    test_method_2=Min('test_method_2'),
+                    test_method_3=Min('test_method_3'),
+                    test_method_4=Min('test_method_4'),
+                    test_method_5=Min('test_method_5'),
+                    test_method_6=Min('test_method_6'),
+                    test_method_7=Min('test_method_7'),
+                    test_method_8=Min('test_method_8'),
+                    test_method_9=Min('test_method_9'),
+                    test_method_10=Min('test_method_10'),
+                    test_method_11=Min('test_method_11'),
+                    test_method_12=Min('test_method_12'),
+                    test_method_13=Min('test_method_13'),
+                    test_method_14=Min('test_method_14'),
+                    test_method_15=Min('test_method_15'),
+                    test_method_16=Min('test_method_16'),
+                    test_method_17=Min('test_method_17'),
+                    test_method_18=Min('test_method_18'),
+                    test_method_19=Min('test_method_19'),
+                    test_method_20=Min('test_method_20'),
+                    test_method_21=Min('test_method_21'),
+                    test_method_22=Min('test_method_22'),
+                    test_method_23=Min('test_method_23'),
+                    test_method_24=Min('test_method_24'),
+                    test_method_25=Min('test_method_25'),
+                    test_method_26=Min('test_method_26'),
+                    test_method_27=Min('test_method_27'),
+                    test_method_28=Min('test_method_28'),
+                    test_method_29=Min('test_method_29'),
+                    test_method_30=Min('test_method_30'),
+                    test_method_31=Min('test_method_31'),
+                    test_method_32=Min('test_method_32'),
+                    test_method_33=Min('test_method_33'),
+                    test_method_34=Min('test_method_34'),
+                    test_method_35=Min('test_method_35'),
+                    test_method_36=Min('test_method_36'),
+                    test_method_37=Min('test_method_37'),
+                    test_method_38=Min('test_method_38'),
+                    test_method_39=Min('test_method_39'),
+                    test_method_40=Min('test_method_40'),
+                    test_method_41=Min('test_method_41'),
+                    test_method_42=Min('test_method_42')
+                )
+                series = []
+                sensor_counts = getSensorCounts(sensor_type)
+                sensor_names = get_constants(sensor_type)
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
+                dynamic_vars = {}
+                for index, element in enumerate(sensor_counts, start=1):
+                    dynamic_vars[f"test_method_{index}"] = []
+                for row_data in data:
+                    for method in dynamic_vars:
+                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                for index, elem in enumerate(request.POST.getlist('method')):
+                    series.append(
+                        {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
+            if sensor_type == 'tilt':
+                data = models.TiltData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                    test_method_1=Min('test_method_1'),
+                    test_method_2=Min('test_method_2'),
+                    test_method_3=Min('test_method_3'),
+                    test_method_4=Min('test_method_4'),
+                    test_method_5=Min('test_method_5'),
+                    test_method_6=Min('test_method_6'),
+                    test_method_7=Min('test_method_7'),
+                    test_method_8=Min('test_method_8'),
+                    test_method_9=Min('test_method_9'),
+                    test_method_10=Min('test_method_10'),
+                    test_method_11=Min('test_method_11'),
+                    test_method_12=Min('test_method_12'),
+                    test_method_13=Min('test_method_13'),
+                    test_method_14=Min('test_method_14'),
+                    test_method_15=Min('test_method_15'),
+                    test_method_16=Min('test_method_16'),
+                    test_method_17=Min('test_method_17'),
+                    test_method_18=Min('test_method_18'),
+                    test_method_19=Min('test_method_19'),
+                    test_method_20=Min('test_method_20'),
+                    test_method_21=Min('test_method_21'),
+                    test_method_22=Min('test_method_22'),
+                    test_method_23=Min('test_method_23'),
+                    test_method_24=Min('test_method_24'),
+                    test_method_25=Min('test_method_25')
+                )
+                series = []
+                sensor_counts = getSensorCounts(sensor_type)
+                sensor_names = get_constants(sensor_type)
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
+                dynamic_vars = {}
+                for index, element in enumerate(sensor_counts, start=1):
+                    dynamic_vars[f"test_method_{index}"] = []
+                for row_data in data:
+                    for method in dynamic_vars:
+                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                for index, elem in enumerate(request.POST.getlist('method')):
+                    series.append(
+                        {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
+            if sensor_type == 'displacement':
+                data = models.DisplacementData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                    test_method_1=Min('test_method_1'),
+                    test_method_2=Min('test_method_2'),
+                    test_method_3=Min('test_method_3'),
+                    test_method_4=Min('test_method_4'),
+                    test_method_5=Min('test_method_5'),
+                    test_method_6=Min('test_method_6'),
+                    test_method_7=Min('test_method_7'),
+                    test_method_8=Min('test_method_8'),
+                    test_method_9=Min('test_method_9'),
+                    test_method_10=Min('test_method_10'),
+                    test_method_11=Min('test_method_11'),
+                    test_method_12=Min('test_method_12'),
+                    test_method_13=Min('test_method_13'),
+                    test_method_14=Min('test_method_14'),
+                    test_method_15=Min('test_method_15'),
+                    test_method_16=Min('test_method_16'),
+                    test_method_17=Min('test_method_17'),
+                    test_method_18=Min('test_method_18'),
+                    test_method_19=Min('test_method_19'),
+                    test_method_20=Min('test_method_20'),
+                    test_method_21=Min('test_method_21'),
+                    test_method_22=Min('test_method_22'),
+                    test_method_23=Min('test_method_23'),
+                    test_method_24=Min('test_method_24'),
+                    test_method_25=Min('test_method_25')
+                )
+                series = []
+                sensor_counts = getSensorCounts(sensor_type)
+                sensor_names = get_constants(sensor_type)
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
+                dynamic_vars = {}
+                for index, element in enumerate(sensor_counts, start=1):
+                    dynamic_vars[f"test_method_{index}"] = []
+                for row_data in data:
+                    for method in dynamic_vars:
+                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                for index, elem in enumerate(request.POST.getlist('method')):
+                    series.append(
+                        {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
+            if sensor_type == 'settlement':
+                data = models.SettlementData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                    test_method_1=Min('test_method_1'),
+                    test_method_2=Min('test_method_2'),
+                    test_method_3=Min('test_method_3'),
+                    test_method_4=Min('test_method_4'),
+                    test_method_5=Min('test_method_5'),
+                    test_method_6=Min('test_method_6'),
+                    test_method_7=Min('test_method_7'),
+                    test_method_8=Min('test_method_8'),
+                    test_method_9=Min('test_method_9'),
+                    test_method_10=Min('test_method_10'),
+                    test_method_11=Min('test_method_11'),
+                    test_method_12=Min('test_method_12'),
+                    test_method_13=Min('test_method_13'),
+                    test_method_14=Min('test_method_14'),
+                    test_method_15=Min('test_method_15'),
+                    test_method_16=Min('test_method_16'),
+                    test_method_17=Min('test_method_17'),
+                    test_method_18=Min('test_method_18'),
+                    test_method_19=Min('test_method_19'),
+                    test_method_20=Min('test_method_20'),
+                    test_method_21=Min('test_method_21'),
+                    test_method_22=Min('test_method_22'),
+                    test_method_23=Min('test_method_23'),
+                    test_method_24=Min('test_method_24'),
+                    test_method_25=Min('test_method_25')
+                )
+                series = []
+                sensor_counts = getSensorCounts(sensor_type)
+                sensor_names = get_constants(sensor_type)
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
+                dynamic_vars = {}
+                for index, element in enumerate(sensor_counts, start=1):
+                    dynamic_vars[f"test_method_{index}"] = []
+                for row_data in data:
+                    for method in dynamic_vars:
+                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                for index, elem in enumerate(request.POST.getlist('method')):
+                    series.append(
+                        {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
+            if sensor_type == 'vibration':
+                data = models.VibrationData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                    test_method_1=Min('test_method_1'),
+                    test_method_2=Min('test_method_2'),
+                    test_method_3=Min('test_method_3'),
+                    test_method_4=Min('test_method_4'),
+                    test_method_5=Min('test_method_5'),
+                    test_method_6=Min('test_method_6'),
+                    test_method_7=Min('test_method_7'),
+                    test_method_8=Min('test_method_8'),
+                    test_method_9=Min('test_method_9'),
+                    test_method_10=Min('test_method_10'),
+                    test_method_11=Min('test_method_11'),
+                    test_method_12=Min('test_method_12'),
+                    test_method_13=Min('test_method_13'),
+                    test_method_14=Min('test_method_14'),
+                    test_method_15=Min('test_method_15'),
+                    test_method_16=Min('test_method_16'),
+                    test_method_17=Min('test_method_17'),
+                    test_method_18=Min('test_method_18'),
+                    test_method_19=Min('test_method_19'),
+                    test_method_20=Min('test_method_20'),
+                    test_method_21=Min('test_method_21'),
+                    test_method_22=Min('test_method_22'),
+                    test_method_23=Min('test_method_23'),
+                    test_method_24=Min('test_method_24'),
+                    test_method_25=Min('test_method_25')
+                )
+                series = []
+                sensor_counts = getSensorCounts(sensor_type)
+                sensor_names = get_constants(sensor_type)
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
+                dynamic_vars = {}
+                for index, element in enumerate(sensor_counts, start=1):
+                    dynamic_vars[f"test_method_{index}"] = []
+                for row_data in data:
+                    for method in dynamic_vars:
+                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                for index, elem in enumerate(request.POST.getlist('method')):
+                    series.append(
+                        {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
+            return JsonResponse({
+                'code': 200,
+                'status': "SUCCESS",
+                'result': {'series': series},
+            })
+        elif chart_type == 'avg':
+            if sensor_type == 'strain':
+                data = models.StrainData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                    test_method_1=Avg('test_method_1'),
+                    test_method_2=Avg('test_method_2'),
+                    test_method_3=Avg('test_method_3'),
+                    test_method_4=Avg('test_method_4'),
+                    test_method_5=Avg('test_method_5'),
+                    test_method_6=Avg('test_method_6'),
+                    test_method_7=Avg('test_method_7'),
+                    test_method_8=Avg('test_method_8'),
+                    test_method_9=Avg('test_method_9'),
+                    test_method_10=Avg('test_method_10'),
+                    test_method_11=Avg('test_method_11'),
+                    test_method_12=Avg('test_method_12'),
+                    test_method_13=Avg('test_method_13'),
+                    test_method_14=Avg('test_method_14'),
+                    test_method_15=Avg('test_method_15'),
+                    test_method_16=Avg('test_method_16'),
+                    test_method_17=Avg('test_method_17'),
+                    test_method_18=Avg('test_method_18'),
+                    test_method_19=Avg('test_method_19'),
+                    test_method_20=Avg('test_method_20'),
+                    test_method_21=Avg('test_method_21'),
+                    test_method_22=Avg('test_method_22'),
+                    test_method_23=Avg('test_method_23'),
+                    test_method_24=Avg('test_method_24'),
+                    test_method_25=Avg('test_method_25'),
+                    test_method_26=Avg('test_method_26'),
+                    test_method_27=Avg('test_method_27'),
+                    test_method_28=Avg('test_method_28'),
+                    test_method_29=Avg('test_method_29'),
+                    test_method_30=Avg('test_method_30'),
+                    test_method_31=Avg('test_method_31'),
+                    test_method_32=Avg('test_method_32'),
+                    test_method_33=Avg('test_method_33'),
+                    test_method_34=Avg('test_method_34'),
+                    test_method_35=Avg('test_method_35'),
+                    test_method_36=Avg('test_method_36'),
+                    test_method_37=Avg('test_method_37'),
+                    test_method_38=Avg('test_method_38'),
+                    test_method_39=Avg('test_method_39'),
+                    test_method_40=Avg('test_method_40'),
+                    test_method_41=Avg('test_method_41'),
+                    test_method_42=Avg('test_method_42')
+                )
+                series = []
+                sensor_counts = getSensorCounts(sensor_type)
+                sensor_names = get_constants(sensor_type)
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
+                dynamic_vars = {}
+                for index, element in enumerate(sensor_counts, start=1):
+                    dynamic_vars[f"test_method_{index}"] = []
+                for row_data in data:
+                    for method in dynamic_vars:
+                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                for index, elem in enumerate(request.POST.getlist('method')):
+                    series.append(
+                        {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
+            if sensor_type == 'tilt':
+                data = models.TiltData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                    test_method_1=Avg('test_method_1'),
+                    test_method_2=Avg('test_method_2'),
+                    test_method_3=Avg('test_method_3'),
+                    test_method_4=Avg('test_method_4'),
+                    test_method_5=Avg('test_method_5'),
+                    test_method_6=Avg('test_method_6'),
+                    test_method_7=Avg('test_method_7'),
+                    test_method_8=Avg('test_method_8'),
+                    test_method_9=Avg('test_method_9'),
+                    test_method_10=Avg('test_method_10'),
+                    test_method_11=Avg('test_method_11'),
+                    test_method_12=Avg('test_method_12'),
+                    test_method_13=Avg('test_method_13'),
+                    test_method_14=Avg('test_method_14'),
+                    test_method_15=Avg('test_method_15'),
+                    test_method_16=Avg('test_method_16'),
+                    test_method_17=Avg('test_method_17'),
+                    test_method_18=Avg('test_method_18'),
+                    test_method_19=Avg('test_method_19'),
+                    test_method_20=Avg('test_method_20'),
+                    test_method_21=Avg('test_method_21'),
+                    test_method_22=Avg('test_method_22'),
+                    test_method_23=Avg('test_method_23'),
+                    test_method_24=Avg('test_method_24'),
+                    test_method_25=Avg('test_method_25')
+                )
+                series = []
+                sensor_counts = getSensorCounts(sensor_type)
+                sensor_names = get_constants(sensor_type)
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
+                dynamic_vars = {}
+                for index, element in enumerate(sensor_counts, start=1):
+                    dynamic_vars[f"test_method_{index}"] = []
+                for row_data in data:
+                    for method in dynamic_vars:
+                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                for index, elem in enumerate(request.POST.getlist('method')):
+                    series.append(
+                        {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
+            if sensor_type == 'displacement':
+                data = models.DisplacementData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                    test_method_1=Avg('test_method_1'),
+                    test_method_2=Avg('test_method_2'),
+                    test_method_3=Avg('test_method_3'),
+                    test_method_4=Avg('test_method_4'),
+                    test_method_5=Avg('test_method_5'),
+                    test_method_6=Avg('test_method_6'),
+                    test_method_7=Avg('test_method_7'),
+                    test_method_8=Avg('test_method_8'),
+                    test_method_9=Avg('test_method_9'),
+                    test_method_10=Avg('test_method_10'),
+                    test_method_11=Avg('test_method_11'),
+                    test_method_12=Avg('test_method_12'),
+                    test_method_13=Avg('test_method_13'),
+                    test_method_14=Avg('test_method_14'),
+                    test_method_15=Avg('test_method_15'),
+                    test_method_16=Avg('test_method_16'),
+                    test_method_17=Avg('test_method_17'),
+                    test_method_18=Avg('test_method_18'),
+                    test_method_19=Avg('test_method_19'),
+                    test_method_20=Avg('test_method_20'),
+                    test_method_21=Avg('test_method_21'),
+                    test_method_22=Avg('test_method_22'),
+                    test_method_23=Avg('test_method_23'),
+                    test_method_24=Avg('test_method_24'),
+                    test_method_25=Avg('test_method_25')
+                )
+                series = []
+                sensor_counts = getSensorCounts(sensor_type)
+                sensor_names = get_constants(sensor_type)
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
+                dynamic_vars = {}
+                for index, element in enumerate(sensor_counts, start=1):
+                    dynamic_vars[f"test_method_{index}"] = []
+                for row_data in data:
+                    for method in dynamic_vars:
+                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                for index, elem in enumerate(request.POST.getlist('method')):
+                    series.append(
+                        {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
+            if sensor_type == 'settlement':
+                data = models.SettlementData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                    test_method_1=Avg('test_method_1'),
+                    test_method_2=Avg('test_method_2'),
+                    test_method_3=Avg('test_method_3'),
+                    test_method_4=Avg('test_method_4'),
+                    test_method_5=Avg('test_method_5'),
+                    test_method_6=Avg('test_method_6'),
+                    test_method_7=Avg('test_method_7'),
+                    test_method_8=Avg('test_method_8'),
+                    test_method_9=Avg('test_method_9'),
+                    test_method_10=Avg('test_method_10'),
+                    test_method_11=Avg('test_method_11'),
+                    test_method_12=Avg('test_method_12'),
+                    test_method_13=Avg('test_method_13'),
+                    test_method_14=Avg('test_method_14'),
+                    test_method_15=Avg('test_method_15'),
+                    test_method_16=Avg('test_method_16'),
+                    test_method_17=Avg('test_method_17'),
+                    test_method_18=Avg('test_method_18'),
+                    test_method_19=Avg('test_method_19'),
+                    test_method_20=Avg('test_method_20'),
+                    test_method_21=Avg('test_method_21'),
+                    test_method_22=Avg('test_method_22'),
+                    test_method_23=Avg('test_method_23'),
+                    test_method_24=Avg('test_method_24'),
+                    test_method_25=Avg('test_method_25')
+                )
+                series = []
+                sensor_counts = getSensorCounts(sensor_type)
+                sensor_names = get_constants(sensor_type)
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
+                dynamic_vars = {}
+                for index, element in enumerate(sensor_counts, start=1):
+                    dynamic_vars[f"test_method_{index}"] = []
+                for row_data in data:
+                    for method in dynamic_vars:
+                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                for index, elem in enumerate(request.POST.getlist('method')):
+                    series.append(
+                        {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
+            if sensor_type == 'vibration':
+                data = models.VibrationData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                    test_method_1=Avg('test_method_1'),
+                    test_method_2=Avg('test_method_2'),
+                    test_method_3=Avg('test_method_3'),
+                    test_method_4=Avg('test_method_4'),
+                    test_method_5=Avg('test_method_5'),
+                    test_method_6=Avg('test_method_6'),
+                    test_method_7=Avg('test_method_7'),
+                    test_method_8=Avg('test_method_8'),
+                    test_method_9=Avg('test_method_9'),
+                    test_method_10=Avg('test_method_10'),
+                    test_method_11=Avg('test_method_11'),
+                    test_method_12=Avg('test_method_12'),
+                    test_method_13=Avg('test_method_13'),
+                    test_method_14=Avg('test_method_14'),
+                    test_method_15=Avg('test_method_15'),
+                    test_method_16=Avg('test_method_16'),
+                    test_method_17=Avg('test_method_17'),
+                    test_method_18=Avg('test_method_18'),
+                    test_method_19=Avg('test_method_19'),
+                    test_method_20=Avg('test_method_20'),
+                    test_method_21=Avg('test_method_21'),
+                    test_method_22=Avg('test_method_22'),
+                    test_method_23=Avg('test_method_23'),
+                    test_method_24=Avg('test_method_24'),
+                    test_method_25=Avg('test_method_25')
+                )
+                series = []
+                sensor_counts = getSensorCounts(sensor_type)
+                sensor_names = get_constants(sensor_type)
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
+                dynamic_vars = {}
+                for index, element in enumerate(sensor_counts, start=1):
+                    dynamic_vars[f"test_method_{index}"] = []
+                for row_data in data:
+                    for method in dynamic_vars:
+                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                for index, elem in enumerate(request.POST.getlist('method')):
+                    series.append(
+                        {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
+            return JsonResponse({
+                'code': 200,
+                'status': "SUCCESS",
+                'result': {'series': series},
+            })
+        else:
+            if sensor_type == 'strain':
+                data = models.StrainData.objects.filter(
+                    date_time__range=(from_time, to_time)).order_by('id')
+                series = []
+                sensor_counts = getSensorCounts(sensor_type)
+                sensor_names = get_constants(sensor_type)
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
+                dynamic_vars = {}
+                for index, element in enumerate(sensor_counts, start=1):
+                    dynamic_vars[f"test_method_{index}"] = []
+                for row_data in data:
+                    for method in dynamic_vars:
+                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
+                for index, elem in enumerate(request.POST.getlist('method')):
+                    series.append(
+                        {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
+            if sensor_type == 'tilt':
+                data = models.TiltData.objects.filter(
+                    date_time__range=(from_time, to_time)).order_by('id')
+                series = []
+                sensor_counts = getSensorCounts(sensor_type)
+                sensor_names = get_constants(sensor_type)
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
+                dynamic_vars = {}
+                for index, element in enumerate(sensor_counts, start=1):
+                    dynamic_vars[f"test_method_{index}"] = []
+                for row_data in data:
+                    for method in dynamic_vars:
+                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
+                for index, elem in enumerate(request.POST.getlist('method')):
+                    series.append(
+                        {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
+            if sensor_type == 'displacement':
+                data = models.DisplacementData.objects.filter(
+                    date_time__range=(from_time, to_time)).order_by('id')
+                series = []
+                sensor_counts = getSensorCounts(sensor_type)
+                sensor_names = get_constants(sensor_type)
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
+                dynamic_vars = {}
+                for index, element in enumerate(sensor_counts, start=1):
+                    dynamic_vars[f"test_method_{index}"] = []
+                for row_data in data:
+                    for method in dynamic_vars:
+                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
+                for index, elem in enumerate(request.POST.getlist('method')):
+                    series.append(
+                        {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
+            if sensor_type == 'settlement':
+                data = models.SettlementData.objects.filter(
+                    date_time__range=(from_time, to_time)).order_by('id')
+                series = []
+                sensor_counts = getSensorCounts(sensor_type)
+                sensor_names = get_constants(sensor_type)
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
+                dynamic_vars = {}
+                for index, element in enumerate(sensor_counts, start=1):
+                    dynamic_vars[f"test_method_{index}"] = []
+                for row_data in data:
+                    for method in dynamic_vars:
+                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
+                for index, elem in enumerate(request.POST.getlist('method')):
+                    series.append(
+                        {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
+            if sensor_type == 'vibration':
+                data = models.VibrationData.objects.filter(
+                    date_time__range=(from_time, to_time)).order_by('id')
+                series = []
+                sensor_counts = getSensorCounts(sensor_type)
+                sensor_names = get_constants(sensor_type)
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
+                dynamic_vars = {}
+                for index, element in enumerate(sensor_counts, start=1):
+                    dynamic_vars[f"test_method_{index}"] = []
+                for row_data in data:
+                    for method in dynamic_vars:
+                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
+                for index, elem in enumerate(request.POST.getlist('method')):
+                    series.append(
+                        {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
+            return JsonResponse({
+                'code': 200,
+                'status': "SUCCESS",
+                'result': {'series': series},
+            })
     else:
         return JsonResponse({
             'code': 502,
