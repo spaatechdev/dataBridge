@@ -249,7 +249,36 @@
                         <form action="#" id="comparative_chart_details_form" enctype="multipart/form-data"
                             class="p-4 p-md-4 border rounded-3 bg-body-tertiary shadow">
                             {% csrf_token %}
-
+                            <div class="row mb-3 d-flex">
+                                <div class="col-lg-3 form-group">
+                                    <div class="form-check">
+                                        <input type="radio" class="form-check-input" id="raw" name="chart_type"
+                                            value="raw" checked>
+                                        <label class="form-check-label" for="raw">Raw</label>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 form-group">
+                                    <div class="form-check">
+                                        <input type="radio" class="form-check-input" id="max" name="chart_type"
+                                            value="max">
+                                        <label class="form-check-label" for="max">Max</label>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 form-group">
+                                    <div class="form-check">
+                                        <input type="radio" class="form-check-input" id="min" name="chart_type"
+                                            value="min">
+                                        <label class="form-check-label" for="min">Min</label>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 form-group">
+                                    <div class="form-check">
+                                        <input type="radio" class="form-check-input" id="avg" name="chart_type"
+                                            value="avg">
+                                        <label class="form-check-label" for="avg">Average</label>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="row mb-3">
                                 <div class="col-md-6 parent_form">
                                     <div class="form-group">
@@ -562,9 +591,9 @@
                         result = response.result;
                         $('.normalChart').css('display', 'none');
                         $('.comparativeChart').css('display', 'block');
-                        renderCombineLineChart(result.combine_data);
-                        renderCombineFirstLineChart(result.all_data[Object.keys(result.all_data)[0]]);
-                        renderCombineSecondLineChart(result.all_data[Object.keys(result.all_data)[1]]);
+                        renderCombineLineChart(result.combine_data, formData.get("chart_type"));
+                        renderCombineFirstLineChart(result.all_data[Object.keys(result.all_data)[0]], formData.get("chart_type"));
+                        renderCombineSecondLineChart(result.all_data[Object.keys(result.all_data)[1]], formData.get("chart_type"));
                     } else {
                         alert(response.message)
                     }
@@ -572,7 +601,7 @@
             });
         });
 
-        function renderCombineLineChart(result) {
+        function renderCombineLineChart(result, chart_type) {
             // Create the chart
             Highcharts.chart('combineChartContainer', {
 
@@ -594,7 +623,8 @@
                 },
 
                 tooltip: {
-                    valueDecimals: 5
+                    valueDecimals: 5,
+                    xDateFormat: chart_type != 'raw' ? '%A, %b %e' : ''
                 },
 
                 xAxis: {
@@ -606,7 +636,7 @@
             });
         }
 
-        function renderCombineFirstLineChart(result) {
+        function renderCombineFirstLineChart(result, chart_type) {
             // Create the chart
             Highcharts.chart('chartFirstContainer', {
 
@@ -628,7 +658,8 @@
                 },
 
                 tooltip: {
-                    valueDecimals: 5
+                    valueDecimals: 5,
+                    xDateFormat: chart_type != 'raw' ? '%A, %b %e' : ''
                 },
 
                 xAxis: {
@@ -640,7 +671,7 @@
             });
         }
 
-        function renderCombineSecondLineChart(result) {
+        function renderCombineSecondLineChart(result, chart_type) {
             // Create the chart
             Highcharts.chart('chartSecondContainer', {
 
@@ -662,7 +693,8 @@
                 },
 
                 tooltip: {
-                    valueDecimals: 5
+                    valueDecimals: 5,
+                    xDateFormat: chart_type != 'raw' ? '%A, %b %e' : ''
                 },
 
                 xAxis: {
