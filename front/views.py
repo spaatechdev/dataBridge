@@ -32,6 +32,8 @@ context['project_name'] = env("PROJECT_NAME")
 context['client_name'] = env("CLIENT_NAME")
 
 # Create your views here.
+
+
 def removeSeconds(timestamp):
     # Split the timestamp into date and time parts
     date_part, time_part = timestamp.split('T')
@@ -53,11 +55,13 @@ def createMilisecondsByDate(date_string):
     timezone_milliseconds = (hours * 3600 * 1000) + (minutes * 60 * 1000)
 
     # Parse the datetime string manually
-    year, month, day, hour, minute, second = map(int, date_string.split('T')[0].split('-') + date_string.split('T')[1].split(':'))
+    year, month, day, hour, minute, second = map(int, date_string.split(
+        'T')[0].split('-') + date_string.split('T')[1].split(':'))
     datetime_tuple = (year, month, day, hour, minute, second, 0, 0, 0)
 
     # Calculate the milliseconds since the Unix epoch
-    milliseconds = int(time.mktime(datetime_tuple) * 1000) + timezone_milliseconds
+    milliseconds = int(time.mktime(datetime_tuple) *
+                       1000) + timezone_milliseconds
     return milliseconds
 
 
@@ -66,10 +70,10 @@ def random_color_code():
     r = random.randint(0, 255)
     g = random.randint(0, 255)
     b = random.randint(0, 255)
-    
+
     # Convert the RGB values to a hexadecimal color code
     color_code = "#{:02X}{:02X}{:02X}".format(r, g, b)
-    
+
     return color_code
 
 
@@ -384,56 +388,98 @@ def importExcel(request):
             f.close()
             if request.FILES.get('strain_gauge', None):
                 file = request.FILES['strain_gauge']
-                tmpname = str(datetime.now().microsecond) + \
-                    os.path.splitext(str(file))[1]
-                fs = FileSystemStorage(
-                    settings.MEDIA_ROOT + "excel/", settings.MEDIA_ROOT + "/excel/")
-                fs.save(tmpname, file)
-                file_name = "excel/" + tmpname
+                if os.path.splitext(str(file))[1] == '.xlsx' or os.path.splitext(str(file))[1] == '.xls':
+                    tmpname = str(datetime.now().microsecond) + \
+                        os.path.splitext(str(file))[1]
+                    fs = FileSystemStorage(
+                        settings.MEDIA_ROOT + "excel/", settings.MEDIA_ROOT + "/excel/")
+                    fs.save(tmpname, file)
+                    file_name = "excel/" + tmpname
 
-                wb = openpyxl.load_workbook(
-                    settings.MEDIA_ROOT + file_name, data_only=True)
-                ws = wb.active
+                    wb = openpyxl.load_workbook(
+                        settings.MEDIA_ROOT + file_name, data_only=True)
+                    ws = wb.active
 
-                # Extract and clean column names from the Excel file (assuming they are in the first row)
-                # column_names = [re.sub(r'[^a-zA-Z0-9_]', '_', str(cell.value)) for cell in ws[1]]
-                column_names = [str(cell.value) for cell in ws[1]]
+                    # Extract and clean column names from the Excel file (assuming they are in the first row)
+                    # column_names = [re.sub(r'[^a-zA-Z0-9_]', '_', str(cell.value)) for cell in ws[1]]
+                    column_names = [str(cell.value) for cell in ws[1]]
 
-                # Removing Date Time Column
-                del column_names[0]
+                    # Removing Date Time Column
+                    del column_names[0]
 
-                # strain_columns = get_constants('strain')
-                strain_columns = constants.strain_columns
+                    # strain_columns = get_constants('strain')
+                    strain_columns = constants.strain_columns
 
-                for index, column in enumerate(column_names):
-                    strain_columns[list(strain_columns.keys())[index]] = column
+                    for index, column in enumerate(column_names):
+                        strain_columns[list(strain_columns.keys())[
+                            index]] = column
 
-                f = open("templates/constants/strain_columns.txt", "w+")
-                columns = json.dumps(strain_columns)
-                f.write(columns)
-                f.close()
+                    f = open("templates/constants/strain_columns.txt", "w+")
+                    columns = json.dumps(strain_columns)
+                    f.write(columns)
+                    f.close()
 
-                data_list = []
+                    data_list = []
 
-                # Initialize a flag to skip the first row
-                skip_first_row = True
+                    # Initialize a flag to skip the first row
+                    skip_first_row = True
 
-                for row in ws.iter_rows(values_only=True):
-                    if skip_first_row:
-                        skip_first_row = False
-                        continue  # Skip the first row
-                    if not row[0]:
-                        break
-                    if len(data_list) > 1000:
-                        models.StrainData.objects.bulk_create(data_list)
+                    for row in ws.iter_rows(values_only=True):
+                        if skip_first_row:
+                            skip_first_row = False
+                            continue  # Skip the first row
+                        if not row[0]:
+                            break
+                        if len(data_list) > 1000:
+                            models.StrainData.objects.bulk_create(data_list)
+                            data_list = []
+                            data_list.append(models.StrainData(date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S") if len(row[0].split(":")) > 2 else datetime.strptime(row[0], "%d-%m-%Y %H:%M"), test_method_1=row[1] if len(row) > 1 else None, test_method_2=row[2] if len(row) > 2 else None, test_method_3=row[3] if len(row) > 3 else None, test_method_4=row[4] if len(row) > 4 else None, test_method_5=row[5] if len(row) > 5 else None, test_method_6=row[6] if len(row) > 6 else None, test_method_7=row[7] if len(row) > 7 else None, test_method_8=row[8] if len(row) > 8 else None, test_method_9=row[9] if len(row) > 9 else None, test_method_10=row[10] if len(row) > 10 else None, test_method_11=row[11] if len(row) > 11 else None, test_method_12=row[12] if len(row) > 12 else None, test_method_13=row[13] if len(row) > 13 else None, test_method_14=row[14] if len(row) > 14 else None, test_method_15=row[15] if len(row) > 15 else None, test_method_16=row[16] if len(row) > 16 else None, test_method_17=row[17] if len(row) > 17 else None, test_method_18=row[18] if len(row) > 18 else None, test_method_19=row[19] if len(row) > 19 else None, test_method_20=row[20] if len(row) > 20 else None, test_method_21=row[21] if len(
+                                row) > 21 else None, test_method_22=row[22] if len(row) > 22 else None, test_method_23=row[23] if len(row) > 23 else None, test_method_24=row[24] if len(row) > 24 else None, test_method_25=row[25] if len(row) > 25 else None, test_method_26=row[26] if len(row) > 26 else None, test_method_27=row[27] if len(row) > 27 else None, test_method_28=row[28] if len(row) > 28 else None, test_method_29=row[29] if len(row) > 29 else None, test_method_30=row[30] if len(row) > 30 else None, test_method_31=row[31] if len(row) > 31 else None, test_method_32=row[32] if len(row) > 32 else None, test_method_33=row[33] if len(row) > 33 else None, test_method_34=row[34] if len(row) > 34 else None, test_method_35=row[35] if len(row) > 35 else None, test_method_36=row[36] if len(row) > 36 else None, test_method_37=row[37] if len(row) > 37 else None, test_method_38=row[38] if len(row) > 38 else None, test_method_39=row[39] if len(row) > 39 else None, test_method_40=row[40] if len(row) > 40 else None, test_method_41=row[41] if len(row) > 41 else None, test_method_42=row[42] if len(row) > 42 else None))
+                        else:
+                            data_list.append(models.StrainData(date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S") if len(row[0].split(":")) > 2 else datetime.strptime(row[0], "%d-%m-%Y %H:%M"), test_method_1=row[1] if len(row) > 1 else None, test_method_2=row[2] if len(row) > 2 else None, test_method_3=row[3] if len(row) > 3 else None, test_method_4=row[4] if len(row) > 4 else None, test_method_5=row[5] if len(row) > 5 else None, test_method_6=row[6] if len(row) > 6 else None, test_method_7=row[7] if len(row) > 7 else None, test_method_8=row[8] if len(row) > 8 else None, test_method_9=row[9] if len(row) > 9 else None, test_method_10=row[10] if len(row) > 10 else None, test_method_11=row[11] if len(row) > 11 else None, test_method_12=row[12] if len(row) > 12 else None, test_method_13=row[13] if len(row) > 13 else None, test_method_14=row[14] if len(row) > 14 else None, test_method_15=row[15] if len(row) > 15 else None, test_method_16=row[16] if len(row) > 16 else None, test_method_17=row[17] if len(row) > 17 else None, test_method_18=row[18] if len(row) > 18 else None, test_method_19=row[19] if len(row) > 19 else None, test_method_20=row[20] if len(row) > 20 else None, test_method_21=row[21] if len(
+                                row) > 21 else None, test_method_22=row[22] if len(row) > 22 else None, test_method_23=row[23] if len(row) > 23 else None, test_method_24=row[24] if len(row) > 24 else None, test_method_25=row[25] if len(row) > 25 else None, test_method_26=row[26] if len(row) > 26 else None, test_method_27=row[27] if len(row) > 27 else None, test_method_28=row[28] if len(row) > 28 else None, test_method_29=row[29] if len(row) > 29 else None, test_method_30=row[30] if len(row) > 30 else None, test_method_31=row[31] if len(row) > 31 else None, test_method_32=row[32] if len(row) > 32 else None, test_method_33=row[33] if len(row) > 33 else None, test_method_34=row[34] if len(row) > 34 else None, test_method_35=row[35] if len(row) > 35 else None, test_method_36=row[36] if len(row) > 36 else None, test_method_37=row[37] if len(row) > 37 else None, test_method_38=row[38] if len(row) > 38 else None, test_method_39=row[39] if len(row) > 39 else None, test_method_40=row[40] if len(row) > 40 else None, test_method_41=row[41] if len(row) > 41 else None, test_method_42=row[42] if len(row) > 42 else None))
+                    models.StrainData.objects.bulk_create(data_list)
+                    os.remove(settings.MEDIA_ROOT + file_name)
+                elif os.path.splitext(str(file))[1] == '.csv':
+                    tmpname = str(datetime.now().microsecond) + \
+                        os.path.splitext(str(file))[1]
+                    fs = FileSystemStorage(settings.MEDIA_ROOT + "csv/", settings.MEDIA_ROOT + "/csv/")
+                    fs.save(tmpname, file)
+                    file_name = "csv/" + tmpname
+
+                    with open(settings.MEDIA_ROOT + file_name, newline='', mode='r', encoding='ISO-8859-1') as csvfile:
+                        reader = csv.DictReader(csvfile)
+                        reader = csv.reader(csvfile)
+                        first_row = next(reader, None)
+
+                        # Removing Date Time Column
+                        del first_row[0]
+
+                        # strain_columns = get_constants('strain')
+                        strain_columns = constants.strain_columns
+
+                        for index, column in enumerate(first_row):
+                            strain_columns[list(strain_columns.keys())[index]] = column
+
+                        f = open("templates/constants/strain_columns.txt", "w+")
+                        columns = json.dumps(strain_columns)
+                        f.write(columns)
+                        f.close()
+
+                        next(reader)
                         data_list = []
-                        data_list.append(models.StrainData(date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), test_method_1=row[1] if len(row) > 1 else None, test_method_2=row[2] if len(row) > 2 else None, test_method_3=row[3] if len(row) > 3 else None, test_method_4=row[4] if len(row) > 4 else None, test_method_5=row[5] if len(row) > 5 else None, test_method_6=row[6] if len(row) > 6 else None, test_method_7=row[7] if len(row) > 7 else None, test_method_8=row[8] if len(row) > 8 else None, test_method_9=row[9] if len(row) > 9 else None, test_method_10=row[10] if len(row) > 10 else None, test_method_11=row[11] if len(row) > 11 else None, test_method_12=row[12] if len(row) > 12 else None, test_method_13=row[13] if len(row) > 13 else None, test_method_14=row[14] if len(row) > 14 else None, test_method_15=row[15] if len(row) > 15 else None, test_method_16=row[16] if len(row) > 16 else None, test_method_17=row[17] if len(row) > 17 else None, test_method_18=row[18] if len(row) > 18 else None, test_method_19=row[19] if len(row) > 19 else None, test_method_20=row[20] if len(row) > 20 else None, test_method_21=row[21] if len(
-                            row) > 21 else None, test_method_22=row[22] if len(row) > 22 else None, test_method_23=row[23] if len(row) > 23 else None, test_method_24=row[24] if len(row) > 24 else None, test_method_25=row[25] if len(row) > 25 else None, test_method_26=row[26] if len(row) > 26 else None, test_method_27=row[27] if len(row) > 27 else None, test_method_28=row[28] if len(row) > 28 else None, test_method_29=row[29] if len(row) > 29 else None, test_method_30=row[30] if len(row) > 30 else None, test_method_31=row[31] if len(row) > 31 else None, test_method_32=row[32] if len(row) > 32 else None, test_method_33=row[33] if len(row) > 33 else None, test_method_34=row[34] if len(row) > 34 else None, test_method_35=row[35] if len(row) > 35 else None, test_method_36=row[36] if len(row) > 36 else None, test_method_37=row[37] if len(row) > 37 else None, test_method_38=row[38] if len(row) > 38 else None, test_method_39=row[39] if len(row) > 39 else None, test_method_40=row[40] if len(row) > 40 else None, test_method_41=row[41] if len(row) > 41 else None, test_method_42=row[42] if len(row) > 42 else None))
-                    else:
-                        data_list.append(models.StrainData(date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), test_method_1=row[1] if len(row) > 1 else None, test_method_2=row[2] if len(row) > 2 else None, test_method_3=row[3] if len(row) > 3 else None, test_method_4=row[4] if len(row) > 4 else None, test_method_5=row[5] if len(row) > 5 else None, test_method_6=row[6] if len(row) > 6 else None, test_method_7=row[7] if len(row) > 7 else None, test_method_8=row[8] if len(row) > 8 else None, test_method_9=row[9] if len(row) > 9 else None, test_method_10=row[10] if len(row) > 10 else None, test_method_11=row[11] if len(row) > 11 else None, test_method_12=row[12] if len(row) > 12 else None, test_method_13=row[13] if len(row) > 13 else None, test_method_14=row[14] if len(row) > 14 else None, test_method_15=row[15] if len(row) > 15 else None, test_method_16=row[16] if len(row) > 16 else None, test_method_17=row[17] if len(row) > 17 else None, test_method_18=row[18] if len(row) > 18 else None, test_method_19=row[19] if len(row) > 19 else None, test_method_20=row[20] if len(row) > 20 else None, test_method_21=row[21] if len(
-                            row) > 21 else None, test_method_22=row[22] if len(row) > 22 else None, test_method_23=row[23] if len(row) > 23 else None, test_method_24=row[24] if len(row) > 24 else None, test_method_25=row[25] if len(row) > 25 else None, test_method_26=row[26] if len(row) > 26 else None, test_method_27=row[27] if len(row) > 27 else None, test_method_28=row[28] if len(row) > 28 else None, test_method_29=row[29] if len(row) > 29 else None, test_method_30=row[30] if len(row) > 30 else None, test_method_31=row[31] if len(row) > 31 else None, test_method_32=row[32] if len(row) > 32 else None, test_method_33=row[33] if len(row) > 33 else None, test_method_34=row[34] if len(row) > 34 else None, test_method_35=row[35] if len(row) > 35 else None, test_method_36=row[36] if len(row) > 36 else None, test_method_37=row[37] if len(row) > 37 else None, test_method_38=row[38] if len(row) > 38 else None, test_method_39=row[39] if len(row) > 39 else None, test_method_40=row[40] if len(row) > 40 else None, test_method_41=row[41] if len(row) > 41 else None, test_method_42=row[42] if len(row) > 42 else None))
-                models.StrainData.objects.bulk_create(data_list)
-                os.remove(settings.MEDIA_ROOT + file_name)
+                        for row in reader:
+                            if len(data_list) > 1000:
+                                models.StrainData.objects.bulk_create(data_list)
+                                data_list = []
+                                data_list.append(models.StrainData(date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S") if len(row[0].split(":")) > 2 else datetime.strptime(row[0], "%d-%m-%Y %H:%M"), test_method_1=row[1] if len(row) > 1 else None, test_method_2=row[2] if len(row) > 2 else None, test_method_3=row[3] if len(row) > 3 else None, test_method_4=row[4] if len(row) > 4 else None, test_method_5=row[5] if len(row) > 5 else None, test_method_6=row[6] if len(row) > 6 else None, test_method_7=row[7] if len(row) > 7 else None, test_method_8=row[8] if len(row) > 8 else None, test_method_9=row[9] if len(row) > 9 else None, test_method_10=row[10] if len(row) > 10 else None, test_method_11=row[11] if len(row) > 11 else None, test_method_12=row[12] if len(row) > 12 else None, test_method_13=row[13] if len(row) > 13 else None, test_method_14=row[14] if len(row) > 14 else None, test_method_15=row[15] if len(row) > 15 else None, test_method_16=row[16] if len(row) > 16 else None, test_method_17=row[17] if len(row) > 17 else None, test_method_18=row[18] if len(row) > 18 else None, test_method_19=row[19] if len(row) > 19 else None, test_method_20=row[20] if len(row) > 20 else None, test_method_21=row[21] if len(
+                                    row) > 21 else None, test_method_22=row[22] if len(row) > 22 else None, test_method_23=row[23] if len(row) > 23 else None, test_method_24=row[24] if len(row) > 24 else None, test_method_25=row[25] if len(row) > 25 else None, test_method_26=row[26] if len(row) > 26 else None, test_method_27=row[27] if len(row) > 27 else None, test_method_28=row[28] if len(row) > 28 else None, test_method_29=row[29] if len(row) > 29 else None, test_method_30=row[30] if len(row) > 30 else None, test_method_31=row[31] if len(row) > 31 else None, test_method_32=row[32] if len(row) > 32 else None, test_method_33=row[33] if len(row) > 33 else None, test_method_34=row[34] if len(row) > 34 else None, test_method_35=row[35] if len(row) > 35 else None, test_method_36=row[36] if len(row) > 36 else None, test_method_37=row[37] if len(row) > 37 else None, test_method_38=row[38] if len(row) > 38 else None, test_method_39=row[39] if len(row) > 39 else None, test_method_40=row[40] if len(row) > 40 else None, test_method_41=row[41] if len(row) > 41 else None, test_method_42=row[42] if len(row) > 42 else None))
+                            else:
+                                data_list.append(models.StrainData(date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S") if len(row[0].split(":")) > 2 else datetime.strptime(row[0], "%d-%m-%Y %H:%M"), test_method_1=row[1] if len(row) > 1 else None, test_method_2=row[2] if len(row) > 2 else None, test_method_3=row[3] if len(row) > 3 else None, test_method_4=row[4] if len(row) > 4 else None, test_method_5=row[5] if len(row) > 5 else None, test_method_6=row[6] if len(row) > 6 else None, test_method_7=row[7] if len(row) > 7 else None, test_method_8=row[8] if len(row) > 8 else None, test_method_9=row[9] if len(row) > 9 else None, test_method_10=row[10] if len(row) > 10 else None, test_method_11=row[11] if len(row) > 11 else None, test_method_12=row[12] if len(row) > 12 else None, test_method_13=row[13] if len(row) > 13 else None, test_method_14=row[14] if len(row) > 14 else None, test_method_15=row[15] if len(row) > 15 else None, test_method_16=row[16] if len(row) > 16 else None, test_method_17=row[17] if len(row) > 17 else None, test_method_18=row[18] if len(row) > 18 else None, test_method_19=row[19] if len(row) > 19 else None, test_method_20=row[20] if len(row) > 20 else None, test_method_21=row[21] if len(
+                                    row) > 21 else None, test_method_22=row[22] if len(row) > 22 else None, test_method_23=row[23] if len(row) > 23 else None, test_method_24=row[24] if len(row) > 24 else None, test_method_25=row[25] if len(row) > 25 else None, test_method_26=row[26] if len(row) > 26 else None, test_method_27=row[27] if len(row) > 27 else None, test_method_28=row[28] if len(row) > 28 else None, test_method_29=row[29] if len(row) > 29 else None, test_method_30=row[30] if len(row) > 30 else None, test_method_31=row[31] if len(row) > 31 else None, test_method_32=row[32] if len(row) > 32 else None, test_method_33=row[33] if len(row) > 33 else None, test_method_34=row[34] if len(row) > 34 else None, test_method_35=row[35] if len(row) > 35 else None, test_method_36=row[36] if len(row) > 36 else None, test_method_37=row[37] if len(row) > 37 else None, test_method_38=row[38] if len(row) > 38 else None, test_method_39=row[39] if len(row) > 39 else None, test_method_40=row[40] if len(row) > 40 else None, test_method_41=row[41] if len(row) > 41 else None, test_method_42=row[42] if len(row) > 42 else None))
+                        models.StrainData.objects.bulk_create(data_list)
+                        csvfile.close()
+                        os.remove(settings.MEDIA_ROOT + file_name)
         if 'tilt_required' in request.POST.keys():
             models.TiltData.objects.all().delete()
             f = open("templates/constants/tilt_columns.txt", "w+")
@@ -441,56 +487,97 @@ def importExcel(request):
             f.close()
             if request.FILES.get('tilt', None):
                 file = request.FILES['tilt']
-                tmpname = str(datetime.now().microsecond) + \
-                    os.path.splitext(str(file))[1]
-                fs = FileSystemStorage(
-                    settings.MEDIA_ROOT + "excel/", settings.MEDIA_ROOT + "/excel/")
-                fs.save(tmpname, file)
-                file_name = "excel/" + tmpname
+                if os.path.splitext(str(file))[1] == '.xlsx' or os.path.splitext(str(file))[1] == '.xls':
+                    tmpname = str(datetime.now().microsecond) + \
+                        os.path.splitext(str(file))[1]
+                    fs = FileSystemStorage(
+                        settings.MEDIA_ROOT + "excel/", settings.MEDIA_ROOT + "/excel/")
+                    fs.save(tmpname, file)
+                    file_name = "excel/" + tmpname
 
-                wb = openpyxl.load_workbook(
-                    settings.MEDIA_ROOT + file_name, data_only=True)
-                ws = wb.active
+                    wb = openpyxl.load_workbook(
+                        settings.MEDIA_ROOT + file_name, data_only=True)
+                    ws = wb.active
 
-                # Extract and clean column names from the Excel file (assuming they are in the first row)
-                # column_names = [re.sub(r'[^a-zA-Z0-9_]', '_', str(cell.value)) for cell in ws[1]]
-                column_names = [str(cell.value) for cell in ws[1]]
+                    # Extract and clean column names from the Excel file (assuming they are in the first row)
+                    # column_names = [re.sub(r'[^a-zA-Z0-9_]', '_', str(cell.value)) for cell in ws[1]]
+                    column_names = [str(cell.value) for cell in ws[1]]
 
-                # Removing Date Time Column
-                del column_names[0]
+                    # Removing Date Time Column
+                    del column_names[0]
 
-                # tilt_columns = get_constants('tilt')
-                tilt_columns = constants.tilt_columns
+                    # tilt_columns = get_constants('tilt')
+                    tilt_columns = constants.tilt_columns
 
-                for index, column in enumerate(column_names):
-                    tilt_columns[list(tilt_columns.keys())[index]] = column
+                    for index, column in enumerate(column_names):
+                        tilt_columns[list(tilt_columns.keys())[index]] = column
 
-                f = open("templates/constants/tilt_columns.txt", "w+")
-                columns = json.dumps(tilt_columns)
-                f.write(columns)
-                f.close()
+                    f = open("templates/constants/tilt_columns.txt", "w+")
+                    columns = json.dumps(tilt_columns)
+                    f.write(columns)
+                    f.close()
 
-                data_list = []
+                    data_list = []
 
-                # Initialize a flag to skip the first row
-                skip_first_row = True
+                    # Initialize a flag to skip the first row
+                    skip_first_row = True
 
-                for row in ws.iter_rows(values_only=True):
-                    if skip_first_row:
-                        skip_first_row = False
-                        continue  # Skip the first row
-                    if not row[0]:
-                        break
-                    if len(data_list) > 1000:
-                        models.TiltData.objects.bulk_create(data_list)
+                    for row in ws.iter_rows(values_only=True):
+                        if skip_first_row:
+                            skip_first_row = False
+                            continue  # Skip the first row
+                        if not row[0]:
+                            break
+                        if len(data_list) > 1000:
+                            models.TiltData.objects.bulk_create(data_list)
+                            data_list = []
+                            data_list.append(models.StrainData(date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S") if len(row[0].split(":")) > 2 else datetime.strptime(row[0], "%d-%m-%Y %H:%M"), test_method_1=row[1] if len(row) > 1 else None, test_method_2=row[2] if len(row) > 2 else None, test_method_3=row[3] if len(row) > 3 else None, test_method_4=row[4] if len(row) > 4 else None, test_method_5=row[5] if len(row) > 5 else None, test_method_6=row[6] if len(row) > 6 else None, test_method_7=row[7] if len(row) > 7 else None, test_method_8=row[8] if len(row) > 8 else None, test_method_9=row[9] if len(row) > 9 else None, test_method_10=row[10] if len(row) > 10 else None, test_method_11=row[11] if len(row) > 11 else None, test_method_12=row[12] if len(
+                                row) > 12 else None, test_method_13=row[13] if len(row) > 13 else None, test_method_14=row[14] if len(row) > 14 else None, test_method_15=row[15] if len(row) > 15 else None, test_method_16=row[16] if len(row) > 16 else None, test_method_17=row[17] if len(row) > 17 else None, test_method_18=row[18] if len(row) > 18 else None, test_method_19=row[19] if len(row) > 19 else None, test_method_20=row[20] if len(row) > 20 else None, test_method_21=row[21] if len(row) > 21 else None, test_method_22=row[22] if len(row) > 22 else None, test_method_23=row[23] if len(row) > 23 else None, test_method_24=row[24] if len(row) > 24 else None, test_method_25=row[25] if len(row) > 25 else None))
+                        else:
+                            data_list.append(models.StrainData(date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S") if len(row[0].split(":")) > 2 else datetime.strptime(row[0], "%d-%m-%Y %H:%M"), test_method_1=row[1] if len(row) > 1 else None, test_method_2=row[2] if len(row) > 2 else None, test_method_3=row[3] if len(row) > 3 else None, test_method_4=row[4] if len(row) > 4 else None, test_method_5=row[5] if len(row) > 5 else None, test_method_6=row[6] if len(row) > 6 else None, test_method_7=row[7] if len(row) > 7 else None, test_method_8=row[8] if len(row) > 8 else None, test_method_9=row[9] if len(row) > 9 else None, test_method_10=row[10] if len(row) > 10 else None, test_method_11=row[11] if len(row) > 11 else None, test_method_12=row[12] if len(
+                                row) > 12 else None, test_method_13=row[13] if len(row) > 13 else None, test_method_14=row[14] if len(row) > 14 else None, test_method_15=row[15] if len(row) > 15 else None, test_method_16=row[16] if len(row) > 16 else None, test_method_17=row[17] if len(row) > 17 else None, test_method_18=row[18] if len(row) > 18 else None, test_method_19=row[19] if len(row) > 19 else None, test_method_20=row[20] if len(row) > 20 else None, test_method_21=row[21] if len(row) > 21 else None, test_method_22=row[22] if len(row) > 22 else None, test_method_23=row[23] if len(row) > 23 else None, test_method_24=row[24] if len(row) > 24 else None, test_method_25=row[25] if len(row) > 25 else None))
+                    models.TiltData.objects.bulk_create(data_list)
+                    os.remove(settings.MEDIA_ROOT + file_name)
+                elif os.path.splitext(str(file))[1] == '.csv':
+                    tmpname = str(datetime.now().microsecond) + \
+                        os.path.splitext(str(file))[1]
+                    fs = FileSystemStorage(settings.MEDIA_ROOT + "csv/", settings.MEDIA_ROOT + "/csv/")
+                    fs.save(tmpname, file)
+                    file_name = "csv/" + tmpname
+
+                    with open(settings.MEDIA_ROOT + file_name, newline='', mode='r', encoding='ISO-8859-1') as csvfile:
+                        reader = csv.DictReader(csvfile)
+                        reader = csv.reader(csvfile)
+                        first_row = next(reader, None)
+
+                        # Removing Date Time Column
+                        del first_row[0]
+
+                        # tilt_columns = get_constants('tilt')
+                        tilt_columns = constants.tilt_columns
+
+                        for index, column in enumerate(first_row):
+                            tilt_columns[list(tilt_columns.keys())[index]] = column
+
+                        f = open("templates/constants/tilt_columns.txt", "w+")
+                        columns = json.dumps(tilt_columns)
+                        f.write(columns)
+                        f.close()
+
+                        next(reader)
                         data_list = []
-                        data_list.append(models.StrainData(date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), test_method_1=row[1] if len(row) > 1 else None, test_method_2=row[2] if len(row) > 2 else None, test_method_3=row[3] if len(row) > 3 else None, test_method_4=row[4] if len(row) > 4 else None, test_method_5=row[5] if len(row) > 5 else None, test_method_6=row[6] if len(row) > 6 else None, test_method_7=row[7] if len(row) > 7 else None, test_method_8=row[8] if len(row) > 8 else None, test_method_9=row[9] if len(row) > 9 else None, test_method_10=row[10] if len(row) > 10 else None, test_method_11=row[11] if len(row) > 11 else None, test_method_12=row[12] if len(
-                            row) > 12 else None, test_method_13=row[13] if len(row) > 13 else None, test_method_14=row[14] if len(row) > 14 else None, test_method_15=row[15] if len(row) > 15 else None, test_method_16=row[16] if len(row) > 16 else None, test_method_17=row[17] if len(row) > 17 else None, test_method_18=row[18] if len(row) > 18 else None, test_method_19=row[19] if len(row) > 19 else None, test_method_20=row[20] if len(row) > 20 else None, test_method_21=row[21] if len(row) > 21 else None, test_method_22=row[22] if len(row) > 22 else None, test_method_23=row[23] if len(row) > 23 else None, test_method_24=row[24] if len(row) > 24 else None, test_method_25=row[25] if len(row) > 25 else None))
-                    else:
-                        data_list.append(models.StrainData(date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), test_method_1=row[1] if len(row) > 1 else None, test_method_2=row[2] if len(row) > 2 else None, test_method_3=row[3] if len(row) > 3 else None, test_method_4=row[4] if len(row) > 4 else None, test_method_5=row[5] if len(row) > 5 else None, test_method_6=row[6] if len(row) > 6 else None, test_method_7=row[7] if len(row) > 7 else None, test_method_8=row[8] if len(row) > 8 else None, test_method_9=row[9] if len(row) > 9 else None, test_method_10=row[10] if len(row) > 10 else None, test_method_11=row[11] if len(row) > 11 else None, test_method_12=row[12] if len(
-                            row) > 12 else None, test_method_13=row[13] if len(row) > 13 else None, test_method_14=row[14] if len(row) > 14 else None, test_method_15=row[15] if len(row) > 15 else None, test_method_16=row[16] if len(row) > 16 else None, test_method_17=row[17] if len(row) > 17 else None, test_method_18=row[18] if len(row) > 18 else None, test_method_19=row[19] if len(row) > 19 else None, test_method_20=row[20] if len(row) > 20 else None, test_method_21=row[21] if len(row) > 21 else None, test_method_22=row[22] if len(row) > 22 else None, test_method_23=row[23] if len(row) > 23 else None, test_method_24=row[24] if len(row) > 24 else None, test_method_25=row[25] if len(row) > 25 else None))
-                models.TiltData.objects.bulk_create(data_list)
-                os.remove(settings.MEDIA_ROOT + file_name)
+                        for row in reader:
+                            if len(data_list) > 1000:
+                                models.TiltData.objects.bulk_create(data_list)
+                                data_list = []
+                                data_list.append(models.StrainData(date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S") if len(row[0].split(":")) > 2 else datetime.strptime(row[0], "%d-%m-%Y %H:%M"), test_method_1=row[1] if len(row) > 1 else None, test_method_2=row[2] if len(row) > 2 else None, test_method_3=row[3] if len(row) > 3 else None, test_method_4=row[4] if len(row) > 4 else None, test_method_5=row[5] if len(row) > 5 else None, test_method_6=row[6] if len(row) > 6 else None, test_method_7=row[7] if len(row) > 7 else None, test_method_8=row[8] if len(row) > 8 else None, test_method_9=row[9] if len(row) > 9 else None, test_method_10=row[10] if len(row) > 10 else None, test_method_11=row[11] if len(row) > 11 else None, test_method_12=row[12] if len(
+                                    row) > 12 else None, test_method_13=row[13] if len(row) > 13 else None, test_method_14=row[14] if len(row) > 14 else None, test_method_15=row[15] if len(row) > 15 else None, test_method_16=row[16] if len(row) > 16 else None, test_method_17=row[17] if len(row) > 17 else None, test_method_18=row[18] if len(row) > 18 else None, test_method_19=row[19] if len(row) > 19 else None, test_method_20=row[20] if len(row) > 20 else None, test_method_21=row[21] if len(row) > 21 else None, test_method_22=row[22] if len(row) > 22 else None, test_method_23=row[23] if len(row) > 23 else None, test_method_24=row[24] if len(row) > 24 else None, test_method_25=row[25] if len(row) > 25 else None))
+                            else:
+                                data_list.append(models.StrainData(date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S") if len(row[0].split(":")) > 2 else datetime.strptime(row[0], "%d-%m-%Y %H:%M"), test_method_1=row[1] if len(row) > 1 else None, test_method_2=row[2] if len(row) > 2 else None, test_method_3=row[3] if len(row) > 3 else None, test_method_4=row[4] if len(row) > 4 else None, test_method_5=row[5] if len(row) > 5 else None, test_method_6=row[6] if len(row) > 6 else None, test_method_7=row[7] if len(row) > 7 else None, test_method_8=row[8] if len(row) > 8 else None, test_method_9=row[9] if len(row) > 9 else None, test_method_10=row[10] if len(row) > 10 else None, test_method_11=row[11] if len(row) > 11 else None, test_method_12=row[12] if len(
+                                    row) > 12 else None, test_method_13=row[13] if len(row) > 13 else None, test_method_14=row[14] if len(row) > 14 else None, test_method_15=row[15] if len(row) > 15 else None, test_method_16=row[16] if len(row) > 16 else None, test_method_17=row[17] if len(row) > 17 else None, test_method_18=row[18] if len(row) > 18 else None, test_method_19=row[19] if len(row) > 19 else None, test_method_20=row[20] if len(row) > 20 else None, test_method_21=row[21] if len(row) > 21 else None, test_method_22=row[22] if len(row) > 22 else None, test_method_23=row[23] if len(row) > 23 else None, test_method_24=row[24] if len(row) > 24 else None, test_method_25=row[25] if len(row) > 25 else None))
+                        models.TiltData.objects.bulk_create(data_list)
+                        csvfile.close()
+                        os.remove(settings.MEDIA_ROOT + file_name)
         if 'displacement_required' in request.POST.keys():
             models.DisplacementData.objects.all().delete()
             f = open("templates/constants/displacement_columns.txt", "w+")
@@ -498,57 +585,98 @@ def importExcel(request):
             f.close()
             if request.FILES.get('displacement', None):
                 file = request.FILES['displacement']
-                tmpname = str(datetime.now().microsecond) + \
-                    os.path.splitext(str(file))[1]
-                fs = FileSystemStorage(
-                    settings.MEDIA_ROOT + "excel/", settings.MEDIA_ROOT + "/excel/")
-                fs.save(tmpname, file)
-                file_name = "excel/" + tmpname
+                if os.path.splitext(str(file))[1] == '.xlsx' or os.path.splitext(str(file))[1] == '.xls':
+                    tmpname = str(datetime.now().microsecond) + \
+                        os.path.splitext(str(file))[1]
+                    fs = FileSystemStorage(
+                        settings.MEDIA_ROOT + "excel/", settings.MEDIA_ROOT + "/excel/")
+                    fs.save(tmpname, file)
+                    file_name = "excel/" + tmpname
 
-                wb = openpyxl.load_workbook(
-                    settings.MEDIA_ROOT + file_name, data_only=True)
-                ws = wb.active
+                    wb = openpyxl.load_workbook(
+                        settings.MEDIA_ROOT + file_name, data_only=True)
+                    ws = wb.active
 
-                # Extract and clean column names from the Excel file (assuming they are in the first row)
-                # column_names = [re.sub(r'[^a-zA-Z0-9_]', '_', str(cell.value)) for cell in ws[1]]
-                column_names = [str(cell.value) for cell in ws[1]]
+                    # Extract and clean column names from the Excel file (assuming they are in the first row)
+                    # column_names = [re.sub(r'[^a-zA-Z0-9_]', '_', str(cell.value)) for cell in ws[1]]
+                    column_names = [str(cell.value) for cell in ws[1]]
 
-                # Removing Date Time Column
-                del column_names[0]
+                    # Removing Date Time Column
+                    del column_names[0]
 
-                # displacement_columns = get_constants('displacement')
-                displacement_columns = constants.displacement_columns
+                    # displacement_columns = get_constants('displacement')
+                    displacement_columns = constants.displacement_columns
 
-                for index, column in enumerate(column_names):
-                    displacement_columns[list(displacement_columns.keys())[
-                        index]] = column
+                    for index, column in enumerate(column_names):
+                        displacement_columns[list(displacement_columns.keys())[
+                            index]] = column
 
-                f = open("templates/constants/displacement_columns.txt", "w+")
-                columns = json.dumps(displacement_columns)
-                f.write(columns)
-                f.close()
+                    f = open("templates/constants/displacement_columns.txt", "w+")
+                    columns = json.dumps(displacement_columns)
+                    f.write(columns)
+                    f.close()
 
-                data_list = []
+                    data_list = []
 
-                # Initialize a flag to skip the first row
-                skip_first_row = True
+                    # Initialize a flag to skip the first row
+                    skip_first_row = True
 
-                for row in ws.iter_rows(values_only=True):
-                    if skip_first_row:
-                        skip_first_row = False
-                        continue  # Skip the first row
-                    if not row[0]:
-                        break
-                    if len(data_list) > 1000:
-                        models.DisplacementData.objects.bulk_create(data_list)
+                    for row in ws.iter_rows(values_only=True):
+                        if skip_first_row:
+                            skip_first_row = False
+                            continue  # Skip the first row
+                        if not row[0]:
+                            break
+                        if len(data_list) > 1000:
+                            models.DisplacementData.objects.bulk_create(data_list)
+                            data_list = []
+                            data_list.append(models.StrainData(date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S") if len(row[0].split(":")) > 2 else datetime.strptime(row[0], "%d-%m-%Y %H:%M"), test_method_1=row[1] if len(row) > 1 else None, test_method_2=row[2] if len(row) > 2 else None, test_method_3=row[3] if len(row) > 3 else None, test_method_4=row[4] if len(row) > 4 else None, test_method_5=row[5] if len(row) > 5 else None, test_method_6=row[6] if len(row) > 6 else None, test_method_7=row[7] if len(row) > 7 else None, test_method_8=row[8] if len(row) > 8 else None, test_method_9=row[9] if len(row) > 9 else None, test_method_10=row[10] if len(row) > 10 else None, test_method_11=row[11] if len(row) > 11 else None, test_method_12=row[12] if len(
+                                row) > 12 else None, test_method_13=row[13] if len(row) > 13 else None, test_method_14=row[14] if len(row) > 14 else None, test_method_15=row[15] if len(row) > 15 else None, test_method_16=row[16] if len(row) > 16 else None, test_method_17=row[17] if len(row) > 17 else None, test_method_18=row[18] if len(row) > 18 else None, test_method_19=row[19] if len(row) > 19 else None, test_method_20=row[20] if len(row) > 20 else None, test_method_21=row[21] if len(row) > 21 else None, test_method_22=row[22] if len(row) > 22 else None, test_method_23=row[23] if len(row) > 23 else None, test_method_24=row[24] if len(row) > 24 else None, test_method_25=row[25] if len(row) > 25 else None))
+                        else:
+                            data_list.append(models.StrainData(date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S") if len(row[0].split(":")) > 2 else datetime.strptime(row[0], "%d-%m-%Y %H:%M"), test_method_1=row[1] if len(row) > 1 else None, test_method_2=row[2] if len(row) > 2 else None, test_method_3=row[3] if len(row) > 3 else None, test_method_4=row[4] if len(row) > 4 else None, test_method_5=row[5] if len(row) > 5 else None, test_method_6=row[6] if len(row) > 6 else None, test_method_7=row[7] if len(row) > 7 else None, test_method_8=row[8] if len(row) > 8 else None, test_method_9=row[9] if len(row) > 9 else None, test_method_10=row[10] if len(row) > 10 else None, test_method_11=row[11] if len(row) > 11 else None, test_method_12=row[12] if len(
+                                row) > 12 else None, test_method_13=row[13] if len(row) > 13 else None, test_method_14=row[14] if len(row) > 14 else None, test_method_15=row[15] if len(row) > 15 else None, test_method_16=row[16] if len(row) > 16 else None, test_method_17=row[17] if len(row) > 17 else None, test_method_18=row[18] if len(row) > 18 else None, test_method_19=row[19] if len(row) > 19 else None, test_method_20=row[20] if len(row) > 20 else None, test_method_21=row[21] if len(row) > 21 else None, test_method_22=row[22] if len(row) > 22 else None, test_method_23=row[23] if len(row) > 23 else None, test_method_24=row[24] if len(row) > 24 else None, test_method_25=row[25] if len(row) > 25 else None))
+                    models.DisplacementData.objects.bulk_create(data_list)
+                    os.remove(settings.MEDIA_ROOT + file_name)
+                elif os.path.splitext(str(file))[1] == '.csv':
+                    tmpname = str(datetime.now().microsecond) + \
+                        os.path.splitext(str(file))[1]
+                    fs = FileSystemStorage(settings.MEDIA_ROOT + "csv/", settings.MEDIA_ROOT + "/csv/")
+                    fs.save(tmpname, file)
+                    file_name = "csv/" + tmpname
+
+                    with open(settings.MEDIA_ROOT + file_name, newline='', mode='r', encoding='ISO-8859-1') as csvfile:
+                        reader = csv.DictReader(csvfile)
+                        reader = csv.reader(csvfile)
+                        first_row = next(reader, None)
+
+                        # Removing Date Time Column
+                        del first_row[0]
+
+                        # displacement_columns = get_constants('displacement')
+                        displacement_columns = constants.displacement_columns
+
+                        for index, column in enumerate(first_row):
+                            displacement_columns[list(displacement_columns.keys())[index]] = column
+
+                        f = open("templates/constants/displacement_columns.txt", "w+")
+                        columns = json.dumps(displacement_columns)
+                        f.write(columns)
+                        f.close()
+
+                        next(reader)
                         data_list = []
-                        data_list.append(models.StrainData(date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), test_method_1=row[1] if len(row) > 1 else None, test_method_2=row[2] if len(row) > 2 else None, test_method_3=row[3] if len(row) > 3 else None, test_method_4=row[4] if len(row) > 4 else None, test_method_5=row[5] if len(row) > 5 else None, test_method_6=row[6] if len(row) > 6 else None, test_method_7=row[7] if len(row) > 7 else None, test_method_8=row[8] if len(row) > 8 else None, test_method_9=row[9] if len(row) > 9 else None, test_method_10=row[10] if len(row) > 10 else None, test_method_11=row[11] if len(row) > 11 else None, test_method_12=row[12] if len(
-                            row) > 12 else None, test_method_13=row[13] if len(row) > 13 else None, test_method_14=row[14] if len(row) > 14 else None, test_method_15=row[15] if len(row) > 15 else None, test_method_16=row[16] if len(row) > 16 else None, test_method_17=row[17] if len(row) > 17 else None, test_method_18=row[18] if len(row) > 18 else None, test_method_19=row[19] if len(row) > 19 else None, test_method_20=row[20] if len(row) > 20 else None, test_method_21=row[21] if len(row) > 21 else None, test_method_22=row[22] if len(row) > 22 else None, test_method_23=row[23] if len(row) > 23 else None, test_method_24=row[24] if len(row) > 24 else None, test_method_25=row[25] if len(row) > 25 else None))
-                    else:
-                        data_list.append(models.StrainData(date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), test_method_1=row[1] if len(row) > 1 else None, test_method_2=row[2] if len(row) > 2 else None, test_method_3=row[3] if len(row) > 3 else None, test_method_4=row[4] if len(row) > 4 else None, test_method_5=row[5] if len(row) > 5 else None, test_method_6=row[6] if len(row) > 6 else None, test_method_7=row[7] if len(row) > 7 else None, test_method_8=row[8] if len(row) > 8 else None, test_method_9=row[9] if len(row) > 9 else None, test_method_10=row[10] if len(row) > 10 else None, test_method_11=row[11] if len(row) > 11 else None, test_method_12=row[12] if len(
-                            row) > 12 else None, test_method_13=row[13] if len(row) > 13 else None, test_method_14=row[14] if len(row) > 14 else None, test_method_15=row[15] if len(row) > 15 else None, test_method_16=row[16] if len(row) > 16 else None, test_method_17=row[17] if len(row) > 17 else None, test_method_18=row[18] if len(row) > 18 else None, test_method_19=row[19] if len(row) > 19 else None, test_method_20=row[20] if len(row) > 20 else None, test_method_21=row[21] if len(row) > 21 else None, test_method_22=row[22] if len(row) > 22 else None, test_method_23=row[23] if len(row) > 23 else None, test_method_24=row[24] if len(row) > 24 else None, test_method_25=row[25] if len(row) > 25 else None))
-                models.DisplacementData.objects.bulk_create(data_list)
-                os.remove(settings.MEDIA_ROOT + file_name)
+                        for row in reader:
+                            if len(data_list) > 1000:
+                                models.DisplacementData.objects.bulk_create(data_list)
+                                data_list = []
+                                data_list.append(models.StrainData(date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S") if len(row[0].split(":")) > 2 else datetime.strptime(row[0], "%d-%m-%Y %H:%M"), test_method_1=row[1] if len(row) > 1 else None, test_method_2=row[2] if len(row) > 2 else None, test_method_3=row[3] if len(row) > 3 else None, test_method_4=row[4] if len(row) > 4 else None, test_method_5=row[5] if len(row) > 5 else None, test_method_6=row[6] if len(row) > 6 else None, test_method_7=row[7] if len(row) > 7 else None, test_method_8=row[8] if len(row) > 8 else None, test_method_9=row[9] if len(row) > 9 else None, test_method_10=row[10] if len(row) > 10 else None, test_method_11=row[11] if len(row) > 11 else None, test_method_12=row[12] if len(
+                                    row) > 12 else None, test_method_13=row[13] if len(row) > 13 else None, test_method_14=row[14] if len(row) > 14 else None, test_method_15=row[15] if len(row) > 15 else None, test_method_16=row[16] if len(row) > 16 else None, test_method_17=row[17] if len(row) > 17 else None, test_method_18=row[18] if len(row) > 18 else None, test_method_19=row[19] if len(row) > 19 else None, test_method_20=row[20] if len(row) > 20 else None, test_method_21=row[21] if len(row) > 21 else None, test_method_22=row[22] if len(row) > 22 else None, test_method_23=row[23] if len(row) > 23 else None, test_method_24=row[24] if len(row) > 24 else None, test_method_25=row[25] if len(row) > 25 else None))
+                            else:
+                                data_list.append(models.StrainData(date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S") if len(row[0].split(":")) > 2 else datetime.strptime(row[0], "%d-%m-%Y %H:%M"), test_method_1=row[1] if len(row) > 1 else None, test_method_2=row[2] if len(row) > 2 else None, test_method_3=row[3] if len(row) > 3 else None, test_method_4=row[4] if len(row) > 4 else None, test_method_5=row[5] if len(row) > 5 else None, test_method_6=row[6] if len(row) > 6 else None, test_method_7=row[7] if len(row) > 7 else None, test_method_8=row[8] if len(row) > 8 else None, test_method_9=row[9] if len(row) > 9 else None, test_method_10=row[10] if len(row) > 10 else None, test_method_11=row[11] if len(row) > 11 else None, test_method_12=row[12] if len(
+                                    row) > 12 else None, test_method_13=row[13] if len(row) > 13 else None, test_method_14=row[14] if len(row) > 14 else None, test_method_15=row[15] if len(row) > 15 else None, test_method_16=row[16] if len(row) > 16 else None, test_method_17=row[17] if len(row) > 17 else None, test_method_18=row[18] if len(row) > 18 else None, test_method_19=row[19] if len(row) > 19 else None, test_method_20=row[20] if len(row) > 20 else None, test_method_21=row[21] if len(row) > 21 else None, test_method_22=row[22] if len(row) > 22 else None, test_method_23=row[23] if len(row) > 23 else None, test_method_24=row[24] if len(row) > 24 else None, test_method_25=row[25] if len(row) > 25 else None))
+                        models.DisplacementData.objects.bulk_create(data_list)
+                        csvfile.close()
+                        os.remove(settings.MEDIA_ROOT + file_name)
         if 'settlement_required' in request.POST.keys():
             models.SettlementData.objects.all().delete()
             f = open("templates/constants/settlement_columns.txt", "w+")
@@ -556,57 +684,99 @@ def importExcel(request):
             f.close()
             if request.FILES.get('settlement', None):
                 file = request.FILES['settlement']
-                tmpname = str(datetime.now().microsecond) + \
-                    os.path.splitext(str(file))[1]
-                fs = FileSystemStorage(
-                    settings.MEDIA_ROOT + "excel/", settings.MEDIA_ROOT + "/excel/")
-                fs.save(tmpname, file)
-                file_name = "excel/" + tmpname
+                if os.path.splitext(str(file))[1] == '.xlsx' or os.path.splitext(str(file))[1] == '.xls':
+                    tmpname = str(datetime.now().microsecond) + \
+                        os.path.splitext(str(file))[1]
+                    fs = FileSystemStorage(
+                        settings.MEDIA_ROOT + "excel/", settings.MEDIA_ROOT + "/excel/")
+                    fs.save(tmpname, file)
+                    file_name = "excel/" + tmpname
 
-                wb = openpyxl.load_workbook(
-                    settings.MEDIA_ROOT + file_name, data_only=True)
-                ws = wb.active
+                    wb = openpyxl.load_workbook(
+                        settings.MEDIA_ROOT + file_name, data_only=True)
+                    ws = wb.active
 
-                # Extract and clean column names from the Excel file (assuming they are in the first row)
-                # column_names = [re.sub(r'[^a-zA-Z0-9_]', '_', str(cell.value)) for cell in ws[1]]
-                column_names = [str(cell.value) for cell in ws[1]]
+                    # Extract and clean column names from the Excel file (assuming they are in the first row)
+                    # column_names = [re.sub(r'[^a-zA-Z0-9_]', '_', str(cell.value)) for cell in ws[1]]
+                    column_names = [str(cell.value) for cell in ws[1]]
 
-                # Removing Date Time Column
-                del column_names[0]
+                    # Removing Date Time Column
+                    del column_names[0]
 
-                # settlement_columns = get_constants('settlement')
-                settlement_columns = constants.settlement_columns
+                    # settlement_columns = get_constants('settlement')
+                    settlement_columns = constants.settlement_columns
 
-                for index, column in enumerate(column_names):
-                    settlement_columns[list(settlement_columns.keys())[
-                        index]] = column
+                    for index, column in enumerate(column_names):
+                        settlement_columns[list(settlement_columns.keys())[
+                            index]] = column
 
-                f = open("templates/constants/settlement_columns.txt", "w+")
-                columns = json.dumps(settlement_columns)
-                f.write(columns)
-                f.close()
+                    f = open("templates/constants/settlement_columns.txt", "w+")
+                    columns = json.dumps(settlement_columns)
+                    f.write(columns)
+                    f.close()
 
-                data_list = []
+                    data_list = []
 
-                # Initialize a flag to skip the first row
-                skip_first_row = True
+                    # Initialize a flag to skip the first row
+                    skip_first_row = True
 
-                for row in ws.iter_rows(values_only=True):
-                    if skip_first_row:
-                        skip_first_row = False
-                        continue  # Skip the first row
-                    if not row[0]:
-                        break
-                    if len(data_list) > 1000:
-                        models.SettlementData.objects.bulk_create(data_list)
+                    for row in ws.iter_rows(values_only=True):
+                        if skip_first_row:
+                            skip_first_row = False
+                            continue  # Skip the first row
+                        if not row[0]:
+                            break
+                        if len(data_list) > 1000:
+                            models.SettlementData.objects.bulk_create(
+                                data_list)
+                            data_list = []
+                            data_list.append(models.StrainData(date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S") if len(row[0].split(":")) > 2 else datetime.strptime(row[0], "%d-%m-%Y %H:%M"), test_method_1=row[1] if len(row) > 1 else None, test_method_2=row[2] if len(row) > 2 else None, test_method_3=row[3] if len(row) > 3 else None, test_method_4=row[4] if len(row) > 4 else None, test_method_5=row[5] if len(row) > 5 else None, test_method_6=row[6] if len(row) > 6 else None, test_method_7=row[7] if len(row) > 7 else None, test_method_8=row[8] if len(row) > 8 else None, test_method_9=row[9] if len(row) > 9 else None, test_method_10=row[10] if len(row) > 10 else None, test_method_11=row[11] if len(row) > 11 else None, test_method_12=row[12] if len(
+                                row) > 12 else None, test_method_13=row[13] if len(row) > 13 else None, test_method_14=row[14] if len(row) > 14 else None, test_method_15=row[15] if len(row) > 15 else None, test_method_16=row[16] if len(row) > 16 else None, test_method_17=row[17] if len(row) > 17 else None, test_method_18=row[18] if len(row) > 18 else None, test_method_19=row[19] if len(row) > 19 else None, test_method_20=row[20] if len(row) > 20 else None, test_method_21=row[21] if len(row) > 21 else None, test_method_22=row[22] if len(row) > 22 else None, test_method_23=row[23] if len(row) > 23 else None, test_method_24=row[24] if len(row) > 24 else None, test_method_25=row[25] if len(row) > 25 else None))
+                        else:
+                            data_list.append(models.StrainData(date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S") if len(row[0].split(":")) > 2 else datetime.strptime(row[0], "%d-%m-%Y %H:%M"), test_method_1=row[1] if len(row) > 1 else None, test_method_2=row[2] if len(row) > 2 else None, test_method_3=row[3] if len(row) > 3 else None, test_method_4=row[4] if len(row) > 4 else None, test_method_5=row[5] if len(row) > 5 else None, test_method_6=row[6] if len(row) > 6 else None, test_method_7=row[7] if len(row) > 7 else None, test_method_8=row[8] if len(row) > 8 else None, test_method_9=row[9] if len(row) > 9 else None, test_method_10=row[10] if len(row) > 10 else None, test_method_11=row[11] if len(row) > 11 else None, test_method_12=row[12] if len(
+                                row) > 12 else None, test_method_13=row[13] if len(row) > 13 else None, test_method_14=row[14] if len(row) > 14 else None, test_method_15=row[15] if len(row) > 15 else None, test_method_16=row[16] if len(row) > 16 else None, test_method_17=row[17] if len(row) > 17 else None, test_method_18=row[18] if len(row) > 18 else None, test_method_19=row[19] if len(row) > 19 else None, test_method_20=row[20] if len(row) > 20 else None, test_method_21=row[21] if len(row) > 21 else None, test_method_22=row[22] if len(row) > 22 else None, test_method_23=row[23] if len(row) > 23 else None, test_method_24=row[24] if len(row) > 24 else None, test_method_25=row[25] if len(row) > 25 else None))
+                    models.SettlementData.objects.bulk_create(data_list)
+                    os.remove(settings.MEDIA_ROOT + file_name)
+                elif os.path.splitext(str(file))[1] == '.csv':
+                    tmpname = str(datetime.now().microsecond) + \
+                        os.path.splitext(str(file))[1]
+                    fs = FileSystemStorage(settings.MEDIA_ROOT + "csv/", settings.MEDIA_ROOT + "/csv/")
+                    fs.save(tmpname, file)
+                    file_name = "csv/" + tmpname
+
+                    with open(settings.MEDIA_ROOT + file_name, newline='', mode='r', encoding='ISO-8859-1') as csvfile:
+                        reader = csv.DictReader(csvfile)
+                        reader = csv.reader(csvfile)
+                        first_row = next(reader, None)
+
+                        # Removing Date Time Column
+                        del first_row[0]
+
+                        # settlement_columns = get_constants('settlement')
+                        settlement_columns = constants.settlement_columns
+
+                        for index, column in enumerate(first_row):
+                            settlement_columns[list(settlement_columns.keys())[index]] = column
+
+                        f = open("templates/constants/settlement_columns.txt", "w+")
+                        columns = json.dumps(settlement_columns)
+                        f.write(columns)
+                        f.close()
+
+                        next(reader)
                         data_list = []
-                        data_list.append(models.StrainData(date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), test_method_1=row[1] if len(row) > 1 else None, test_method_2=row[2] if len(row) > 2 else None, test_method_3=row[3] if len(row) > 3 else None, test_method_4=row[4] if len(row) > 4 else None, test_method_5=row[5] if len(row) > 5 else None, test_method_6=row[6] if len(row) > 6 else None, test_method_7=row[7] if len(row) > 7 else None, test_method_8=row[8] if len(row) > 8 else None, test_method_9=row[9] if len(row) > 9 else None, test_method_10=row[10] if len(row) > 10 else None, test_method_11=row[11] if len(row) > 11 else None, test_method_12=row[12] if len(
-                            row) > 12 else None, test_method_13=row[13] if len(row) > 13 else None, test_method_14=row[14] if len(row) > 14 else None, test_method_15=row[15] if len(row) > 15 else None, test_method_16=row[16] if len(row) > 16 else None, test_method_17=row[17] if len(row) > 17 else None, test_method_18=row[18] if len(row) > 18 else None, test_method_19=row[19] if len(row) > 19 else None, test_method_20=row[20] if len(row) > 20 else None, test_method_21=row[21] if len(row) > 21 else None, test_method_22=row[22] if len(row) > 22 else None, test_method_23=row[23] if len(row) > 23 else None, test_method_24=row[24] if len(row) > 24 else None, test_method_25=row[25] if len(row) > 25 else None))
-                    else:
-                        data_list.append(models.StrainData(date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), test_method_1=row[1] if len(row) > 1 else None, test_method_2=row[2] if len(row) > 2 else None, test_method_3=row[3] if len(row) > 3 else None, test_method_4=row[4] if len(row) > 4 else None, test_method_5=row[5] if len(row) > 5 else None, test_method_6=row[6] if len(row) > 6 else None, test_method_7=row[7] if len(row) > 7 else None, test_method_8=row[8] if len(row) > 8 else None, test_method_9=row[9] if len(row) > 9 else None, test_method_10=row[10] if len(row) > 10 else None, test_method_11=row[11] if len(row) > 11 else None, test_method_12=row[12] if len(
-                            row) > 12 else None, test_method_13=row[13] if len(row) > 13 else None, test_method_14=row[14] if len(row) > 14 else None, test_method_15=row[15] if len(row) > 15 else None, test_method_16=row[16] if len(row) > 16 else None, test_method_17=row[17] if len(row) > 17 else None, test_method_18=row[18] if len(row) > 18 else None, test_method_19=row[19] if len(row) > 19 else None, test_method_20=row[20] if len(row) > 20 else None, test_method_21=row[21] if len(row) > 21 else None, test_method_22=row[22] if len(row) > 22 else None, test_method_23=row[23] if len(row) > 23 else None, test_method_24=row[24] if len(row) > 24 else None, test_method_25=row[25] if len(row) > 25 else None))
-                models.SettlementData.objects.bulk_create(data_list)
-                os.remove(settings.MEDIA_ROOT + file_name)
+                        for row in reader:
+                            if len(data_list) > 1000:
+                                models.SettlementData.objects.bulk_create(data_list)
+                                data_list = []
+                                data_list.append(models.StrainData(date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S") if len(row[0].split(":")) > 2 else datetime.strptime(row[0], "%d-%m-%Y %H:%M"), test_method_1=row[1] if len(row) > 1 else None, test_method_2=row[2] if len(row) > 2 else None, test_method_3=row[3] if len(row) > 3 else None, test_method_4=row[4] if len(row) > 4 else None, test_method_5=row[5] if len(row) > 5 else None, test_method_6=row[6] if len(row) > 6 else None, test_method_7=row[7] if len(row) > 7 else None, test_method_8=row[8] if len(row) > 8 else None, test_method_9=row[9] if len(row) > 9 else None, test_method_10=row[10] if len(row) > 10 else None, test_method_11=row[11] if len(row) > 11 else None, test_method_12=row[12] if len(
+                                    row) > 12 else None, test_method_13=row[13] if len(row) > 13 else None, test_method_14=row[14] if len(row) > 14 else None, test_method_15=row[15] if len(row) > 15 else None, test_method_16=row[16] if len(row) > 16 else None, test_method_17=row[17] if len(row) > 17 else None, test_method_18=row[18] if len(row) > 18 else None, test_method_19=row[19] if len(row) > 19 else None, test_method_20=row[20] if len(row) > 20 else None, test_method_21=row[21] if len(row) > 21 else None, test_method_22=row[22] if len(row) > 22 else None, test_method_23=row[23] if len(row) > 23 else None, test_method_24=row[24] if len(row) > 24 else None, test_method_25=row[25] if len(row) > 25 else None))
+                            else:
+                                data_list.append(models.StrainData(date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S") if len(row[0].split(":")) > 2 else datetime.strptime(row[0], "%d-%m-%Y %H:%M"), test_method_1=row[1] if len(row) > 1 else None, test_method_2=row[2] if len(row) > 2 else None, test_method_3=row[3] if len(row) > 3 else None, test_method_4=row[4] if len(row) > 4 else None, test_method_5=row[5] if len(row) > 5 else None, test_method_6=row[6] if len(row) > 6 else None, test_method_7=row[7] if len(row) > 7 else None, test_method_8=row[8] if len(row) > 8 else None, test_method_9=row[9] if len(row) > 9 else None, test_method_10=row[10] if len(row) > 10 else None, test_method_11=row[11] if len(row) > 11 else None, test_method_12=row[12] if len(
+                                    row) > 12 else None, test_method_13=row[13] if len(row) > 13 else None, test_method_14=row[14] if len(row) > 14 else None, test_method_15=row[15] if len(row) > 15 else None, test_method_16=row[16] if len(row) > 16 else None, test_method_17=row[17] if len(row) > 17 else None, test_method_18=row[18] if len(row) > 18 else None, test_method_19=row[19] if len(row) > 19 else None, test_method_20=row[20] if len(row) > 20 else None, test_method_21=row[21] if len(row) > 21 else None, test_method_22=row[22] if len(row) > 22 else None, test_method_23=row[23] if len(row) > 23 else None, test_method_24=row[24] if len(row) > 24 else None, test_method_25=row[25] if len(row) > 25 else None))
+                        models.SettlementData.objects.bulk_create(data_list)
+                        csvfile.close()
+                        os.remove(settings.MEDIA_ROOT + file_name)
         if 'vibration_required' in request.POST.keys():
             models.VibrationData.objects.all().delete()
             f = open("templates/constants/vibration_columns.txt", "w+")
@@ -614,57 +784,98 @@ def importExcel(request):
             f.close()
             if request.FILES.get('vibration', None):
                 file = request.FILES['vibration']
-                tmpname = str(datetime.now().microsecond) + \
-                    os.path.splitext(str(file))[1]
-                fs = FileSystemStorage(
-                    settings.MEDIA_ROOT + "excel/", settings.MEDIA_ROOT + "/excel/")
-                fs.save(tmpname, file)
-                file_name = "excel/" + tmpname
+                if os.path.splitext(str(file))[1] == '.xlsx' or os.path.splitext(str(file))[1] == '.xls':
+                    tmpname = str(datetime.now().microsecond) + \
+                        os.path.splitext(str(file))[1]
+                    fs = FileSystemStorage(
+                        settings.MEDIA_ROOT + "excel/", settings.MEDIA_ROOT + "/excel/")
+                    fs.save(tmpname, file)
+                    file_name = "excel/" + tmpname
 
-                wb = openpyxl.load_workbook(
-                    settings.MEDIA_ROOT + file_name, data_only=True)
-                ws = wb.active
+                    wb = openpyxl.load_workbook(
+                        settings.MEDIA_ROOT + file_name, data_only=True)
+                    ws = wb.active
 
-                # Extract and clean column names from the Excel file (assuming they are in the first row)
-                # column_names = [re.sub(r'[^a-zA-Z0-9_]', '_', str(cell.value)) for cell in ws[1]]
-                column_names = [str(cell.value) for cell in ws[1]]
+                    # Extract and clean column names from the Excel file (assuming they are in the first row)
+                    # column_names = [re.sub(r'[^a-zA-Z0-9_]', '_', str(cell.value)) for cell in ws[1]]
+                    column_names = [str(cell.value) for cell in ws[1]]
 
-                # Removing Date Time Column
-                del column_names[0]
+                    # Removing Date Time Column
+                    del column_names[0]
 
-                # vibration_columns = get_constants('vibration')
-                vibration_columns = constants.vibration_columns
+                    # vibration_columns = get_constants('vibration')
+                    vibration_columns = constants.vibration_columns
 
-                for index, column in enumerate(column_names):
-                    vibration_columns[list(vibration_columns.keys())[
-                        index]] = column
+                    for index, column in enumerate(column_names):
+                        vibration_columns[list(vibration_columns.keys())[
+                            index]] = column
 
-                f = open("templates/constants/vibration_columns.txt", "w+")
-                columns = json.dumps(vibration_columns)
-                f.write(columns)
-                f.close()
+                    f = open("templates/constants/vibration_columns.txt", "w+")
+                    columns = json.dumps(vibration_columns)
+                    f.write(columns)
+                    f.close()
 
-                data_list = []
+                    data_list = []
 
-                # Initialize a flag to skip the first row
-                skip_first_row = True
+                    # Initialize a flag to skip the first row
+                    skip_first_row = True
 
-                for row in ws.iter_rows(values_only=True):
-                    if skip_first_row:
-                        skip_first_row = False
-                        continue  # Skip the first row
-                    if not row[0]:
-                        break
-                    if len(data_list) > 1000:
-                        models.VibrationData.objects.bulk_create(data_list)
+                    for row in ws.iter_rows(values_only=True):
+                        if skip_first_row:
+                            skip_first_row = False
+                            continue  # Skip the first row
+                        if not row[0]:
+                            break
+                        if len(data_list) > 1000:
+                            models.VibrationData.objects.bulk_create(data_list)
+                            data_list = []
+                            data_list.append(models.StrainData(date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S") if len(row[0].split(":")) > 2 else datetime.strptime(row[0], "%d-%m-%Y %H:%M"), test_method_1=row[1] if len(row) > 1 else None, test_method_2=row[2] if len(row) > 2 else None, test_method_3=row[3] if len(row) > 3 else None, test_method_4=row[4] if len(row) > 4 else None, test_method_5=row[5] if len(row) > 5 else None, test_method_6=row[6] if len(row) > 6 else None, test_method_7=row[7] if len(row) > 7 else None, test_method_8=row[8] if len(row) > 8 else None, test_method_9=row[9] if len(row) > 9 else None, test_method_10=row[10] if len(row) > 10 else None, test_method_11=row[11] if len(row) > 11 else None, test_method_12=row[12] if len(
+                                row) > 12 else None, test_method_13=row[13] if len(row) > 13 else None, test_method_14=row[14] if len(row) > 14 else None, test_method_15=row[15] if len(row) > 15 else None, test_method_16=row[16] if len(row) > 16 else None, test_method_17=row[17] if len(row) > 17 else None, test_method_18=row[18] if len(row) > 18 else None, test_method_19=row[19] if len(row) > 19 else None, test_method_20=row[20] if len(row) > 20 else None, test_method_21=row[21] if len(row) > 21 else None, test_method_22=row[22] if len(row) > 22 else None, test_method_23=row[23] if len(row) > 23 else None, test_method_24=row[24] if len(row) > 24 else None, test_method_25=row[25] if len(row) > 25 else None))
+                        else:
+                            data_list.append(models.StrainData(date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S") if len(row[0].split(":")) > 2 else datetime.strptime(row[0], "%d-%m-%Y %H:%M"), test_method_1=row[1] if len(row) > 1 else None, test_method_2=row[2] if len(row) > 2 else None, test_method_3=row[3] if len(row) > 3 else None, test_method_4=row[4] if len(row) > 4 else None, test_method_5=row[5] if len(row) > 5 else None, test_method_6=row[6] if len(row) > 6 else None, test_method_7=row[7] if len(row) > 7 else None, test_method_8=row[8] if len(row) > 8 else None, test_method_9=row[9] if len(row) > 9 else None, test_method_10=row[10] if len(row) > 10 else None, test_method_11=row[11] if len(row) > 11 else None, test_method_12=row[12] if len(
+                                row) > 12 else None, test_method_13=row[13] if len(row) > 13 else None, test_method_14=row[14] if len(row) > 14 else None, test_method_15=row[15] if len(row) > 15 else None, test_method_16=row[16] if len(row) > 16 else None, test_method_17=row[17] if len(row) > 17 else None, test_method_18=row[18] if len(row) > 18 else None, test_method_19=row[19] if len(row) > 19 else None, test_method_20=row[20] if len(row) > 20 else None, test_method_21=row[21] if len(row) > 21 else None, test_method_22=row[22] if len(row) > 22 else None, test_method_23=row[23] if len(row) > 23 else None, test_method_24=row[24] if len(row) > 24 else None, test_method_25=row[25] if len(row) > 25 else None))
+                    models.VibrationData.objects.bulk_create(data_list)
+                    os.remove(settings.MEDIA_ROOT + file_name)
+                elif os.path.splitext(str(file))[1] == '.csv':
+                    tmpname = str(datetime.now().microsecond) + \
+                        os.path.splitext(str(file))[1]
+                    fs = FileSystemStorage(settings.MEDIA_ROOT + "csv/", settings.MEDIA_ROOT + "/csv/")
+                    fs.save(tmpname, file)
+                    file_name = "csv/" + tmpname
+
+                    with open(settings.MEDIA_ROOT + file_name, newline='', mode='r', encoding='ISO-8859-1') as csvfile:
+                        reader = csv.DictReader(csvfile)
+                        reader = csv.reader(csvfile)
+                        first_row = next(reader, None)
+
+                        # Removing Date Time Column
+                        del first_row[0]
+
+                        # vibration_columns = get_constants('vibration')
+                        vibration_columns = constants.vibration_columns
+
+                        for index, column in enumerate(first_row):
+                            vibration_columns[list(vibration_columns.keys())[index]] = column
+
+                        f = open("templates/constants/vibration_columns.txt", "w+")
+                        columns = json.dumps(vibration_columns)
+                        f.write(columns)
+                        f.close()
+
+                        next(reader)
                         data_list = []
-                        data_list.append(models.StrainData(date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), test_method_1=row[1] if len(row) > 1 else None, test_method_2=row[2] if len(row) > 2 else None, test_method_3=row[3] if len(row) > 3 else None, test_method_4=row[4] if len(row) > 4 else None, test_method_5=row[5] if len(row) > 5 else None, test_method_6=row[6] if len(row) > 6 else None, test_method_7=row[7] if len(row) > 7 else None, test_method_8=row[8] if len(row) > 8 else None, test_method_9=row[9] if len(row) > 9 else None, test_method_10=row[10] if len(row) > 10 else None, test_method_11=row[11] if len(row) > 11 else None, test_method_12=row[12] if len(
-                            row) > 12 else None, test_method_13=row[13] if len(row) > 13 else None, test_method_14=row[14] if len(row) > 14 else None, test_method_15=row[15] if len(row) > 15 else None, test_method_16=row[16] if len(row) > 16 else None, test_method_17=row[17] if len(row) > 17 else None, test_method_18=row[18] if len(row) > 18 else None, test_method_19=row[19] if len(row) > 19 else None, test_method_20=row[20] if len(row) > 20 else None, test_method_21=row[21] if len(row) > 21 else None, test_method_22=row[22] if len(row) > 22 else None, test_method_23=row[23] if len(row) > 23 else None, test_method_24=row[24] if len(row) > 24 else None, test_method_25=row[25] if len(row) > 25 else None))
-                    else:
-                        data_list.append(models.StrainData(date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S"), test_method_1=row[1] if len(row) > 1 else None, test_method_2=row[2] if len(row) > 2 else None, test_method_3=row[3] if len(row) > 3 else None, test_method_4=row[4] if len(row) > 4 else None, test_method_5=row[5] if len(row) > 5 else None, test_method_6=row[6] if len(row) > 6 else None, test_method_7=row[7] if len(row) > 7 else None, test_method_8=row[8] if len(row) > 8 else None, test_method_9=row[9] if len(row) > 9 else None, test_method_10=row[10] if len(row) > 10 else None, test_method_11=row[11] if len(row) > 11 else None, test_method_12=row[12] if len(
-                            row) > 12 else None, test_method_13=row[13] if len(row) > 13 else None, test_method_14=row[14] if len(row) > 14 else None, test_method_15=row[15] if len(row) > 15 else None, test_method_16=row[16] if len(row) > 16 else None, test_method_17=row[17] if len(row) > 17 else None, test_method_18=row[18] if len(row) > 18 else None, test_method_19=row[19] if len(row) > 19 else None, test_method_20=row[20] if len(row) > 20 else None, test_method_21=row[21] if len(row) > 21 else None, test_method_22=row[22] if len(row) > 22 else None, test_method_23=row[23] if len(row) > 23 else None, test_method_24=row[24] if len(row) > 24 else None, test_method_25=row[25] if len(row) > 25 else None))
-                models.VibrationData.objects.bulk_create(data_list)
-                os.remove(settings.MEDIA_ROOT + file_name)
+                        for row in reader:
+                            if len(data_list) > 1000:
+                                models.VibrationData.objects.bulk_create(data_list)
+                                data_list = []
+                                data_list.append(models.StrainData(date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S") if len(row[0].split(":")) > 2 else datetime.strptime(row[0], "%d-%m-%Y %H:%M"), test_method_1=row[1] if len(row) > 1 else None, test_method_2=row[2] if len(row) > 2 else None, test_method_3=row[3] if len(row) > 3 else None, test_method_4=row[4] if len(row) > 4 else None, test_method_5=row[5] if len(row) > 5 else None, test_method_6=row[6] if len(row) > 6 else None, test_method_7=row[7] if len(row) > 7 else None, test_method_8=row[8] if len(row) > 8 else None, test_method_9=row[9] if len(row) > 9 else None, test_method_10=row[10] if len(row) > 10 else None, test_method_11=row[11] if len(row) > 11 else None, test_method_12=row[12] if len(
+                                    row) > 12 else None, test_method_13=row[13] if len(row) > 13 else None, test_method_14=row[14] if len(row) > 14 else None, test_method_15=row[15] if len(row) > 15 else None, test_method_16=row[16] if len(row) > 16 else None, test_method_17=row[17] if len(row) > 17 else None, test_method_18=row[18] if len(row) > 18 else None, test_method_19=row[19] if len(row) > 19 else None, test_method_20=row[20] if len(row) > 20 else None, test_method_21=row[21] if len(row) > 21 else None, test_method_22=row[22] if len(row) > 22 else None, test_method_23=row[23] if len(row) > 23 else None, test_method_24=row[24] if len(row) > 24 else None, test_method_25=row[25] if len(row) > 25 else None))
+                            else:
+                                data_list.append(models.StrainData(date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S") if len(row[0].split(":")) > 2 else datetime.strptime(row[0], "%d-%m-%Y %H:%M"), test_method_1=row[1] if len(row) > 1 else None, test_method_2=row[2] if len(row) > 2 else None, test_method_3=row[3] if len(row) > 3 else None, test_method_4=row[4] if len(row) > 4 else None, test_method_5=row[5] if len(row) > 5 else None, test_method_6=row[6] if len(row) > 6 else None, test_method_7=row[7] if len(row) > 7 else None, test_method_8=row[8] if len(row) > 8 else None, test_method_9=row[9] if len(row) > 9 else None, test_method_10=row[10] if len(row) > 10 else None, test_method_11=row[11] if len(row) > 11 else None, test_method_12=row[12] if len(
+                                    row) > 12 else None, test_method_13=row[13] if len(row) > 13 else None, test_method_14=row[14] if len(row) > 14 else None, test_method_15=row[15] if len(row) > 15 else None, test_method_16=row[16] if len(row) > 16 else None, test_method_17=row[17] if len(row) > 17 else None, test_method_18=row[18] if len(row) > 18 else None, test_method_19=row[19] if len(row) > 19 else None, test_method_20=row[20] if len(row) > 20 else None, test_method_21=row[21] if len(row) > 21 else None, test_method_22=row[22] if len(row) > 22 else None, test_method_23=row[23] if len(row) > 23 else None, test_method_24=row[24] if len(row) > 24 else None, test_method_25=row[25] if len(row) > 25 else None))
+                        models.VibrationData.objects.bulk_create(data_list)
+                        csvfile.close()
+                        os.remove(settings.MEDIA_ROOT + file_name)
         # Delete all messages by popping them from the list
         try:
             storage = get_messages(request)
@@ -758,7 +969,8 @@ def getChartData(request):
                     dynamic_vars[f"test_method_{index}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                 for index, elem in enumerate(request.POST.getlist('method')):
                     series.append(
                         {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
@@ -800,7 +1012,8 @@ def getChartData(request):
                     dynamic_vars[f"test_method_{index}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                 for index, elem in enumerate(request.POST.getlist('method')):
                     series.append(
                         {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
@@ -842,7 +1055,8 @@ def getChartData(request):
                     dynamic_vars[f"test_method_{index}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                 for index, elem in enumerate(request.POST.getlist('method')):
                     series.append(
                         {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
@@ -884,7 +1098,8 @@ def getChartData(request):
                     dynamic_vars[f"test_method_{index}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                 for index, elem in enumerate(request.POST.getlist('method')):
                     series.append(
                         {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
@@ -926,7 +1141,8 @@ def getChartData(request):
                     dynamic_vars[f"test_method_{index}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                 for index, elem in enumerate(request.POST.getlist('method')):
                     series.append(
                         {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
@@ -991,7 +1207,8 @@ def getChartData(request):
                     dynamic_vars[f"test_method_{index}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                 for index, elem in enumerate(request.POST.getlist('method')):
                     series.append(
                         {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
@@ -1033,7 +1250,8 @@ def getChartData(request):
                     dynamic_vars[f"test_method_{index}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                 for index, elem in enumerate(request.POST.getlist('method')):
                     series.append(
                         {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
@@ -1075,7 +1293,8 @@ def getChartData(request):
                     dynamic_vars[f"test_method_{index}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                 for index, elem in enumerate(request.POST.getlist('method')):
                     series.append(
                         {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
@@ -1117,7 +1336,8 @@ def getChartData(request):
                     dynamic_vars[f"test_method_{index}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                 for index, elem in enumerate(request.POST.getlist('method')):
                     series.append(
                         {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
@@ -1159,7 +1379,8 @@ def getChartData(request):
                     dynamic_vars[f"test_method_{index}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                 for index, elem in enumerate(request.POST.getlist('method')):
                     series.append(
                         {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
@@ -1224,7 +1445,8 @@ def getChartData(request):
                     dynamic_vars[f"test_method_{index}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                 for index, elem in enumerate(request.POST.getlist('method')):
                     series.append(
                         {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
@@ -1266,7 +1488,8 @@ def getChartData(request):
                     dynamic_vars[f"test_method_{index}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                 for index, elem in enumerate(request.POST.getlist('method')):
                     series.append(
                         {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
@@ -1308,7 +1531,8 @@ def getChartData(request):
                     dynamic_vars[f"test_method_{index}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                 for index, elem in enumerate(request.POST.getlist('method')):
                     series.append(
                         {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
@@ -1350,7 +1574,8 @@ def getChartData(request):
                     dynamic_vars[f"test_method_{index}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                 for index, elem in enumerate(request.POST.getlist('method')):
                     series.append(
                         {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
@@ -1392,7 +1617,8 @@ def getChartData(request):
                     dynamic_vars[f"test_method_{index}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                 for index, elem in enumerate(request.POST.getlist('method')):
                     series.append(
                         {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
@@ -1415,7 +1641,8 @@ def getChartData(request):
                     dynamic_vars[f"test_method_{index}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
                 for index, elem in enumerate(request.POST.getlist('method')):
                     series.append(
                         {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
@@ -1432,7 +1659,8 @@ def getChartData(request):
                     dynamic_vars[f"test_method_{index}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
                 for index, elem in enumerate(request.POST.getlist('method')):
                     series.append(
                         {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
@@ -1449,7 +1677,8 @@ def getChartData(request):
                     dynamic_vars[f"test_method_{index}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
                 for index, elem in enumerate(request.POST.getlist('method')):
                     series.append(
                         {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
@@ -1466,7 +1695,8 @@ def getChartData(request):
                     dynamic_vars[f"test_method_{index}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
                 for index, elem in enumerate(request.POST.getlist('method')):
                     series.append(
                         {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
@@ -1483,7 +1713,8 @@ def getChartData(request):
                     dynamic_vars[f"test_method_{index}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
                 for index, elem in enumerate(request.POST.getlist('method')):
                     series.append(
                         {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
@@ -1694,7 +1925,8 @@ def getCompareCombineChartData(post_data):
     chart_type = post_data['chart_type']
     from_time = post_data['from_time']
     to_time = post_data['to_time']
-    from_miliseconds = int(datetime.fromisoformat(from_time).timestamp() * 1000)
+    from_miliseconds = int(datetime.fromisoformat(
+        from_time).timestamp() * 1000)
     to_miliseconds = int(datetime.fromisoformat(to_time).timestamp() * 1000)
     if from_miliseconds > to_miliseconds:
         return JsonResponse({
@@ -1706,7 +1938,8 @@ def getCompareCombineChartData(post_data):
     for index, elem in enumerate(post_data.getlist('sensor_type')):
         if chart_type == 'max':
             if elem == 'strain':
-                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist('method') if elem + '~~' in sensor]
+                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist(
+                    'method') if elem + '~~' in sensor]
                 data = models.StrainData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Max('test_method_1'),
                     test_method_2=Max('test_method_2'),
@@ -1753,18 +1986,22 @@ def getCompareCombineChartData(post_data):
                 )
                 sensor_counts = getSensorCounts(elem)
                 sensor_names = get_constants(elem)
-                columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
                 dynamic_vars = {}
                 for i, element in enumerate(sensor_counts, start=1):
                     dynamic_vars[f"test_method_{i}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                 for each in sensor_data:
                     if each in columns.keys():
-                        series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
+                        series.append({'color': random_color_code(
+                        ), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
             if elem == 'tilt':
-                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist('method') if elem + '~~' in sensor]
+                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist(
+                    'method') if elem + '~~' in sensor]
                 data = models.TiltData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Max('test_method_1'),
                     test_method_2=Max('test_method_2'),
@@ -1794,18 +2031,22 @@ def getCompareCombineChartData(post_data):
                 )
                 sensor_counts = getSensorCounts(elem)
                 sensor_names = get_constants(elem)
-                columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
                 dynamic_vars = {}
                 for i, element in enumerate(sensor_counts, start=1):
                     dynamic_vars[f"test_method_{i}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                 for each in sensor_data:
                     if each in columns.keys():
-                        series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
+                        series.append({'color': random_color_code(
+                        ), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
             if elem == 'displacement':
-                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist('method') if elem + '~~' in sensor]
+                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist(
+                    'method') if elem + '~~' in sensor]
                 data = models.DisplacementData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Max('test_method_1'),
                     test_method_2=Max('test_method_2'),
@@ -1835,18 +2076,22 @@ def getCompareCombineChartData(post_data):
                 )
                 sensor_counts = getSensorCounts(elem)
                 sensor_names = get_constants(elem)
-                columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
                 dynamic_vars = {}
                 for i, element in enumerate(sensor_counts, start=1):
                     dynamic_vars[f"test_method_{i}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                 for each in sensor_data:
                     if each in columns.keys():
-                        series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
+                        series.append({'color': random_color_code(
+                        ), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
             if elem == 'settlement':
-                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist('method') if elem + '~~' in sensor]
+                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist(
+                    'method') if elem + '~~' in sensor]
                 data = models.SettlementData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Max('test_method_1'),
                     test_method_2=Max('test_method_2'),
@@ -1876,18 +2121,22 @@ def getCompareCombineChartData(post_data):
                 )
                 sensor_counts = getSensorCounts(elem)
                 sensor_names = get_constants(elem)
-                columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
                 dynamic_vars = {}
                 for i, element in enumerate(sensor_counts, start=1):
                     dynamic_vars[f"test_method_{i}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                 for each in sensor_data:
                     if each in columns.keys():
-                        series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
+                        series.append({'color': random_color_code(
+                        ), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
             if elem == 'vibration':
-                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist('method') if elem + '~~' in sensor]
+                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist(
+                    'method') if elem + '~~' in sensor]
                 data = models.VibrationData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Max('test_method_1'),
                     test_method_2=Max('test_method_2'),
@@ -1917,19 +2166,23 @@ def getCompareCombineChartData(post_data):
                 )
                 sensor_counts = getSensorCounts(elem)
                 sensor_names = get_constants(elem)
-                columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
                 dynamic_vars = {}
                 for i, element in enumerate(sensor_counts, start=1):
                     dynamic_vars[f"test_method_{i}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                 for each in sensor_data:
                     if each in columns.keys():
-                        series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
+                        series.append({'color': random_color_code(
+                        ), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
         elif chart_type == 'min':
             if elem == 'strain':
-                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist('method') if elem + '~~' in sensor]
+                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist(
+                    'method') if elem + '~~' in sensor]
                 data = models.StrainData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Min('test_method_1'),
                     test_method_2=Min('test_method_2'),
@@ -1976,18 +2229,22 @@ def getCompareCombineChartData(post_data):
                 )
                 sensor_counts = getSensorCounts(elem)
                 sensor_names = get_constants(elem)
-                columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
                 dynamic_vars = {}
                 for i, element in enumerate(sensor_counts, start=1):
                     dynamic_vars[f"test_method_{i}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                 for each in sensor_data:
                     if each in columns.keys():
-                        series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
+                        series.append({'color': random_color_code(
+                        ), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
             if elem == 'tilt':
-                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist('method') if elem + '~~' in sensor]
+                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist(
+                    'method') if elem + '~~' in sensor]
                 data = models.TiltData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Min('test_method_1'),
                     test_method_2=Min('test_method_2'),
@@ -2017,18 +2274,22 @@ def getCompareCombineChartData(post_data):
                 )
                 sensor_counts = getSensorCounts(elem)
                 sensor_names = get_constants(elem)
-                columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
                 dynamic_vars = {}
                 for i, element in enumerate(sensor_counts, start=1):
                     dynamic_vars[f"test_method_{i}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                 for each in sensor_data:
                     if each in columns.keys():
-                        series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
+                        series.append({'color': random_color_code(
+                        ), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
             if elem == 'displacement':
-                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist('method') if elem + '~~' in sensor]
+                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist(
+                    'method') if elem + '~~' in sensor]
                 data = models.DisplacementData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Min('test_method_1'),
                     test_method_2=Min('test_method_2'),
@@ -2058,18 +2319,22 @@ def getCompareCombineChartData(post_data):
                 )
                 sensor_counts = getSensorCounts(elem)
                 sensor_names = get_constants(elem)
-                columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
                 dynamic_vars = {}
                 for i, element in enumerate(sensor_counts, start=1):
                     dynamic_vars[f"test_method_{i}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                 for each in sensor_data:
                     if each in columns.keys():
-                        series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
+                        series.append({'color': random_color_code(
+                        ), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
             if elem == 'settlement':
-                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist('method') if elem + '~~' in sensor]
+                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist(
+                    'method') if elem + '~~' in sensor]
                 data = models.SettlementData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Min('test_method_1'),
                     test_method_2=Min('test_method_2'),
@@ -2099,18 +2364,22 @@ def getCompareCombineChartData(post_data):
                 )
                 sensor_counts = getSensorCounts(elem)
                 sensor_names = get_constants(elem)
-                columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
                 dynamic_vars = {}
                 for i, element in enumerate(sensor_counts, start=1):
                     dynamic_vars[f"test_method_{i}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                 for each in sensor_data:
                     if each in columns.keys():
-                        series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
+                        series.append({'color': random_color_code(
+                        ), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
             if elem == 'vibration':
-                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist('method') if elem + '~~' in sensor]
+                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist(
+                    'method') if elem + '~~' in sensor]
                 data = models.VibrationData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Min('test_method_1'),
                     test_method_2=Min('test_method_2'),
@@ -2140,19 +2409,23 @@ def getCompareCombineChartData(post_data):
                 )
                 sensor_counts = getSensorCounts(elem)
                 sensor_names = get_constants(elem)
-                columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
                 dynamic_vars = {}
                 for i, element in enumerate(sensor_counts, start=1):
                     dynamic_vars[f"test_method_{i}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                 for each in sensor_data:
                     if each in columns.keys():
-                        series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
+                        series.append({'color': random_color_code(
+                        ), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
         elif chart_type == 'avg':
             if elem == 'strain':
-                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist('method') if elem + '~~' in sensor]
+                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist(
+                    'method') if elem + '~~' in sensor]
                 data = models.StrainData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Avg('test_method_1'),
                     test_method_2=Avg('test_method_2'),
@@ -2199,18 +2472,22 @@ def getCompareCombineChartData(post_data):
                 )
                 sensor_counts = getSensorCounts(elem)
                 sensor_names = get_constants(elem)
-                columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
                 dynamic_vars = {}
                 for i, element in enumerate(sensor_counts, start=1):
                     dynamic_vars[f"test_method_{i}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                 for each in sensor_data:
                     if each in columns.keys():
-                        series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
+                        series.append({'color': random_color_code(
+                        ), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
             if elem == 'tilt':
-                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist('method') if elem + '~~' in sensor]
+                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist(
+                    'method') if elem + '~~' in sensor]
                 data = models.TiltData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Avg('test_method_1'),
                     test_method_2=Avg('test_method_2'),
@@ -2240,18 +2517,22 @@ def getCompareCombineChartData(post_data):
                 )
                 sensor_counts = getSensorCounts(elem)
                 sensor_names = get_constants(elem)
-                columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
                 dynamic_vars = {}
                 for i, element in enumerate(sensor_counts, start=1):
                     dynamic_vars[f"test_method_{i}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                 for each in sensor_data:
                     if each in columns.keys():
-                        series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
+                        series.append({'color': random_color_code(
+                        ), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
             if elem == 'displacement':
-                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist('method') if elem + '~~' in sensor]
+                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist(
+                    'method') if elem + '~~' in sensor]
                 data = models.DisplacementData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Avg('test_method_1'),
                     test_method_2=Avg('test_method_2'),
@@ -2281,18 +2562,22 @@ def getCompareCombineChartData(post_data):
                 )
                 sensor_counts = getSensorCounts(elem)
                 sensor_names = get_constants(elem)
-                columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
                 dynamic_vars = {}
                 for i, element in enumerate(sensor_counts, start=1):
                     dynamic_vars[f"test_method_{i}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                 for each in sensor_data:
                     if each in columns.keys():
-                        series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
+                        series.append({'color': random_color_code(
+                        ), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
             if elem == 'settlement':
-                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist('method') if elem + '~~' in sensor]
+                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist(
+                    'method') if elem + '~~' in sensor]
                 data = models.SettlementData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Avg('test_method_1'),
                     test_method_2=Avg('test_method_2'),
@@ -2322,18 +2607,22 @@ def getCompareCombineChartData(post_data):
                 )
                 sensor_counts = getSensorCounts(elem)
                 sensor_names = get_constants(elem)
-                columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
                 dynamic_vars = {}
                 for i, element in enumerate(sensor_counts, start=1):
                     dynamic_vars[f"test_method_{i}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                 for each in sensor_data:
                     if each in columns.keys():
-                        series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
+                        series.append({'color': random_color_code(
+                        ), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
             if elem == 'vibration':
-                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist('method') if elem + '~~' in sensor]
+                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist(
+                    'method') if elem + '~~' in sensor]
                 data = models.VibrationData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Avg('test_method_1'),
                     test_method_2=Avg('test_method_2'),
@@ -2363,103 +2652,133 @@ def getCompareCombineChartData(post_data):
                 )
                 sensor_counts = getSensorCounts(elem)
                 sensor_names = get_constants(elem)
-                columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
                 dynamic_vars = {}
                 for i, element in enumerate(sensor_counts, start=1):
                     dynamic_vars[f"test_method_{i}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                 for each in sensor_data:
                     if each in columns.keys():
-                        series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
+                        series.append({'color': random_color_code(
+                        ), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
         else:
             if elem == 'strain':
-                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist('method') if elem + '~~' in sensor]
-                data = models.StrainData.objects.filter(date_time__range=(from_time, to_time)).order_by('date_time')
+                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist(
+                    'method') if elem + '~~' in sensor]
+                data = models.StrainData.objects.filter(
+                    date_time__range=(from_time, to_time)).order_by('date_time')
                 sensor_counts = getSensorCounts(elem)
                 sensor_names = get_constants(elem)
-                columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
                 dynamic_vars = {}
                 for i, element in enumerate(sensor_counts, start=1):
                     dynamic_vars[f"test_method_{i}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
                 for each in sensor_data:
                     if each in columns.keys():
-                        series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
+                        series.append({'color': random_color_code(
+                        ), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
             if elem == 'tilt':
-                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist('method') if elem + '~~' in sensor]
-                data = models.TiltData.objects.filter(date_time__range=(from_time, to_time)).order_by('date_time')
+                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist(
+                    'method') if elem + '~~' in sensor]
+                data = models.TiltData.objects.filter(
+                    date_time__range=(from_time, to_time)).order_by('date_time')
                 sensor_counts = getSensorCounts(elem)
                 sensor_names = get_constants(elem)
-                columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
                 dynamic_vars = {}
                 for i, element in enumerate(sensor_counts, start=1):
                     dynamic_vars[f"test_method_{i}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
                 for each in sensor_data:
                     if each in columns.keys():
-                        series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
+                        series.append({'color': random_color_code(
+                        ), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
             if elem == 'displacement':
-                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist('method') if elem + '~~' in sensor]
-                data = models.DisplacementData.objects.filter(date_time__range=(from_time, to_time)).order_by('date_time')
+                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist(
+                    'method') if elem + '~~' in sensor]
+                data = models.DisplacementData.objects.filter(
+                    date_time__range=(from_time, to_time)).order_by('date_time')
                 sensor_counts = getSensorCounts(elem)
                 sensor_names = get_constants(elem)
-                columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
                 dynamic_vars = {}
                 for i, element in enumerate(sensor_counts, start=1):
                     dynamic_vars[f"test_method_{i}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
                 for each in sensor_data:
                     if each in columns.keys():
-                        series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
+                        series.append({'color': random_color_code(
+                        ), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
             if elem == 'settlement':
-                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist('method') if elem + '~~' in sensor]
-                data = models.SettlementData.objects.filter(date_time__range=(from_time, to_time)).order_by('date_time')
+                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist(
+                    'method') if elem + '~~' in sensor]
+                data = models.SettlementData.objects.filter(
+                    date_time__range=(from_time, to_time)).order_by('date_time')
                 sensor_counts = getSensorCounts(elem)
                 sensor_names = get_constants(elem)
-                columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
                 dynamic_vars = {}
                 for i, element in enumerate(sensor_counts, start=1):
                     dynamic_vars[f"test_method_{i}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
                 for each in sensor_data:
                     if each in columns.keys():
-                        series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
+                        series.append({'color': random_color_code(
+                        ), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
             if elem == 'vibration':
-                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist('method') if elem + '~~' in sensor]
-                data = models.VibrationData.objects.filter(date_time__range=(from_time, to_time)).order_by('date_time')
+                sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist(
+                    'method') if elem + '~~' in sensor]
+                data = models.VibrationData.objects.filter(
+                    date_time__range=(from_time, to_time)).order_by('date_time')
                 sensor_counts = getSensorCounts(elem)
                 sensor_names = get_constants(elem)
-                columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                columns = {k: v for k, v in sensor_names.items(
+                ) if not v.startswith('test_method_')}
                 dynamic_vars = {}
                 for i, element in enumerate(sensor_counts, start=1):
                     dynamic_vars[f"test_method_{i}"] = []
                 for row_data in data:
                     for method in dynamic_vars:
-                        dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
+                        dynamic_vars[method].append([int(createMilisecondsByDate(
+                            str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
                 for each in sensor_data:
                     if each in columns.keys():
-                        series.append({'color': random_color_code(), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
+                        series.append({'color': random_color_code(
+                        ), 'name': constants.sensor_types[elem] + "=>" + columns[each], 'data': dynamic_vars[each]})
     random.shuffle(series)
     return series
-    
+
 
 def getCompareChartData(request):
     if request.method == "POST":
         chart_type = request.POST['chart_type']
         from_time = request.POST['from_time']
         to_time = request.POST['to_time']
-        from_miliseconds = int(datetime.fromisoformat(from_time).timestamp() * 1000)
-        to_miliseconds = int(datetime.fromisoformat(to_time).timestamp() * 1000)
+        from_miliseconds = int(datetime.fromisoformat(
+            from_time).timestamp() * 1000)
+        to_miliseconds = int(datetime.fromisoformat(
+            to_time).timestamp() * 1000)
         if from_miliseconds > to_miliseconds:
             return JsonResponse({
                 'code': 507,
@@ -2470,7 +2789,8 @@ def getCompareChartData(request):
         for index, elem in enumerate(request.POST.getlist('sensor_type')):
             if chart_type == 'max':
                 if elem == 'strain':
-                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist('method') if elem + '~~' in sensor]
+                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist(
+                        'method') if elem + '~~' in sensor]
                     series = []
                     data = models.StrainData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                         test_method_1=Max('test_method_1'),
@@ -2518,21 +2838,26 @@ def getCompareChartData(request):
                     )
                     sensor_counts = getSensorCounts(elem)
                     sensor_names = get_constants(elem)
-                    columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                    columns = {k: v for k, v in sensor_names.items(
+                    ) if not v.startswith('test_method_')}
                     dynamic_vars = {}
                     for i, element in enumerate(sensor_counts, start=1):
                         dynamic_vars[f"test_method_{i}"] = []
                     for row_data in data:
                         for method in dynamic_vars:
-                            dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                            dynamic_vars[method].append([int(createMilisecondsByDate(
+                                str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                     for each in sensor_data:
                         if each in columns.keys():
-                            series.append({'color': random_color_code(), 'name': columns[each], 'data': dynamic_vars[each]})
+                            series.append({'color': random_color_code(
+                            ), 'name': columns[each], 'data': dynamic_vars[each]})
                     all_data[elem] = {}
-                    all_data[elem]['header'] = "Comparative Data Analysis (" + constants.sensor_types[elem] +  ")"
+                    all_data[elem]['header'] = "Comparative Data Analysis (" + \
+                        constants.sensor_types[elem] + ")"
                     all_data[elem]['data'] = series
                 if elem == 'tilt':
-                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist('method') if elem + '~~' in sensor]
+                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist(
+                        'method') if elem + '~~' in sensor]
                     series = []
                     data = models.TiltData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                         test_method_1=Max('test_method_1'),
@@ -2563,21 +2888,26 @@ def getCompareChartData(request):
                     )
                     sensor_counts = getSensorCounts(elem)
                     sensor_names = get_constants(elem)
-                    columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                    columns = {k: v for k, v in sensor_names.items(
+                    ) if not v.startswith('test_method_')}
                     dynamic_vars = {}
                     for i, element in enumerate(sensor_counts, start=1):
                         dynamic_vars[f"test_method_{i}"] = []
                     for row_data in data:
                         for method in dynamic_vars:
-                            dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                            dynamic_vars[method].append([int(createMilisecondsByDate(
+                                str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                     for each in sensor_data:
                         if each in columns.keys():
-                            series.append({'color': random_color_code(), 'name': columns[each], 'data': dynamic_vars[each]})
+                            series.append({'color': random_color_code(
+                            ), 'name': columns[each], 'data': dynamic_vars[each]})
                     all_data[elem] = {}
-                    all_data[elem]['header'] = "Comparative Data Analysis (" + constants.sensor_types[elem] +  ")"
+                    all_data[elem]['header'] = "Comparative Data Analysis (" + \
+                        constants.sensor_types[elem] + ")"
                     all_data[elem]['data'] = series
                 if elem == 'displacement':
-                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist('method') if elem + '~~' in sensor]
+                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist(
+                        'method') if elem + '~~' in sensor]
                     series = []
                     data = models.DisplacementData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                         test_method_1=Max('test_method_1'),
@@ -2608,21 +2938,26 @@ def getCompareChartData(request):
                     )
                     sensor_counts = getSensorCounts(elem)
                     sensor_names = get_constants(elem)
-                    columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                    columns = {k: v for k, v in sensor_names.items(
+                    ) if not v.startswith('test_method_')}
                     dynamic_vars = {}
                     for i, element in enumerate(sensor_counts, start=1):
                         dynamic_vars[f"test_method_{i}"] = []
                     for row_data in data:
                         for method in dynamic_vars:
-                            dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                            dynamic_vars[method].append([int(createMilisecondsByDate(
+                                str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                     for each in sensor_data:
                         if each in columns.keys():
-                            series.append({'color': random_color_code(), 'name': columns[each], 'data': dynamic_vars[each]})
+                            series.append({'color': random_color_code(
+                            ), 'name': columns[each], 'data': dynamic_vars[each]})
                     all_data[elem] = {}
-                    all_data[elem]['header'] = "Comparative Data Analysis (" + constants.sensor_types[elem] +  ")"
+                    all_data[elem]['header'] = "Comparative Data Analysis (" + \
+                        constants.sensor_types[elem] + ")"
                     all_data[elem]['data'] = series
                 if elem == 'settlement':
-                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist('method') if elem + '~~' in sensor]
+                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist(
+                        'method') if elem + '~~' in sensor]
                     series = []
                     data = models.SettlementData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                         test_method_1=Max('test_method_1'),
@@ -2653,21 +2988,26 @@ def getCompareChartData(request):
                     )
                     sensor_counts = getSensorCounts(elem)
                     sensor_names = get_constants(elem)
-                    columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                    columns = {k: v for k, v in sensor_names.items(
+                    ) if not v.startswith('test_method_')}
                     dynamic_vars = {}
                     for i, element in enumerate(sensor_counts, start=1):
                         dynamic_vars[f"test_method_{i}"] = []
                     for row_data in data:
                         for method in dynamic_vars:
-                            dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                            dynamic_vars[method].append([int(createMilisecondsByDate(
+                                str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                     for each in sensor_data:
                         if each in columns.keys():
-                            series.append({'color': random_color_code(), 'name': columns[each], 'data': dynamic_vars[each]})
+                            series.append({'color': random_color_code(
+                            ), 'name': columns[each], 'data': dynamic_vars[each]})
                     all_data[elem] = {}
-                    all_data[elem]['header'] = "Comparative Data Analysis (" + constants.sensor_types[elem] +  ")"
+                    all_data[elem]['header'] = "Comparative Data Analysis (" + \
+                        constants.sensor_types[elem] + ")"
                     all_data[elem]['data'] = series
                 if elem == 'vibration':
-                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist('method') if elem + '~~' in sensor]
+                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist(
+                        'method') if elem + '~~' in sensor]
                     series = []
                     data = models.VibrationData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                         test_method_1=Max('test_method_1'),
@@ -2698,22 +3038,27 @@ def getCompareChartData(request):
                     )
                     sensor_counts = getSensorCounts(elem)
                     sensor_names = get_constants(elem)
-                    columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                    columns = {k: v for k, v in sensor_names.items(
+                    ) if not v.startswith('test_method_')}
                     dynamic_vars = {}
                     for i, element in enumerate(sensor_counts, start=1):
                         dynamic_vars[f"test_method_{i}"] = []
                     for row_data in data:
                         for method in dynamic_vars:
-                            dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                            dynamic_vars[method].append([int(createMilisecondsByDate(
+                                str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                     for each in sensor_data:
                         if each in columns.keys():
-                            series.append({'color': random_color_code(), 'name': columns[each], 'data': dynamic_vars[each]})
+                            series.append({'color': random_color_code(
+                            ), 'name': columns[each], 'data': dynamic_vars[each]})
                     all_data[elem] = {}
-                    all_data[elem]['header'] = "Comparative Data Analysis (" + constants.sensor_types[elem] +  ")"
+                    all_data[elem]['header'] = "Comparative Data Analysis (" + \
+                        constants.sensor_types[elem] + ")"
                     all_data[elem]['data'] = series
             elif chart_type == 'min':
                 if elem == 'strain':
-                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist('method') if elem + '~~' in sensor]
+                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist(
+                        'method') if elem + '~~' in sensor]
                     series = []
                     data = models.StrainData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                         test_method_1=Min('test_method_1'),
@@ -2761,21 +3106,26 @@ def getCompareChartData(request):
                     )
                     sensor_counts = getSensorCounts(elem)
                     sensor_names = get_constants(elem)
-                    columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                    columns = {k: v for k, v in sensor_names.items(
+                    ) if not v.startswith('test_method_')}
                     dynamic_vars = {}
                     for i, element in enumerate(sensor_counts, start=1):
                         dynamic_vars[f"test_method_{i}"] = []
                     for row_data in data:
                         for method in dynamic_vars:
-                            dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                            dynamic_vars[method].append([int(createMilisecondsByDate(
+                                str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                     for each in sensor_data:
                         if each in columns.keys():
-                            series.append({'color': random_color_code(), 'name': columns[each], 'data': dynamic_vars[each]})
+                            series.append({'color': random_color_code(
+                            ), 'name': columns[each], 'data': dynamic_vars[each]})
                     all_data[elem] = {}
-                    all_data[elem]['header'] = "Comparative Data Analysis (" + constants.sensor_types[elem] +  ")"
+                    all_data[elem]['header'] = "Comparative Data Analysis (" + \
+                        constants.sensor_types[elem] + ")"
                     all_data[elem]['data'] = series
                 if elem == 'tilt':
-                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist('method') if elem + '~~' in sensor]
+                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist(
+                        'method') if elem + '~~' in sensor]
                     series = []
                     data = models.TiltData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                         test_method_1=Min('test_method_1'),
@@ -2806,21 +3156,26 @@ def getCompareChartData(request):
                     )
                     sensor_counts = getSensorCounts(elem)
                     sensor_names = get_constants(elem)
-                    columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                    columns = {k: v for k, v in sensor_names.items(
+                    ) if not v.startswith('test_method_')}
                     dynamic_vars = {}
                     for i, element in enumerate(sensor_counts, start=1):
                         dynamic_vars[f"test_method_{i}"] = []
                     for row_data in data:
                         for method in dynamic_vars:
-                            dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                            dynamic_vars[method].append([int(createMilisecondsByDate(
+                                str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                     for each in sensor_data:
                         if each in columns.keys():
-                            series.append({'color': random_color_code(), 'name': columns[each], 'data': dynamic_vars[each]})
+                            series.append({'color': random_color_code(
+                            ), 'name': columns[each], 'data': dynamic_vars[each]})
                     all_data[elem] = {}
-                    all_data[elem]['header'] = "Comparative Data Analysis (" + constants.sensor_types[elem] +  ")"
+                    all_data[elem]['header'] = "Comparative Data Analysis (" + \
+                        constants.sensor_types[elem] + ")"
                     all_data[elem]['data'] = series
                 if elem == 'displacement':
-                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist('method') if elem + '~~' in sensor]
+                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist(
+                        'method') if elem + '~~' in sensor]
                     series = []
                     data = models.DisplacementData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                         test_method_1=Min('test_method_1'),
@@ -2851,21 +3206,26 @@ def getCompareChartData(request):
                     )
                     sensor_counts = getSensorCounts(elem)
                     sensor_names = get_constants(elem)
-                    columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                    columns = {k: v for k, v in sensor_names.items(
+                    ) if not v.startswith('test_method_')}
                     dynamic_vars = {}
                     for i, element in enumerate(sensor_counts, start=1):
                         dynamic_vars[f"test_method_{i}"] = []
                     for row_data in data:
                         for method in dynamic_vars:
-                            dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                            dynamic_vars[method].append([int(createMilisecondsByDate(
+                                str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                     for each in sensor_data:
                         if each in columns.keys():
-                            series.append({'color': random_color_code(), 'name': columns[each], 'data': dynamic_vars[each]})
+                            series.append({'color': random_color_code(
+                            ), 'name': columns[each], 'data': dynamic_vars[each]})
                     all_data[elem] = {}
-                    all_data[elem]['header'] = "Comparative Data Analysis (" + constants.sensor_types[elem] +  ")"
+                    all_data[elem]['header'] = "Comparative Data Analysis (" + \
+                        constants.sensor_types[elem] + ")"
                     all_data[elem]['data'] = series
                 if elem == 'settlement':
-                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist('method') if elem + '~~' in sensor]
+                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist(
+                        'method') if elem + '~~' in sensor]
                     series = []
                     data = models.SettlementData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                         test_method_1=Min('test_method_1'),
@@ -2896,21 +3256,26 @@ def getCompareChartData(request):
                     )
                     sensor_counts = getSensorCounts(elem)
                     sensor_names = get_constants(elem)
-                    columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                    columns = {k: v for k, v in sensor_names.items(
+                    ) if not v.startswith('test_method_')}
                     dynamic_vars = {}
                     for i, element in enumerate(sensor_counts, start=1):
                         dynamic_vars[f"test_method_{i}"] = []
                     for row_data in data:
                         for method in dynamic_vars:
-                            dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                            dynamic_vars[method].append([int(createMilisecondsByDate(
+                                str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                     for each in sensor_data:
                         if each in columns.keys():
-                            series.append({'color': random_color_code(), 'name': columns[each], 'data': dynamic_vars[each]})
+                            series.append({'color': random_color_code(
+                            ), 'name': columns[each], 'data': dynamic_vars[each]})
                     all_data[elem] = {}
-                    all_data[elem]['header'] = "Comparative Data Analysis (" + constants.sensor_types[elem] +  ")"
+                    all_data[elem]['header'] = "Comparative Data Analysis (" + \
+                        constants.sensor_types[elem] + ")"
                     all_data[elem]['data'] = series
                 if elem == 'vibration':
-                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist('method') if elem + '~~' in sensor]
+                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist(
+                        'method') if elem + '~~' in sensor]
                     series = []
                     data = models.VibrationData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                         test_method_1=Min('test_method_1'),
@@ -2941,22 +3306,27 @@ def getCompareChartData(request):
                     )
                     sensor_counts = getSensorCounts(elem)
                     sensor_names = get_constants(elem)
-                    columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                    columns = {k: v for k, v in sensor_names.items(
+                    ) if not v.startswith('test_method_')}
                     dynamic_vars = {}
                     for i, element in enumerate(sensor_counts, start=1):
                         dynamic_vars[f"test_method_{i}"] = []
                     for row_data in data:
                         for method in dynamic_vars:
-                            dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                            dynamic_vars[method].append([int(createMilisecondsByDate(
+                                str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                     for each in sensor_data:
                         if each in columns.keys():
-                            series.append({'color': random_color_code(), 'name': columns[each], 'data': dynamic_vars[each]})
+                            series.append({'color': random_color_code(
+                            ), 'name': columns[each], 'data': dynamic_vars[each]})
                     all_data[elem] = {}
-                    all_data[elem]['header'] = "Comparative Data Analysis (" + constants.sensor_types[elem] +  ")"
+                    all_data[elem]['header'] = "Comparative Data Analysis (" + \
+                        constants.sensor_types[elem] + ")"
                     all_data[elem]['data'] = series
             elif chart_type == 'avg':
                 if elem == 'strain':
-                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist('method') if elem + '~~' in sensor]
+                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist(
+                        'method') if elem + '~~' in sensor]
                     series = []
                     data = models.StrainData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                         test_method_1=Avg('test_method_1'),
@@ -3004,21 +3374,26 @@ def getCompareChartData(request):
                     )
                     sensor_counts = getSensorCounts(elem)
                     sensor_names = get_constants(elem)
-                    columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                    columns = {k: v for k, v in sensor_names.items(
+                    ) if not v.startswith('test_method_')}
                     dynamic_vars = {}
                     for i, element in enumerate(sensor_counts, start=1):
                         dynamic_vars[f"test_method_{i}"] = []
                     for row_data in data:
                         for method in dynamic_vars:
-                            dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                            dynamic_vars[method].append([int(createMilisecondsByDate(
+                                str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                     for each in sensor_data:
                         if each in columns.keys():
-                            series.append({'color': random_color_code(), 'name': columns[each], 'data': dynamic_vars[each]})
+                            series.append({'color': random_color_code(
+                            ), 'name': columns[each], 'data': dynamic_vars[each]})
                     all_data[elem] = {}
-                    all_data[elem]['header'] = "Comparative Data Analysis (" + constants.sensor_types[elem] +  ")"
+                    all_data[elem]['header'] = "Comparative Data Analysis (" + \
+                        constants.sensor_types[elem] + ")"
                     all_data[elem]['data'] = series
                 if elem == 'tilt':
-                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist('method') if elem + '~~' in sensor]
+                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist(
+                        'method') if elem + '~~' in sensor]
                     series = []
                     data = models.TiltData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                         test_method_1=Avg('test_method_1'),
@@ -3049,21 +3424,26 @@ def getCompareChartData(request):
                     )
                     sensor_counts = getSensorCounts(elem)
                     sensor_names = get_constants(elem)
-                    columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                    columns = {k: v for k, v in sensor_names.items(
+                    ) if not v.startswith('test_method_')}
                     dynamic_vars = {}
                     for i, element in enumerate(sensor_counts, start=1):
                         dynamic_vars[f"test_method_{i}"] = []
                     for row_data in data:
                         for method in dynamic_vars:
-                            dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                            dynamic_vars[method].append([int(createMilisecondsByDate(
+                                str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                     for each in sensor_data:
                         if each in columns.keys():
-                            series.append({'color': random_color_code(), 'name': columns[each], 'data': dynamic_vars[each]})
+                            series.append({'color': random_color_code(
+                            ), 'name': columns[each], 'data': dynamic_vars[each]})
                     all_data[elem] = {}
-                    all_data[elem]['header'] = "Comparative Data Analysis (" + constants.sensor_types[elem] +  ")"
+                    all_data[elem]['header'] = "Comparative Data Analysis (" + \
+                        constants.sensor_types[elem] + ")"
                     all_data[elem]['data'] = series
                 if elem == 'displacement':
-                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist('method') if elem + '~~' in sensor]
+                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist(
+                        'method') if elem + '~~' in sensor]
                     series = []
                     data = models.DisplacementData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                         test_method_1=Avg('test_method_1'),
@@ -3094,21 +3474,26 @@ def getCompareChartData(request):
                     )
                     sensor_counts = getSensorCounts(elem)
                     sensor_names = get_constants(elem)
-                    columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                    columns = {k: v for k, v in sensor_names.items(
+                    ) if not v.startswith('test_method_')}
                     dynamic_vars = {}
                     for i, element in enumerate(sensor_counts, start=1):
                         dynamic_vars[f"test_method_{i}"] = []
                     for row_data in data:
                         for method in dynamic_vars:
-                            dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                            dynamic_vars[method].append([int(createMilisecondsByDate(
+                                str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                     for each in sensor_data:
                         if each in columns.keys():
-                            series.append({'color': random_color_code(), 'name': columns[each], 'data': dynamic_vars[each]})
+                            series.append({'color': random_color_code(
+                            ), 'name': columns[each], 'data': dynamic_vars[each]})
                     all_data[elem] = {}
-                    all_data[elem]['header'] = "Comparative Data Analysis (" + constants.sensor_types[elem] +  ")"
+                    all_data[elem]['header'] = "Comparative Data Analysis (" + \
+                        constants.sensor_types[elem] + ")"
                     all_data[elem]['data'] = series
                 if elem == 'settlement':
-                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist('method') if elem + '~~' in sensor]
+                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist(
+                        'method') if elem + '~~' in sensor]
                     series = []
                     data = models.SettlementData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                         test_method_1=Avg('test_method_1'),
@@ -3139,21 +3524,26 @@ def getCompareChartData(request):
                     )
                     sensor_counts = getSensorCounts(elem)
                     sensor_names = get_constants(elem)
-                    columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                    columns = {k: v for k, v in sensor_names.items(
+                    ) if not v.startswith('test_method_')}
                     dynamic_vars = {}
                     for i, element in enumerate(sensor_counts, start=1):
                         dynamic_vars[f"test_method_{i}"] = []
                     for row_data in data:
                         for method in dynamic_vars:
-                            dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                            dynamic_vars[method].append([int(createMilisecondsByDate(
+                                str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                     for each in sensor_data:
                         if each in columns.keys():
-                            series.append({'color': random_color_code(), 'name': columns[each], 'data': dynamic_vars[each]})
+                            series.append({'color': random_color_code(
+                            ), 'name': columns[each], 'data': dynamic_vars[each]})
                     all_data[elem] = {}
-                    all_data[elem]['header'] = "Comparative Data Analysis (" + constants.sensor_types[elem] +  ")"
+                    all_data[elem]['header'] = "Comparative Data Analysis (" + \
+                        constants.sensor_types[elem] + ")"
                     all_data[elem]['data'] = series
                 if elem == 'vibration':
-                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist('method') if elem + '~~' in sensor]
+                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist(
+                        'method') if elem + '~~' in sensor]
                     series = []
                     data = models.VibrationData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                         test_method_1=Avg('test_method_1'),
@@ -3184,114 +3574,150 @@ def getCompareChartData(request):
                     )
                     sensor_counts = getSensorCounts(elem)
                     sensor_names = get_constants(elem)
-                    columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                    columns = {k: v for k, v in sensor_names.items(
+                    ) if not v.startswith('test_method_')}
                     dynamic_vars = {}
                     for i, element in enumerate(sensor_counts, start=1):
                         dynamic_vars[f"test_method_{i}"] = []
                     for row_data in data:
                         for method in dynamic_vars:
-                            dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data['date']) + "T00:00:00")), float(row_data[method])])
+                            dynamic_vars[method].append([int(createMilisecondsByDate(
+                                str(row_data['date']) + "T00:00:00")), float(row_data[method])])
                     for each in sensor_data:
                         if each in columns.keys():
-                            series.append({'color': random_color_code(), 'name': columns[each], 'data': dynamic_vars[each]})
+                            series.append({'color': random_color_code(
+                            ), 'name': columns[each], 'data': dynamic_vars[each]})
                     all_data[elem] = {}
-                    all_data[elem]['header'] = "Comparative Data Analysis (" + constants.sensor_types[elem] +  ")"
+                    all_data[elem]['header'] = "Comparative Data Analysis (" + \
+                        constants.sensor_types[elem] + ")"
                     all_data[elem]['data'] = series
             else:
                 if elem == 'strain':
-                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist('method') if elem + '~~' in sensor]
+                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist(
+                        'method') if elem + '~~' in sensor]
                     series = []
-                    data = models.StrainData.objects.filter(date_time__range=(from_time, to_time)).order_by('date_time')
+                    data = models.StrainData.objects.filter(
+                        date_time__range=(from_time, to_time)).order_by('date_time')
                     sensor_counts = getSensorCounts(elem)
                     sensor_names = get_constants(elem)
-                    columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                    columns = {k: v for k, v in sensor_names.items(
+                    ) if not v.startswith('test_method_')}
                     dynamic_vars = {}
                     for i, element in enumerate(sensor_counts, start=1):
                         dynamic_vars[f"test_method_{i}"] = []
                     for row_data in data:
+                        print(row_data)
                         for method in dynamic_vars:
-                            dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
+                            print(method)
+                            dynamic_vars[method].append([int(createMilisecondsByDate(
+                                str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
                     for each in sensor_data:
                         if each in columns.keys():
-                            series.append({'color': random_color_code(), 'name': columns[each], 'data': dynamic_vars[each]})
+                            series.append({'color': random_color_code(
+                            ), 'name': columns[each], 'data': dynamic_vars[each]})
                     all_data[elem] = {}
-                    all_data[elem]['header'] = "Comparative Data Analysis (" + constants.sensor_types[elem] +  ")"
+                    all_data[elem]['header'] = "Comparative Data Analysis (" + \
+                        constants.sensor_types[elem] + ")"
                     all_data[elem]['data'] = series
                 if elem == 'tilt':
-                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist('method') if elem + '~~' in sensor]
+                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist(
+                        'method') if elem + '~~' in sensor]
                     series = []
-                    data = models.TiltData.objects.filter(date_time__range=(from_time, to_time)).order_by('date_time')
+                    data = models.TiltData.objects.filter(
+                        date_time__range=(from_time, to_time)).order_by('date_time')
                     sensor_counts = getSensorCounts(elem)
                     sensor_names = get_constants(elem)
-                    columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                    columns = {k: v for k, v in sensor_names.items(
+                    ) if not v.startswith('test_method_')}
                     dynamic_vars = {}
                     for i, element in enumerate(sensor_counts, start=1):
                         dynamic_vars[f"test_method_{i}"] = []
                     for row_data in data:
                         for method in dynamic_vars:
-                            dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
+                            dynamic_vars[method].append([int(createMilisecondsByDate(
+                                str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
                     for each in sensor_data:
                         if each in columns.keys():
-                            series.append({'color': random_color_code(), 'name': columns[each], 'data': dynamic_vars[each]})
+                            series.append({'color': random_color_code(
+                            ), 'name': columns[each], 'data': dynamic_vars[each]})
                     all_data[elem] = {}
-                    all_data[elem]['header'] = "Comparative Data Analysis (" + constants.sensor_types[elem] +  ")"
+                    all_data[elem]['header'] = "Comparative Data Analysis (" + \
+                        constants.sensor_types[elem] + ")"
                     all_data[elem]['data'] = series
                 if elem == 'displacement':
-                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist('method') if elem + '~~' in sensor]
+                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist(
+                        'method') if elem + '~~' in sensor]
                     series = []
-                    data = models.DisplacementData.objects.filter(date_time__range=(from_time, to_time)).order_by('date_time')
+                    data = models.DisplacementData.objects.filter(
+                        date_time__range=(from_time, to_time)).order_by('date_time')
                     sensor_counts = getSensorCounts(elem)
                     sensor_names = get_constants(elem)
-                    columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                    columns = {k: v for k, v in sensor_names.items(
+                    ) if not v.startswith('test_method_')}
                     dynamic_vars = {}
                     for i, element in enumerate(sensor_counts, start=1):
                         dynamic_vars[f"test_method_{i}"] = []
                     for row_data in data:
                         for method in dynamic_vars:
-                            dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
+                            dynamic_vars[method].append([int(createMilisecondsByDate(
+                                str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
                     for each in sensor_data:
                         if each in columns.keys():
-                            series.append({'color': random_color_code(), 'name': columns[each], 'data': dynamic_vars[each]})
+                            series.append({'color': random_color_code(
+                            ), 'name': columns[each], 'data': dynamic_vars[each]})
                     all_data[elem] = {}
-                    all_data[elem]['header'] = "Comparative Data Analysis (" + constants.sensor_types[elem] +  ")"
+                    all_data[elem]['header'] = "Comparative Data Analysis (" + \
+                        constants.sensor_types[elem] + ")"
                     all_data[elem]['data'] = series
                 if elem == 'settlement':
-                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist('method') if elem + '~~' in sensor]
+                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist(
+                        'method') if elem + '~~' in sensor]
                     series = []
-                    data = models.SettlementData.objects.filter(date_time__range=(from_time, to_time)).order_by('date_time')
+                    data = models.SettlementData.objects.filter(
+                        date_time__range=(from_time, to_time)).order_by('date_time')
                     sensor_counts = getSensorCounts(elem)
                     sensor_names = get_constants(elem)
-                    columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                    columns = {k: v for k, v in sensor_names.items(
+                    ) if not v.startswith('test_method_')}
                     dynamic_vars = {}
                     for i, element in enumerate(sensor_counts, start=1):
                         dynamic_vars[f"test_method_{i}"] = []
                     for row_data in data:
                         for method in dynamic_vars:
-                            dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
+                            dynamic_vars[method].append([int(createMilisecondsByDate(
+                                str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
                     for each in sensor_data:
                         if each in columns.keys():
-                            series.append({'color': random_color_code(), 'name': columns[each], 'data': dynamic_vars[each]})
+                            series.append({'color': random_color_code(
+                            ), 'name': columns[each], 'data': dynamic_vars[each]})
                     all_data[elem] = {}
-                    all_data[elem]['header'] = "Comparative Data Analysis (" + constants.sensor_types[elem] +  ")"
+                    all_data[elem]['header'] = "Comparative Data Analysis (" + \
+                        constants.sensor_types[elem] + ")"
                     all_data[elem]['data'] = series
                 if elem == 'vibration':
-                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist('method') if elem + '~~' in sensor]
+                    sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist(
+                        'method') if elem + '~~' in sensor]
                     series = []
-                    data = models.VibrationData.objects.filter(date_time__range=(from_time, to_time)).order_by('date_time')
+                    data = models.VibrationData.objects.filter(
+                        date_time__range=(from_time, to_time)).order_by('date_time')
                     sensor_counts = getSensorCounts(elem)
                     sensor_names = get_constants(elem)
-                    columns = {k: v for k, v in sensor_names.items() if not v.startswith('test_method_')}
+                    columns = {k: v for k, v in sensor_names.items(
+                    ) if not v.startswith('test_method_')}
                     dynamic_vars = {}
                     for i, element in enumerate(sensor_counts, start=1):
                         dynamic_vars[f"test_method_{i}"] = []
                     for row_data in data:
                         for method in dynamic_vars:
-                            dynamic_vars[method].append([int(createMilisecondsByDate(str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
+                            dynamic_vars[method].append([int(createMilisecondsByDate(
+                                str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
                     for each in sensor_data:
                         if each in columns.keys():
-                            series.append({'color': random_color_code(), 'name': columns[each], 'data': dynamic_vars[each]})
+                            series.append({'color': random_color_code(
+                            ), 'name': columns[each], 'data': dynamic_vars[each]})
                     all_data[elem] = {}
-                    all_data[elem]['header'] = "Comparative Data Analysis (" + constants.sensor_types[elem] +  ")"
+                    all_data[elem]['header'] = "Comparative Data Analysis (" + \
+                        constants.sensor_types[elem] + ")"
                     all_data[elem]['data'] = series
         combine_data = getCompareCombineChartData(request.POST)
         return JsonResponse({

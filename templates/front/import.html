@@ -70,7 +70,7 @@
                         <article class="my-3">
                             <div class="bd-heading align-self-start mt-2 mb-2 mt-xl-0 mb-xl-2">
                                 <div class="mb-3 form-check">
-                                    <label class="form-check-label" for="strain_gauge">Strain Gauge Excel</label>
+                                    <label class="form-check-label" for="strain_gauge">Strain Gauge</label>
                                     <input type="checkbox" name="strain_required" checked id="strain_required"
                                         class="check_required form-check-input">
                                 </div>
@@ -84,7 +84,7 @@
                                                 <div class="col-lg-8">
                                                     <input type="file" class="form-control form-control-sm"
                                                         id="strain_gauge" name="strain_gauge"
-                                                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                                        accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                                                         required aria-label="Small file input example">
                                                 </div>
                                                 <div class="col-lg-4">
@@ -102,7 +102,7 @@
                         <article class="my-3">
                             <div class="bd-heading align-self-start mt-2 mb-2 mt-xl-0 mb-xl-2">
                                 <div class="mb-3 form-check">
-                                    <label class="form-check-label" for="tilt">Tilt Excel</label>
+                                    <label class="form-check-label" for="tilt">Tilt</label>
                                     <input type="checkbox" name="tilt_required" checked id="tilt_required"
                                         class="check_required form-check-input">
                                 </div>
@@ -116,7 +116,7 @@
                                                 <div class="col-lg-8">
                                                     <input type="file" class="form-control form-control-sm" id="tilt"
                                                         name="tilt"
-                                                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                                        accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                                                         required aria-label="Small file input example">
                                                 </div>
                                                 <div class="col-lg-4">
@@ -134,7 +134,7 @@
                         <article class="my-3">
                             <div class="bd-heading align-self-start mt-2 mb-2 mt-xl-0 mb-xl-2">
                                 <div class="mb-3 form-check">
-                                    <label for="displacement" class="form-check-label">Displacement Excel</label>
+                                    <label for="displacement" class="form-check-label">Displacement</label>
                                     <input type="checkbox" name="displacement_required" checked
                                         id="displacement_required" class="check_required form-check-input">
                                 </div>
@@ -148,7 +148,7 @@
                                                 <div class="col-lg-8">
                                                     <input type="file" class="form-control form-control-sm"
                                                         id="displacement" name="displacement"
-                                                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                                        accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                                                         required aria-label="Small file input example">
                                                 </div>
                                                 <div class="col-lg-4">
@@ -167,7 +167,7 @@
                         <article class="my-3">
                             <div class="bd-heading align-self-start mt-2 mb-2 mt-xl-0 mb-xl-2">
                                 <div class="mb-3 form-check">
-                                    <label for="settlement" class="form-check-label">Settlement Excel</label>
+                                    <label for="settlement" class="form-check-label">Settlement</label>
                                     <input type="checkbox" name="settlement_required" checked id="settlement_required"
                                         class="check_required form-check-input">
                                 </div>
@@ -181,7 +181,7 @@
                                                 <div class="col-lg-8">
                                                     <input type="file" class="form-control form-control-sm"
                                                         id="settlement" name="settlement"
-                                                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                                        accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                                                         required aria-label="Small file input example">
                                                 </div>
                                                 <div class="col-lg-4">
@@ -200,7 +200,7 @@
                         <article class="my-3">
                             <div class="bd-heading align-self-start mt-2 mb-2 mt-xl-0 mb-xl-2">
                                 <div class="mb-3 form-check">
-                                    <label for="vibration" class="form-check-label">Vibration Excel</label>
+                                    <label for="vibration" class="form-check-label">Vibration</label>
                                     <input type="checkbox" name="vibration_required" checked id="vibration_required"
                                         class="check_required form-check-input">
                                 </div>
@@ -214,7 +214,7 @@
                                                 <div class="col-lg-8">
                                                     <input type="file" class="form-control form-control-sm"
                                                         id="vibration" name="vibration"
-                                                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                                        accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                                                         required aria-label="Small file input example">
                                                 </div>
                                                 <div class="col-lg-4">
@@ -254,9 +254,9 @@
         $(document).on('click', '.check_required', function () {
             let elem = $(this);
             if (elem.is(':checked')) {
-                elem.parents(".form-group").find("input[type=file]").attr('required', 'required');
+                elem.parents(".my-3").find("input[type=file]").attr('required', 'required');
             } else {
-                elem.parents(".form-group").find("input[type=file]").removeAttr('required');
+                elem.parents(".my-3").find("input[type=file]").removeAttr('required');
             }
         });
     </script>
