@@ -3606,9 +3606,7 @@ def getCompareChartData(request):
                     for i, element in enumerate(sensor_counts, start=1):
                         dynamic_vars[f"test_method_{i}"] = []
                     for row_data in data:
-                        print(row_data)
                         for method in dynamic_vars:
-                            print(method)
                             dynamic_vars[method].append([int(createMilisecondsByDate(
                                 str(row_data.date_time).replace(" ", "T"))), float(getattr(row_data, method))])
                     for each in sensor_data:
