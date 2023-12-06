@@ -383,9 +383,9 @@ def importExcel(request):
     if request.method == "POST":
         if 'strain_required' in request.POST.keys():
             models.StrainData.objects.all().delete()
-            f = open("templates/constants/strain_columns.txt", "w+")
-            f.write("")
-            f.close()
+            # f = open("templates/constants/strain_columns.txt", "w+")
+            # f.write("")
+            # f.close()
             if request.FILES.get('strain_gauge', None):
                 file = request.FILES['strain_gauge']
                 if os.path.splitext(str(file))[1] == '.xlsx' or os.path.splitext(str(file))[1] == '.xls':
