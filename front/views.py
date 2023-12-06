@@ -383,9 +383,9 @@ def importExcel(request):
     if request.method == "POST":
         if 'strain_required' in request.POST.keys():
             models.StrainData.objects.all().delete()
-            # f = open("templates/constants/strain_columns.txt", "w+")
-            # f.write("")
-            # f.close()
+            f = open("templates/constants/strain_columns.txt", "w+")
+            f.write("")
+            f.close()
             if request.FILES.get('strain_gauge', None):
                 file = request.FILES['strain_gauge']
                 if os.path.splitext(str(file))[1] == '.xlsx' or os.path.splitext(str(file))[1] == '.xls':
@@ -409,13 +409,13 @@ def importExcel(request):
 
                     # strain_columns = get_constants('strain')
                     strain_columns = constants.strain_columns
-
+                    new_strain_columns = {}
                     for index, column in enumerate(column_names):
-                        strain_columns[list(strain_columns.keys())[
+                        new_strain_columns[list(strain_columns.keys())[
                             index]] = column
 
                     f = open("templates/constants/strain_columns.txt", "w+")
-                    columns = json.dumps(strain_columns)
+                    columns = json.dumps(new_strain_columns)
                     f.write(columns)
                     f.close()
 
@@ -457,12 +457,12 @@ def importExcel(request):
 
                         # strain_columns = get_constants('strain')
                         strain_columns = constants.strain_columns
-
+                        new_strain_columns = {}
                         for index, column in enumerate(first_row):
-                            strain_columns[list(strain_columns.keys())[index]] = column
+                            new_strain_columns[list(strain_columns.keys())[index]] = column
 
                         f = open("templates/constants/strain_columns.txt", "w+")
-                        columns = json.dumps(strain_columns)
+                        columns = json.dumps(new_strain_columns)
                         f.write(columns)
                         f.close()
 
@@ -508,12 +508,12 @@ def importExcel(request):
 
                     # tilt_columns = get_constants('tilt')
                     tilt_columns = constants.tilt_columns
-
+                    new_tilt_columns = {}
                     for index, column in enumerate(column_names):
-                        tilt_columns[list(tilt_columns.keys())[index]] = column
+                        new_tilt_columns[list(tilt_columns.keys())[index]] = column
 
                     f = open("templates/constants/tilt_columns.txt", "w+")
-                    columns = json.dumps(tilt_columns)
+                    columns = json.dumps(new_tilt_columns)
                     f.write(columns)
                     f.close()
 
@@ -555,12 +555,12 @@ def importExcel(request):
 
                         # tilt_columns = get_constants('tilt')
                         tilt_columns = constants.tilt_columns
-
+                        new_tilt_columns = {}
                         for index, column in enumerate(first_row):
-                            tilt_columns[list(tilt_columns.keys())[index]] = column
+                            new_tilt_columns[list(tilt_columns.keys())[index]] = column
 
                         f = open("templates/constants/tilt_columns.txt", "w+")
-                        columns = json.dumps(tilt_columns)
+                        columns = json.dumps(new_tilt_columns)
                         f.write(columns)
                         f.close()
 
@@ -606,13 +606,13 @@ def importExcel(request):
 
                     # displacement_columns = get_constants('displacement')
                     displacement_columns = constants.displacement_columns
-
+                    new_displacement_columns = {}
                     for index, column in enumerate(column_names):
-                        displacement_columns[list(displacement_columns.keys())[
+                        new_displacement_columns[list(displacement_columns.keys())[
                             index]] = column
 
                     f = open("templates/constants/displacement_columns.txt", "w+")
-                    columns = json.dumps(displacement_columns)
+                    columns = json.dumps(new_displacement_columns)
                     f.write(columns)
                     f.close()
 
@@ -654,12 +654,12 @@ def importExcel(request):
 
                         # displacement_columns = get_constants('displacement')
                         displacement_columns = constants.displacement_columns
-
+                        new_displacement_columns = {}
                         for index, column in enumerate(first_row):
-                            displacement_columns[list(displacement_columns.keys())[index]] = column
+                            new_displacement_columns[list(displacement_columns.keys())[index]] = column
 
                         f = open("templates/constants/displacement_columns.txt", "w+")
-                        columns = json.dumps(displacement_columns)
+                        columns = json.dumps(new_displacement_columns)
                         f.write(columns)
                         f.close()
 
@@ -705,13 +705,13 @@ def importExcel(request):
 
                     # settlement_columns = get_constants('settlement')
                     settlement_columns = constants.settlement_columns
-
+                    new_settlement_columns = {}
                     for index, column in enumerate(column_names):
-                        settlement_columns[list(settlement_columns.keys())[
+                        new_settlement_columns[list(settlement_columns.keys())[
                             index]] = column
 
                     f = open("templates/constants/settlement_columns.txt", "w+")
-                    columns = json.dumps(settlement_columns)
+                    columns = json.dumps(new_settlement_columns)
                     f.write(columns)
                     f.close()
 
@@ -754,12 +754,12 @@ def importExcel(request):
 
                         # settlement_columns = get_constants('settlement')
                         settlement_columns = constants.settlement_columns
-
+                        new_settlement_columns = {}
                         for index, column in enumerate(first_row):
-                            settlement_columns[list(settlement_columns.keys())[index]] = column
+                            new_settlement_columns[list(settlement_columns.keys())[index]] = column
 
                         f = open("templates/constants/settlement_columns.txt", "w+")
-                        columns = json.dumps(settlement_columns)
+                        columns = json.dumps(new_settlement_columns)
                         f.write(columns)
                         f.close()
 
@@ -805,13 +805,13 @@ def importExcel(request):
 
                     # vibration_columns = get_constants('vibration')
                     vibration_columns = constants.vibration_columns
-
+                    new_vibration_columns = {}
                     for index, column in enumerate(column_names):
-                        vibration_columns[list(vibration_columns.keys())[
+                        new_vibration_columns[list(vibration_columns.keys())[
                             index]] = column
 
                     f = open("templates/constants/vibration_columns.txt", "w+")
-                    columns = json.dumps(vibration_columns)
+                    columns = json.dumps(new_vibration_columns)
                     f.write(columns)
                     f.close()
 
@@ -853,12 +853,12 @@ def importExcel(request):
 
                         # vibration_columns = get_constants('vibration')
                         vibration_columns = constants.vibration_columns
-
+                        new_vibration_columns = {}
                         for index, column in enumerate(first_row):
-                            vibration_columns[list(vibration_columns.keys())[index]] = column
+                            new_vibration_columns[list(vibration_columns.keys())[index]] = column
 
                         f = open("templates/constants/vibration_columns.txt", "w+")
-                        columns = json.dumps(vibration_columns)
+                        columns = json.dumps(new_vibration_columns)
                         f.write(columns)
                         f.close()
 
