@@ -241,7 +241,7 @@ def getSensorCounts(sensor_type):
         columns_fields = [
             field.name for field in models.StrainData._meta.get_fields()]
         for each in columns_fields:
-            if each.startswith('test_method_') and columns_constants[each] != each:
+            if each.startswith('test_method_') and (each in columns_constants.keys()) and columns_constants[each] != each:
                 column_names.append(columns_constants[each])
         return column_names
     if sensor_type == 'tilt':
@@ -255,7 +255,7 @@ def getSensorCounts(sensor_type):
         columns_fields = [
             field.name for field in models.TiltData._meta.get_fields()]
         for each in columns_fields:
-            if each.startswith('test_method_') and columns_constants[each] != each:
+            if each.startswith('test_method_') and (each in columns_constants.keys()) and columns_constants[each] != each:
                 column_names.append(columns_constants[each])
         return column_names
     if sensor_type == 'displacement':
@@ -269,7 +269,7 @@ def getSensorCounts(sensor_type):
         columns_fields = [
             field.name for field in models.DisplacementData._meta.get_fields()]
         for each in columns_fields:
-            if each.startswith('test_method_') and columns_constants[each] != each:
+            if each.startswith('test_method_') and (each in columns_constants.keys()) and columns_constants[each] != each:
                 column_names.append(columns_constants[each])
         return column_names
     if sensor_type == 'settlement':
@@ -283,7 +283,7 @@ def getSensorCounts(sensor_type):
         columns_fields = [
             field.name for field in models.SettlementData._meta.get_fields()]
         for each in columns_fields:
-            if each.startswith('test_method_') and columns_constants[each] != each:
+            if each.startswith('test_method_') and (each in columns_constants.keys()) and columns_constants[each] != each:
                 column_names.append(columns_constants[each])
         return column_names
     if sensor_type == 'vibration':
@@ -297,7 +297,7 @@ def getSensorCounts(sensor_type):
         columns_fields = [
             field.name for field in models.VibrationData._meta.get_fields()]
         for each in columns_fields:
-            if each.startswith('test_method_') and columns_constants[each] != each:
+            if each.startswith('test_method_') and (each in columns_constants.keys()) and columns_constants[each] != each:
                 column_names.append(columns_constants[each])
         return column_names
 
