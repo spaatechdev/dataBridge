@@ -55,8 +55,18 @@ def createMilisecondsByDate(date_string):
     timezone_milliseconds = (hours * 3600 * 1000) + (minutes * 60 * 1000)
 
     # Parse the datetime string manually
-    year, month, day, hour, minute, second = map(int, date_string.split(
-        'T')[0].split('-') + date_string.split('T')[1].split(':'))
+    if '+' in date_string:
+        dt_object = datetime.strptime(date_string, '%Y-%m-%dT%H:%M:%S%z')
+        # Access individual components
+        year = dt_object.year
+        month = dt_object.month
+        day = dt_object.day
+        hour = dt_object.hour
+        minute = dt_object.minute
+        second = dt_object.second
+    else:
+        year, month, day, hour, minute, second = map(int, date_string.split(
+            'T')[0].split('-') + date_string.split('T')[1].split(':'))
     datetime_tuple = (year, month, day, hour, minute, second, 0, 0, 0)
 
     # Calculate the milliseconds since the Unix epoch
@@ -443,7 +453,8 @@ def importExcel(request):
                 elif os.path.splitext(str(file))[1] == '.csv':
                     tmpname = str(datetime.now().microsecond) + \
                         os.path.splitext(str(file))[1]
-                    fs = FileSystemStorage(settings.MEDIA_ROOT + "csv/", settings.MEDIA_ROOT + "/csv/")
+                    fs = FileSystemStorage(
+                        settings.MEDIA_ROOT + "csv/", settings.MEDIA_ROOT + "/csv/")
                     fs.save(tmpname, file)
                     file_name = "csv/" + tmpname
 
@@ -459,7 +470,8 @@ def importExcel(request):
                         strain_columns = constants.strain_columns
                         new_strain_columns = {}
                         for index, column in enumerate(first_row):
-                            new_strain_columns[list(strain_columns.keys())[index]] = column
+                            new_strain_columns[list(strain_columns.keys())[
+                                index]] = column
 
                         f = open("templates/constants/strain_columns.txt", "w+")
                         columns = json.dumps(new_strain_columns)
@@ -470,7 +482,8 @@ def importExcel(request):
                         data_list = []
                         for row in reader:
                             if len(data_list) > 1000:
-                                models.StrainData.objects.bulk_create(data_list)
+                                models.StrainData.objects.bulk_create(
+                                    data_list)
                                 data_list = []
                                 data_list.append(models.StrainData(date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S") if len(row[0].split(":")) > 2 else datetime.strptime(row[0], "%d-%m-%Y %H:%M"), test_method_1=row[1] if len(row) > 1 else None, test_method_2=row[2] if len(row) > 2 else None, test_method_3=row[3] if len(row) > 3 else None, test_method_4=row[4] if len(row) > 4 else None, test_method_5=row[5] if len(row) > 5 else None, test_method_6=row[6] if len(row) > 6 else None, test_method_7=row[7] if len(row) > 7 else None, test_method_8=row[8] if len(row) > 8 else None, test_method_9=row[9] if len(row) > 9 else None, test_method_10=row[10] if len(row) > 10 else None, test_method_11=row[11] if len(row) > 11 else None, test_method_12=row[12] if len(row) > 12 else None, test_method_13=row[13] if len(row) > 13 else None, test_method_14=row[14] if len(row) > 14 else None, test_method_15=row[15] if len(row) > 15 else None, test_method_16=row[16] if len(row) > 16 else None, test_method_17=row[17] if len(row) > 17 else None, test_method_18=row[18] if len(row) > 18 else None, test_method_19=row[19] if len(row) > 19 else None, test_method_20=row[20] if len(row) > 20 else None, test_method_21=row[21] if len(
                                     row) > 21 else None, test_method_22=row[22] if len(row) > 22 else None, test_method_23=row[23] if len(row) > 23 else None, test_method_24=row[24] if len(row) > 24 else None, test_method_25=row[25] if len(row) > 25 else None, test_method_26=row[26] if len(row) > 26 else None, test_method_27=row[27] if len(row) > 27 else None, test_method_28=row[28] if len(row) > 28 else None, test_method_29=row[29] if len(row) > 29 else None, test_method_30=row[30] if len(row) > 30 else None, test_method_31=row[31] if len(row) > 31 else None, test_method_32=row[32] if len(row) > 32 else None, test_method_33=row[33] if len(row) > 33 else None, test_method_34=row[34] if len(row) > 34 else None, test_method_35=row[35] if len(row) > 35 else None, test_method_36=row[36] if len(row) > 36 else None, test_method_37=row[37] if len(row) > 37 else None, test_method_38=row[38] if len(row) > 38 else None, test_method_39=row[39] if len(row) > 39 else None, test_method_40=row[40] if len(row) > 40 else None, test_method_41=row[41] if len(row) > 41 else None, test_method_42=row[42] if len(row) > 42 else None))
@@ -510,7 +523,8 @@ def importExcel(request):
                     tilt_columns = constants.tilt_columns
                     new_tilt_columns = {}
                     for index, column in enumerate(column_names):
-                        new_tilt_columns[list(tilt_columns.keys())[index]] = column
+                        new_tilt_columns[list(tilt_columns.keys())[
+                            index]] = column
 
                     f = open("templates/constants/tilt_columns.txt", "w+")
                     columns = json.dumps(new_tilt_columns)
@@ -541,7 +555,8 @@ def importExcel(request):
                 elif os.path.splitext(str(file))[1] == '.csv':
                     tmpname = str(datetime.now().microsecond) + \
                         os.path.splitext(str(file))[1]
-                    fs = FileSystemStorage(settings.MEDIA_ROOT + "csv/", settings.MEDIA_ROOT + "/csv/")
+                    fs = FileSystemStorage(
+                        settings.MEDIA_ROOT + "csv/", settings.MEDIA_ROOT + "/csv/")
                     fs.save(tmpname, file)
                     file_name = "csv/" + tmpname
 
@@ -557,7 +572,8 @@ def importExcel(request):
                         tilt_columns = constants.tilt_columns
                         new_tilt_columns = {}
                         for index, column in enumerate(first_row):
-                            new_tilt_columns[list(tilt_columns.keys())[index]] = column
+                            new_tilt_columns[list(tilt_columns.keys())[
+                                index]] = column
 
                         f = open("templates/constants/tilt_columns.txt", "w+")
                         columns = json.dumps(new_tilt_columns)
@@ -628,7 +644,8 @@ def importExcel(request):
                         if not row[0]:
                             break
                         if len(data_list) > 1000:
-                            models.DisplacementData.objects.bulk_create(data_list)
+                            models.DisplacementData.objects.bulk_create(
+                                data_list)
                             data_list = []
                             data_list.append(models.StrainData(date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S") if len(row[0].split(":")) > 2 else datetime.strptime(row[0], "%d-%m-%Y %H:%M"), test_method_1=row[1] if len(row) > 1 else None, test_method_2=row[2] if len(row) > 2 else None, test_method_3=row[3] if len(row) > 3 else None, test_method_4=row[4] if len(row) > 4 else None, test_method_5=row[5] if len(row) > 5 else None, test_method_6=row[6] if len(row) > 6 else None, test_method_7=row[7] if len(row) > 7 else None, test_method_8=row[8] if len(row) > 8 else None, test_method_9=row[9] if len(row) > 9 else None, test_method_10=row[10] if len(row) > 10 else None, test_method_11=row[11] if len(row) > 11 else None, test_method_12=row[12] if len(
                                 row) > 12 else None, test_method_13=row[13] if len(row) > 13 else None, test_method_14=row[14] if len(row) > 14 else None, test_method_15=row[15] if len(row) > 15 else None, test_method_16=row[16] if len(row) > 16 else None, test_method_17=row[17] if len(row) > 17 else None, test_method_18=row[18] if len(row) > 18 else None, test_method_19=row[19] if len(row) > 19 else None, test_method_20=row[20] if len(row) > 20 else None, test_method_21=row[21] if len(row) > 21 else None, test_method_22=row[22] if len(row) > 22 else None, test_method_23=row[23] if len(row) > 23 else None, test_method_24=row[24] if len(row) > 24 else None, test_method_25=row[25] if len(row) > 25 else None))
@@ -640,7 +657,8 @@ def importExcel(request):
                 elif os.path.splitext(str(file))[1] == '.csv':
                     tmpname = str(datetime.now().microsecond) + \
                         os.path.splitext(str(file))[1]
-                    fs = FileSystemStorage(settings.MEDIA_ROOT + "csv/", settings.MEDIA_ROOT + "/csv/")
+                    fs = FileSystemStorage(
+                        settings.MEDIA_ROOT + "csv/", settings.MEDIA_ROOT + "/csv/")
                     fs.save(tmpname, file)
                     file_name = "csv/" + tmpname
 
@@ -656,9 +674,11 @@ def importExcel(request):
                         displacement_columns = constants.displacement_columns
                         new_displacement_columns = {}
                         for index, column in enumerate(first_row):
-                            new_displacement_columns[list(displacement_columns.keys())[index]] = column
+                            new_displacement_columns[list(displacement_columns.keys())[
+                                index]] = column
 
-                        f = open("templates/constants/displacement_columns.txt", "w+")
+                        f = open(
+                            "templates/constants/displacement_columns.txt", "w+")
                         columns = json.dumps(new_displacement_columns)
                         f.write(columns)
                         f.close()
@@ -667,7 +687,8 @@ def importExcel(request):
                         data_list = []
                         for row in reader:
                             if len(data_list) > 1000:
-                                models.DisplacementData.objects.bulk_create(data_list)
+                                models.DisplacementData.objects.bulk_create(
+                                    data_list)
                                 data_list = []
                                 data_list.append(models.StrainData(date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S") if len(row[0].split(":")) > 2 else datetime.strptime(row[0], "%d-%m-%Y %H:%M"), test_method_1=row[1] if len(row) > 1 else None, test_method_2=row[2] if len(row) > 2 else None, test_method_3=row[3] if len(row) > 3 else None, test_method_4=row[4] if len(row) > 4 else None, test_method_5=row[5] if len(row) > 5 else None, test_method_6=row[6] if len(row) > 6 else None, test_method_7=row[7] if len(row) > 7 else None, test_method_8=row[8] if len(row) > 8 else None, test_method_9=row[9] if len(row) > 9 else None, test_method_10=row[10] if len(row) > 10 else None, test_method_11=row[11] if len(row) > 11 else None, test_method_12=row[12] if len(
                                     row) > 12 else None, test_method_13=row[13] if len(row) > 13 else None, test_method_14=row[14] if len(row) > 14 else None, test_method_15=row[15] if len(row) > 15 else None, test_method_16=row[16] if len(row) > 16 else None, test_method_17=row[17] if len(row) > 17 else None, test_method_18=row[18] if len(row) > 18 else None, test_method_19=row[19] if len(row) > 19 else None, test_method_20=row[20] if len(row) > 20 else None, test_method_21=row[21] if len(row) > 21 else None, test_method_22=row[22] if len(row) > 22 else None, test_method_23=row[23] if len(row) > 23 else None, test_method_24=row[24] if len(row) > 24 else None, test_method_25=row[25] if len(row) > 25 else None))
@@ -740,7 +761,8 @@ def importExcel(request):
                 elif os.path.splitext(str(file))[1] == '.csv':
                     tmpname = str(datetime.now().microsecond) + \
                         os.path.splitext(str(file))[1]
-                    fs = FileSystemStorage(settings.MEDIA_ROOT + "csv/", settings.MEDIA_ROOT + "/csv/")
+                    fs = FileSystemStorage(
+                        settings.MEDIA_ROOT + "csv/", settings.MEDIA_ROOT + "/csv/")
                     fs.save(tmpname, file)
                     file_name = "csv/" + tmpname
 
@@ -756,9 +778,11 @@ def importExcel(request):
                         settlement_columns = constants.settlement_columns
                         new_settlement_columns = {}
                         for index, column in enumerate(first_row):
-                            new_settlement_columns[list(settlement_columns.keys())[index]] = column
+                            new_settlement_columns[list(settlement_columns.keys())[
+                                index]] = column
 
-                        f = open("templates/constants/settlement_columns.txt", "w+")
+                        f = open(
+                            "templates/constants/settlement_columns.txt", "w+")
                         columns = json.dumps(new_settlement_columns)
                         f.write(columns)
                         f.close()
@@ -767,7 +791,8 @@ def importExcel(request):
                         data_list = []
                         for row in reader:
                             if len(data_list) > 1000:
-                                models.SettlementData.objects.bulk_create(data_list)
+                                models.SettlementData.objects.bulk_create(
+                                    data_list)
                                 data_list = []
                                 data_list.append(models.StrainData(date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S") if len(row[0].split(":")) > 2 else datetime.strptime(row[0], "%d-%m-%Y %H:%M"), test_method_1=row[1] if len(row) > 1 else None, test_method_2=row[2] if len(row) > 2 else None, test_method_3=row[3] if len(row) > 3 else None, test_method_4=row[4] if len(row) > 4 else None, test_method_5=row[5] if len(row) > 5 else None, test_method_6=row[6] if len(row) > 6 else None, test_method_7=row[7] if len(row) > 7 else None, test_method_8=row[8] if len(row) > 8 else None, test_method_9=row[9] if len(row) > 9 else None, test_method_10=row[10] if len(row) > 10 else None, test_method_11=row[11] if len(row) > 11 else None, test_method_12=row[12] if len(
                                     row) > 12 else None, test_method_13=row[13] if len(row) > 13 else None, test_method_14=row[14] if len(row) > 14 else None, test_method_15=row[15] if len(row) > 15 else None, test_method_16=row[16] if len(row) > 16 else None, test_method_17=row[17] if len(row) > 17 else None, test_method_18=row[18] if len(row) > 18 else None, test_method_19=row[19] if len(row) > 19 else None, test_method_20=row[20] if len(row) > 20 else None, test_method_21=row[21] if len(row) > 21 else None, test_method_22=row[22] if len(row) > 22 else None, test_method_23=row[23] if len(row) > 23 else None, test_method_24=row[24] if len(row) > 24 else None, test_method_25=row[25] if len(row) > 25 else None))
@@ -839,7 +864,8 @@ def importExcel(request):
                 elif os.path.splitext(str(file))[1] == '.csv':
                     tmpname = str(datetime.now().microsecond) + \
                         os.path.splitext(str(file))[1]
-                    fs = FileSystemStorage(settings.MEDIA_ROOT + "csv/", settings.MEDIA_ROOT + "/csv/")
+                    fs = FileSystemStorage(
+                        settings.MEDIA_ROOT + "csv/", settings.MEDIA_ROOT + "/csv/")
                     fs.save(tmpname, file)
                     file_name = "csv/" + tmpname
 
@@ -855,9 +881,11 @@ def importExcel(request):
                         vibration_columns = constants.vibration_columns
                         new_vibration_columns = {}
                         for index, column in enumerate(first_row):
-                            new_vibration_columns[list(vibration_columns.keys())[index]] = column
+                            new_vibration_columns[list(vibration_columns.keys())[
+                                index]] = column
 
-                        f = open("templates/constants/vibration_columns.txt", "w+")
+                        f = open(
+                            "templates/constants/vibration_columns.txt", "w+")
                         columns = json.dumps(new_vibration_columns)
                         f.write(columns)
                         f.close()
@@ -866,7 +894,8 @@ def importExcel(request):
                         data_list = []
                         for row in reader:
                             if len(data_list) > 1000:
-                                models.VibrationData.objects.bulk_create(data_list)
+                                models.VibrationData.objects.bulk_create(
+                                    data_list)
                                 data_list = []
                                 data_list.append(models.StrainData(date_time=datetime.strptime(row[0], "%d-%m-%Y %H:%M:%S") if len(row[0].split(":")) > 2 else datetime.strptime(row[0], "%d-%m-%Y %H:%M"), test_method_1=row[1] if len(row) > 1 else None, test_method_2=row[2] if len(row) > 2 else None, test_method_3=row[3] if len(row) > 3 else None, test_method_4=row[4] if len(row) > 4 else None, test_method_5=row[5] if len(row) > 5 else None, test_method_6=row[6] if len(row) > 6 else None, test_method_7=row[7] if len(row) > 7 else None, test_method_8=row[8] if len(row) > 8 else None, test_method_9=row[9] if len(row) > 9 else None, test_method_10=row[10] if len(row) > 10 else None, test_method_11=row[11] if len(row) > 11 else None, test_method_12=row[12] if len(
                                     row) > 12 else None, test_method_13=row[13] if len(row) > 13 else None, test_method_14=row[14] if len(row) > 14 else None, test_method_15=row[15] if len(row) > 15 else None, test_method_16=row[16] if len(row) > 16 else None, test_method_17=row[17] if len(row) > 17 else None, test_method_18=row[18] if len(row) > 18 else None, test_method_19=row[19] if len(row) > 19 else None, test_method_20=row[20] if len(row) > 20 else None, test_method_21=row[21] if len(row) > 21 else None, test_method_22=row[22] if len(row) > 22 else None, test_method_23=row[23] if len(row) > 23 else None, test_method_24=row[24] if len(row) > 24 else None, test_method_25=row[25] if len(row) > 25 else None))
