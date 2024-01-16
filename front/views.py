@@ -7,7 +7,7 @@ from django.http import JsonResponse, HttpResponse
 from django.core.files.storage import FileSystemStorage
 from . import models
 from . import constants
-from django.db.models import Max, Min, Avg
+from django.db.models import Max, Min, Avg, F
 from django.db.models.functions import TruncDate
 import os
 import math
@@ -22,6 +22,8 @@ from django.db import connections
 from django.contrib.messages import get_messages
 import re
 from collections import defaultdict
+# import pandas as pd
+# from statsmodels.tsa.holtwinters import ExponentialSmoothing
 
 import environ
 env = environ.Env()
@@ -87,6 +89,7 @@ def random_color_code():
     return color_code
 
 
+# Download predefined existed Excel files
 def downloadExcel(request, sensor_type):
     if sensor_type == 'strain':
         file_path = (settings.MEDIA_ROOT +
@@ -139,6 +142,7 @@ def downloadExcel(request, sensor_type):
                 return response
 
 
+# If columns for every sensor type already exists, then we are collecting it from these below updated files, otherwise collecting it from constants file
 def get_constants(sensor_type):
     if sensor_type == 'strain':
         file_path = "templates/constants/strain_columns.txt"
@@ -192,6 +196,7 @@ def get_constants(sensor_type):
         return json.loads(columns)
 
 
+# Getting sensor names(columns which are updated on the time of importing) by sensor types
 def getSensorsByTypes(request):
     if request.method == "POST":
         sensor_type = request.POST['sensor_type']
@@ -239,6 +244,7 @@ def getSensorsByTypes(request):
         })
 
 
+# Get the exact columns which are uploaded on the time of importing
 def getSensorCounts(sensor_type):
     if sensor_type == 'strain':
         column_names = []
@@ -312,6 +318,7 @@ def getSensorCounts(sensor_type):
         return column_names
 
 
+# Showing Index page if all the sensor data are present otherwise importing form will be displayed
 def index(request):
     strain_data = models.StrainData.objects.count()
     if strain_data == 0:
@@ -389,6 +396,8 @@ def index(request):
     return render(request, 'front/index.html', context)
 
 
+# Importing Sensor Types and uploading it into the database
+# and updating the column values by removing values in constants file
 def importExcel(request):
     if request.method == "POST":
         if 'strain_required' in request.POST.keys():
@@ -926,6 +935,7 @@ def find_key_by_value(dictionary, value_to_find):
     return None  # or raise ValueError("Value not found")
 
 
+# Generating single type chart data by highcharts' recommendation
 def getChartData(request):
     if request.method == "POST":
         chart_type = request.POST['chart_type']
@@ -944,7 +954,7 @@ def getChartData(request):
             })
         if chart_type == 'max':
             if sensor_type == 'strain':
-                data = models.StrainData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                data = models.StrainData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Max('test_method_1'),
                     test_method_2=Max('test_method_2'),
                     test_method_3=Max('test_method_3'),
@@ -1004,7 +1014,7 @@ def getChartData(request):
                     series.append(
                         {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
             if sensor_type == 'tilt':
-                data = models.TiltData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                data = models.TiltData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Max('test_method_1'),
                     test_method_2=Max('test_method_2'),
                     test_method_3=Max('test_method_3'),
@@ -1047,7 +1057,7 @@ def getChartData(request):
                     series.append(
                         {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
             if sensor_type == 'displacement':
-                data = models.DisplacementData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                data = models.DisplacementData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Max('test_method_1'),
                     test_method_2=Max('test_method_2'),
                     test_method_3=Max('test_method_3'),
@@ -1090,7 +1100,7 @@ def getChartData(request):
                     series.append(
                         {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
             if sensor_type == 'settlement':
-                data = models.SettlementData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                data = models.SettlementData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Max('test_method_1'),
                     test_method_2=Max('test_method_2'),
                     test_method_3=Max('test_method_3'),
@@ -1133,7 +1143,7 @@ def getChartData(request):
                     series.append(
                         {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
             if sensor_type == 'vibration':
-                data = models.VibrationData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                data = models.VibrationData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Max('test_method_1'),
                     test_method_2=Max('test_method_2'),
                     test_method_3=Max('test_method_3'),
@@ -1182,7 +1192,7 @@ def getChartData(request):
             })
         elif chart_type == 'min':
             if sensor_type == 'strain':
-                data = models.StrainData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                data = models.StrainData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Min('test_method_1'),
                     test_method_2=Min('test_method_2'),
                     test_method_3=Min('test_method_3'),
@@ -1242,7 +1252,7 @@ def getChartData(request):
                     series.append(
                         {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
             if sensor_type == 'tilt':
-                data = models.TiltData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                data = models.TiltData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Min('test_method_1'),
                     test_method_2=Min('test_method_2'),
                     test_method_3=Min('test_method_3'),
@@ -1285,7 +1295,7 @@ def getChartData(request):
                     series.append(
                         {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
             if sensor_type == 'displacement':
-                data = models.DisplacementData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                data = models.DisplacementData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Min('test_method_1'),
                     test_method_2=Min('test_method_2'),
                     test_method_3=Min('test_method_3'),
@@ -1328,7 +1338,7 @@ def getChartData(request):
                     series.append(
                         {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
             if sensor_type == 'settlement':
-                data = models.SettlementData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                data = models.SettlementData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Min('test_method_1'),
                     test_method_2=Min('test_method_2'),
                     test_method_3=Min('test_method_3'),
@@ -1371,7 +1381,7 @@ def getChartData(request):
                     series.append(
                         {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
             if sensor_type == 'vibration':
-                data = models.VibrationData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                data = models.VibrationData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Min('test_method_1'),
                     test_method_2=Min('test_method_2'),
                     test_method_3=Min('test_method_3'),
@@ -1420,7 +1430,7 @@ def getChartData(request):
             })
         elif chart_type == 'avg':
             if sensor_type == 'strain':
-                data = models.StrainData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                data = models.StrainData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Avg('test_method_1'),
                     test_method_2=Avg('test_method_2'),
                     test_method_3=Avg('test_method_3'),
@@ -1480,7 +1490,7 @@ def getChartData(request):
                     series.append(
                         {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
             if sensor_type == 'tilt':
-                data = models.TiltData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                data = models.TiltData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Avg('test_method_1'),
                     test_method_2=Avg('test_method_2'),
                     test_method_3=Avg('test_method_3'),
@@ -1523,7 +1533,7 @@ def getChartData(request):
                     series.append(
                         {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
             if sensor_type == 'displacement':
-                data = models.DisplacementData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                data = models.DisplacementData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Avg('test_method_1'),
                     test_method_2=Avg('test_method_2'),
                     test_method_3=Avg('test_method_3'),
@@ -1566,7 +1576,7 @@ def getChartData(request):
                     series.append(
                         {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
             if sensor_type == 'settlement':
-                data = models.SettlementData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                data = models.SettlementData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Avg('test_method_1'),
                     test_method_2=Avg('test_method_2'),
                     test_method_3=Avg('test_method_3'),
@@ -1609,7 +1619,7 @@ def getChartData(request):
                     series.append(
                         {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
             if sensor_type == 'vibration':
-                data = models.VibrationData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                data = models.VibrationData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Avg('test_method_1'),
                     test_method_2=Avg('test_method_2'),
                     test_method_3=Avg('test_method_3'),
@@ -1747,6 +1757,25 @@ def getChartData(request):
                 for index, elem in enumerate(request.POST.getlist('method')):
                     series.append(
                         {'color': random_color_code(), 'name': columns[elem], 'data': dynamic_vars[elem]})
+            # # Sample data
+            # data = {'Date': pd.date_range(start='2022-01-01', periods=10, freq='D'),
+            #         'Value': [10, 12, 15, 7, 20, 22, 25, 18, 30, 32]}
+
+            # df = pd.DataFrame(data)
+            # df.set_index('Date', inplace=True)
+
+            # # Fit the Holt-Winters Exponential Smoothing model
+            # model = ExponentialSmoothing(df['Value'], seasonal='add', seasonal_periods=4)
+            # result = model.fit()
+
+            # # Forecast future values
+            # forecast_steps = 5
+            # forecast = result.forecast(steps=forecast_steps)
+
+            # # Print the forecast values
+            # print("Forecasted Values:")
+            # print(forecast)
+            # exit()
             return JsonResponse({
                 'code': 200,
                 'status': "SUCCESS",
@@ -1898,6 +1927,7 @@ def compareCombine(request):
     return render(request, 'front/compare.html', context)
 
 
+# Getting Min time and Max time by the sensor type
 def getCompareTimeDetails(request):
     if request.method == "POST":
         sensor_types = request.POST.getlist('sensor_types[]')
@@ -1969,7 +1999,7 @@ def getCompareCombineChartData(post_data):
             if elem == 'strain':
                 sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist(
                     'method') if elem + '~~' in sensor]
-                data = models.StrainData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                data = models.StrainData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Max('test_method_1'),
                     test_method_2=Max('test_method_2'),
                     test_method_3=Max('test_method_3'),
@@ -2031,7 +2061,7 @@ def getCompareCombineChartData(post_data):
             if elem == 'tilt':
                 sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist(
                     'method') if elem + '~~' in sensor]
-                data = models.TiltData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                data = models.TiltData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Max('test_method_1'),
                     test_method_2=Max('test_method_2'),
                     test_method_3=Max('test_method_3'),
@@ -2076,7 +2106,7 @@ def getCompareCombineChartData(post_data):
             if elem == 'displacement':
                 sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist(
                     'method') if elem + '~~' in sensor]
-                data = models.DisplacementData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                data = models.DisplacementData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Max('test_method_1'),
                     test_method_2=Max('test_method_2'),
                     test_method_3=Max('test_method_3'),
@@ -2121,7 +2151,7 @@ def getCompareCombineChartData(post_data):
             if elem == 'settlement':
                 sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist(
                     'method') if elem + '~~' in sensor]
-                data = models.SettlementData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                data = models.SettlementData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Max('test_method_1'),
                     test_method_2=Max('test_method_2'),
                     test_method_3=Max('test_method_3'),
@@ -2166,7 +2196,7 @@ def getCompareCombineChartData(post_data):
             if elem == 'vibration':
                 sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist(
                     'method') if elem + '~~' in sensor]
-                data = models.VibrationData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                data = models.VibrationData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Max('test_method_1'),
                     test_method_2=Max('test_method_2'),
                     test_method_3=Max('test_method_3'),
@@ -2212,7 +2242,7 @@ def getCompareCombineChartData(post_data):
             if elem == 'strain':
                 sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist(
                     'method') if elem + '~~' in sensor]
-                data = models.StrainData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                data = models.StrainData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Min('test_method_1'),
                     test_method_2=Min('test_method_2'),
                     test_method_3=Min('test_method_3'),
@@ -2274,7 +2304,7 @@ def getCompareCombineChartData(post_data):
             if elem == 'tilt':
                 sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist(
                     'method') if elem + '~~' in sensor]
-                data = models.TiltData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                data = models.TiltData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Min('test_method_1'),
                     test_method_2=Min('test_method_2'),
                     test_method_3=Min('test_method_3'),
@@ -2319,7 +2349,7 @@ def getCompareCombineChartData(post_data):
             if elem == 'displacement':
                 sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist(
                     'method') if elem + '~~' in sensor]
-                data = models.DisplacementData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                data = models.DisplacementData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Min('test_method_1'),
                     test_method_2=Min('test_method_2'),
                     test_method_3=Min('test_method_3'),
@@ -2364,7 +2394,7 @@ def getCompareCombineChartData(post_data):
             if elem == 'settlement':
                 sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist(
                     'method') if elem + '~~' in sensor]
-                data = models.SettlementData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                data = models.SettlementData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Min('test_method_1'),
                     test_method_2=Min('test_method_2'),
                     test_method_3=Min('test_method_3'),
@@ -2409,7 +2439,7 @@ def getCompareCombineChartData(post_data):
             if elem == 'vibration':
                 sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist(
                     'method') if elem + '~~' in sensor]
-                data = models.VibrationData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                data = models.VibrationData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Min('test_method_1'),
                     test_method_2=Min('test_method_2'),
                     test_method_3=Min('test_method_3'),
@@ -2455,7 +2485,7 @@ def getCompareCombineChartData(post_data):
             if elem == 'strain':
                 sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist(
                     'method') if elem + '~~' in sensor]
-                data = models.StrainData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                data = models.StrainData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Avg('test_method_1'),
                     test_method_2=Avg('test_method_2'),
                     test_method_3=Avg('test_method_3'),
@@ -2517,7 +2547,7 @@ def getCompareCombineChartData(post_data):
             if elem == 'tilt':
                 sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist(
                     'method') if elem + '~~' in sensor]
-                data = models.TiltData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                data = models.TiltData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Avg('test_method_1'),
                     test_method_2=Avg('test_method_2'),
                     test_method_3=Avg('test_method_3'),
@@ -2562,7 +2592,7 @@ def getCompareCombineChartData(post_data):
             if elem == 'displacement':
                 sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist(
                     'method') if elem + '~~' in sensor]
-                data = models.DisplacementData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                data = models.DisplacementData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Avg('test_method_1'),
                     test_method_2=Avg('test_method_2'),
                     test_method_3=Avg('test_method_3'),
@@ -2607,7 +2637,7 @@ def getCompareCombineChartData(post_data):
             if elem == 'settlement':
                 sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist(
                     'method') if elem + '~~' in sensor]
-                data = models.SettlementData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                data = models.SettlementData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Avg('test_method_1'),
                     test_method_2=Avg('test_method_2'),
                     test_method_3=Avg('test_method_3'),
@@ -2652,7 +2682,7 @@ def getCompareCombineChartData(post_data):
             if elem == 'vibration':
                 sensor_data = [sensor.split('~~')[1] for sensor in post_data.getlist(
                     'method') if elem + '~~' in sensor]
-                data = models.VibrationData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                data = models.VibrationData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                     test_method_1=Avg('test_method_1'),
                     test_method_2=Avg('test_method_2'),
                     test_method_3=Avg('test_method_3'),
@@ -2799,6 +2829,7 @@ def getCompareCombineChartData(post_data):
     return series
 
 
+# Generating compare type chart data by highcharts' recommendation
 def getCompareChartData(request):
     if request.method == "POST":
         chart_type = request.POST['chart_type']
@@ -2821,7 +2852,7 @@ def getCompareChartData(request):
                     sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist(
                         'method') if elem + '~~' in sensor]
                     series = []
-                    data = models.StrainData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                    data = models.StrainData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                         test_method_1=Max('test_method_1'),
                         test_method_2=Max('test_method_2'),
                         test_method_3=Max('test_method_3'),
@@ -2888,7 +2919,7 @@ def getCompareChartData(request):
                     sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist(
                         'method') if elem + '~~' in sensor]
                     series = []
-                    data = models.TiltData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                    data = models.TiltData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                         test_method_1=Max('test_method_1'),
                         test_method_2=Max('test_method_2'),
                         test_method_3=Max('test_method_3'),
@@ -2938,7 +2969,7 @@ def getCompareChartData(request):
                     sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist(
                         'method') if elem + '~~' in sensor]
                     series = []
-                    data = models.DisplacementData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                    data = models.DisplacementData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                         test_method_1=Max('test_method_1'),
                         test_method_2=Max('test_method_2'),
                         test_method_3=Max('test_method_3'),
@@ -2988,7 +3019,7 @@ def getCompareChartData(request):
                     sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist(
                         'method') if elem + '~~' in sensor]
                     series = []
-                    data = models.SettlementData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                    data = models.SettlementData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                         test_method_1=Max('test_method_1'),
                         test_method_2=Max('test_method_2'),
                         test_method_3=Max('test_method_3'),
@@ -3038,7 +3069,7 @@ def getCompareChartData(request):
                     sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist(
                         'method') if elem + '~~' in sensor]
                     series = []
-                    data = models.VibrationData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                    data = models.VibrationData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                         test_method_1=Max('test_method_1'),
                         test_method_2=Max('test_method_2'),
                         test_method_3=Max('test_method_3'),
@@ -3089,7 +3120,7 @@ def getCompareChartData(request):
                     sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist(
                         'method') if elem + '~~' in sensor]
                     series = []
-                    data = models.StrainData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                    data = models.StrainData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                         test_method_1=Min('test_method_1'),
                         test_method_2=Min('test_method_2'),
                         test_method_3=Min('test_method_3'),
@@ -3156,7 +3187,7 @@ def getCompareChartData(request):
                     sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist(
                         'method') if elem + '~~' in sensor]
                     series = []
-                    data = models.TiltData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                    data = models.TiltData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                         test_method_1=Min('test_method_1'),
                         test_method_2=Min('test_method_2'),
                         test_method_3=Min('test_method_3'),
@@ -3206,7 +3237,7 @@ def getCompareChartData(request):
                     sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist(
                         'method') if elem + '~~' in sensor]
                     series = []
-                    data = models.DisplacementData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                    data = models.DisplacementData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                         test_method_1=Min('test_method_1'),
                         test_method_2=Min('test_method_2'),
                         test_method_3=Min('test_method_3'),
@@ -3256,7 +3287,7 @@ def getCompareChartData(request):
                     sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist(
                         'method') if elem + '~~' in sensor]
                     series = []
-                    data = models.SettlementData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                    data = models.SettlementData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                         test_method_1=Min('test_method_1'),
                         test_method_2=Min('test_method_2'),
                         test_method_3=Min('test_method_3'),
@@ -3306,7 +3337,7 @@ def getCompareChartData(request):
                     sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist(
                         'method') if elem + '~~' in sensor]
                     series = []
-                    data = models.VibrationData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                    data = models.VibrationData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                         test_method_1=Min('test_method_1'),
                         test_method_2=Min('test_method_2'),
                         test_method_3=Min('test_method_3'),
@@ -3357,7 +3388,7 @@ def getCompareChartData(request):
                     sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist(
                         'method') if elem + '~~' in sensor]
                     series = []
-                    data = models.StrainData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                    data = models.StrainData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                         test_method_1=Avg('test_method_1'),
                         test_method_2=Avg('test_method_2'),
                         test_method_3=Avg('test_method_3'),
@@ -3424,7 +3455,7 @@ def getCompareChartData(request):
                     sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist(
                         'method') if elem + '~~' in sensor]
                     series = []
-                    data = models.TiltData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                    data = models.TiltData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                         test_method_1=Avg('test_method_1'),
                         test_method_2=Avg('test_method_2'),
                         test_method_3=Avg('test_method_3'),
@@ -3474,7 +3505,7 @@ def getCompareChartData(request):
                     sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist(
                         'method') if elem + '~~' in sensor]
                     series = []
-                    data = models.DisplacementData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                    data = models.DisplacementData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                         test_method_1=Avg('test_method_1'),
                         test_method_2=Avg('test_method_2'),
                         test_method_3=Avg('test_method_3'),
@@ -3524,7 +3555,7 @@ def getCompareChartData(request):
                     sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist(
                         'method') if elem + '~~' in sensor]
                     series = []
-                    data = models.SettlementData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                    data = models.SettlementData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                         test_method_1=Avg('test_method_1'),
                         test_method_2=Avg('test_method_2'),
                         test_method_3=Avg('test_method_3'),
@@ -3574,7 +3605,7 @@ def getCompareChartData(request):
                     sensor_data = [sensor.split('~~')[1] for sensor in request.POST.getlist(
                         'method') if elem + '~~' in sensor]
                     series = []
-                    data = models.VibrationData.objects.annotate(date=TruncDate('date_time')).values('date').filter(date_time__range=(from_time, to_time)).annotate(
+                    data = models.VibrationData.objects.annotate(date=TruncDate(F('date_time'))).values('date').filter(date_time__range=(from_time, to_time)).annotate(
                         test_method_1=Avg('test_method_1'),
                         test_method_2=Avg('test_method_2'),
                         test_method_3=Avg('test_method_3'),
