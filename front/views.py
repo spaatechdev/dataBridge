@@ -89,7 +89,7 @@ def random_color_code():
     return color_code
 
 
-# Download predefined existed Excel files
+# Download already existed Excel files
 def downloadExcel(request, sensor_type):
     if sensor_type == 'strain':
         file_path = (settings.MEDIA_ROOT +
