@@ -1,0 +1,35 @@
+.logo a.logo-img img {
+    max-height: 50px;
+}
+
+.selectpicker {
+    height: 100px;
+}
+
+.sensor_type_id{
+    height: 100px;
+}
+
+.required-indicator {
+    color: red;
+}
+
+.input-group-addon {
+    border: 1px solid #e7e7e7;
+    background: #f7f7f7;
+}
+
+.colorpicker-alpha {
+    display: none !important;
+}
+
+.content_child{
+    border: 1px solid black;            
+    border-radius: 5px; 
+    /* max-width: 83%; */
+    margin: auto;
+    /* margin-left: 20px; */
+    /* margin-left: 20px;
+    margin-right: 20px;
+    margin-bottom: 20px; */
+  }

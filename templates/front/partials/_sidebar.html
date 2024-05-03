@@ -1,0 +1,79 @@
+{% load static %}
+
+<div class="page-sidebar">
+  <div class="logo">
+    <a class="logo-img" href="{% url 'index' %}">
+      <img class="desktop-logo" src="{% static 'images/logoo.png' %}" alt="">
+    </a>
+    <a id="sidebar-toggle-button-close"><i class="wd-20" data-feather="x"></i> </a>
+  </div>
+  <!--================================-->
+  <!-- Sidebar Menu Start -->
+  <!--================================-->
+  <div class="page-sidebar-inner">
+    <div class="page-sidebar-menu">
+      <ul class="accordion-menu">
+        <li class="{% if request.path == '/' %}active{% endif %}">
+          <a href="{% url 'index' %}"><i data-feather="home"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li class="mg-l-20-force mg-t-25-force menu-navigation">Navigation</li>      
+
+        <li
+          class="{% if request.path == '/sensor-type-list' or request.path == '/sensor-list' or request.path == '/section-list' or request.path == '/section-sensor-mapping-list'%}open active{% endif %}">
+          <a href="javascript:void(0)"><i data-feather="grid"></i>
+            <span>Master Data</span><i class="accordion-icon fa fa-angle-left"></i>
+          </a>
+          <ul class="sub-menu"
+            style="display: {% if request.path == '/sensor-type-list' or request.path == '/sensor-list' or request.path == '/section-list' or request.path == '/section-sensor-mapping-list' %}block{% else %}none{% endif %};">
+            <li class="{% if request.path == '/sensor-type-list' %}active{% endif %}">
+              <a href="{% url 'sensorTypeList' %}">Sensor Type</a>
+            </li>
+            <li class="{% if request.path == '/sensor-list' %}active{% endif %}">
+              <a href="{% url 'sensorList' %}">Sensor</a>
+            </li>
+            <li class="{% if request.path == '/section-list' %}active{% endif %}">
+              <a href="{% url 'sectionList' %}">Section</a>
+            </li>
+            <li class="{% if request.path == '/section-sensor-mapping-list' %}active{% endif %}">
+              <a href="{% url 'sectionSensorMappingList' %}">Section Sensor Mapping</a>
+            </li>
+          </ul>
+        </li>
+
+        <li class="{% if request.path == '/import-excel' %}open active{% endif %}">
+          <a href="{% url 'importExcel' %}"><i data-feather="download"></i>
+            <span>Import Excel</span></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!--/ Sidebar Menu End -->
+  <!--================================-->
+</div>
+
+{% block js %}
+<script>
+$(document).ready(function () {
+      $.ajax({
+            url: "{% url 'api:upload' %}",
+            type: 'GET',
+            data: ({}),
+            headers: {
+                'Authorization': getCookieValue("accessToken")
+            },
+            success: function (response) {
+                if (response.status == 200) {
+                    console.log("Successful")
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function (error) {
+                $('.error-msg-txt').text(error.responseJSON != null ? error.responseJSON.detail : error.statusText);
+            }
+        });
+    })
+</script>
+{% endblock %}

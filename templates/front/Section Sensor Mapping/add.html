@@ -1,0 +1,383 @@
+{% extends 'front/base.html' %}
+
+{% block css %}
+<style>
+    .select2-container--default .select2-selection--single {
+        background-color: #fff;
+        border: 1px solid #aaa;
+        border-radius: 4px;
+        height: 38px;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #444;
+        line-height: 28px;
+        padding-top: 4px;
+    }
+    .box{
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+    
+    .search{
+        border-top:    1px solid  black;
+        border-right:  1px solid black;
+        border-left:   1px solid  black;
+        padding: 10px;
+    }
+
+    input{
+        width: 93%;
+        height: 2rem;
+    }
+
+    #available_sensors, #chosen_sensors{
+        width: 100%;
+        height: 200px;
+        border-bottom:    1px solid  black;
+        border-right:  1px solid black;
+        border-left:   1px solid  black;
+        padding-left: 6px;
+    }
+    
+    .arrow_buttons{
+        text-align: center;
+        justify-content: center; 
+        align-items: center; 
+        display: flex;
+        align-items: center;
+    }
+
+    .btn{
+        border-width: 0px;
+    }
+    
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="wrapper">
+    <!--================================-->
+    <!-- Breadcrumb Start -->
+    <!--================================-->
+    <div class="pageheader pd-t-25 pd-b-35">
+        <div class="d-flex justify-content-between">
+            <div class="clearfix">
+                <div class="pd-t-5 pd-b-5">
+                    <h1 class="pd-0 mg-0 tx-20 tx-dark">{{parent_page_title}} {{page_title}}</h1>
+                </div>
+                <div class="breadcrumb pd-0 mg-0">
+                    {% for breadcrumb in breadcrumbs %}
+                    {% if forloop.counter != breadcrumbs|length %}
+                    <a class="breadcrumb-item" href="{{breadcrumb.url}}">{{breadcrumb.name}}</a>
+                    {% else %}
+                    <span class="breadcrumb-item active">{{breadcrumb.name}}</span>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--/ Breadcrumb End -->
+    <!--================================-->
+    <!-- Form Element Start -->
+    <!--================================-->
+    <div class="row row-xs clearfix">
+        <div class="col-md-12 col-lg-12">
+            {% if messages %}
+            {% for message in messages %}
+            {% if forloop.counter == messages|length %}
+            <div class="{{ message.tags }} success-msg-txt" style="height: 30px; text-align: center;">{{ message }}
+            </div>
+            {% endif %}
+            {% endfor %}
+            {% endif %}
+            <div class="error-msg-txt" style="height: 30px; text-align: center;"></div>
+            <div class="card mg-b-30">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-header-title tx-13 mb-0">{{parent_page_title}} {{page_title}}</h6>
+                        </div>
+                        <div class="text-right">
+                            <div class="d-flex">
+                                <a href="{% url 'sectionSensorMappingList' %}" class="mr-3"><i
+                                        class="fa fa-step-backward"></i></a>
+                                <a href="" class="mr-3"><i class="ti-reload"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form id="create_form" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        <div class="form-row">
+                            <div class="col-md-6 mb-3">
+                                <label>Section<span class="required-indicator">*</span></label>
+                                <div class="input-group">
+                                    <select class="custom-select selectpicker section_id" name="section_id" required style="height: 36px;">
+                                        <option value="">Choose...</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label>Sensor Type<span class="required-indicator">*</span></label>
+                                <div class="input-group">
+                                    <select class="custom-select selectpicker sensor_type_id" name="sensor_type_id" required style="height: 36px;">
+                                        <option value="">Choose...</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="container sensor_list" hidden>
+                            <p>Sensors:</p>
+                            <div class="form-row ">
+                                <div class="col-md mb-3 box available_sensors">
+                                    <div class="search" >
+                                        <label for="available_sensor_search" style="float: left;margin-right: 8px;" ><i class="fa fa-search fa-lg"></i></label>
+                                        <input id="available_sensor_search" type="text" name="available_sensor_search" placeholder="Search" >
+                                    </div>
+                                    <div class="available_sensors_select">
+                                        <select name="available_sensors" id="available_sensors" multiple>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-1 mb-3 container arrow_buttons">
+                                    <span>
+                                        <button type="button" class="btn right-arrow" disabled>
+                                            <i class="fa fa-arrow-circle-right fa-3x"></i>
+                                        </button><br>
+                                        <button type="button" class="btn left-arrow" disabled>
+                                            <i class="fa fa-arrow-circle-left fa-3x"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <div class="col-md mb-3 box chosen_sensors">
+                                    <div class="search" >
+                                        <label for="chosen_sensor_search" style="float: left;margin-right: 8px;" ><i class="fa fa-search fa-lg"></i></label>
+                                        <input id="chosen_sensor_search" type="text" name="chosen_sensor_search" placeholder="Search">
+                                    </div>
+                                    <div class="chosen_sensors_select">
+                                        <select name="chosen_sensors" id="chosen_sensors" multiple required>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn btn-success submit-btn" type="submit">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--/ Form Element End -->
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+    // Example starter JavaScript for disabling form submissions if there are invalid fields
+    (function () {
+        'use strict';
+        window.addEventListener('load', function () {
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            var forms = document.getElementsByClassName('needs-validation');
+            // Loop over them and prevent submission
+            var validation = Array.prototype.filter.call(forms, function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+</script>
+<script>
+    $('.selectpicker').select2({
+        placeholder: ''
+    });
+
+    function render_sensor_list(){
+        if($('.sensor_type_id').val()){
+            let sensor_type_id=$('.sensor_type_id').val()
+            let section_id=$(".section_id").val()
+            $.ajax({
+                url: "{% url 'api:sensorList' %}",
+                type: 'GET',
+                data: ({
+                    "sensor_type_id":sensor_type_id,
+                    "section_id":section_id
+                }),
+                headers: {
+                    'Authorization': getCookieValue("accessToken")
+                },
+                success: function (response) {
+                    if (response.status == 200) {
+                        var available_sensors_options_text = ``;
+                        for (let index = 0; index < response.available_sensors.length; index++) {
+                            available_sensors_options_text+=`<option value="${response.available_sensors[index].pk}">${response.available_sensors[index].name}</option>`;
+                        }
+                        $("#available_sensors").html(available_sensors_options_text)
+                        var chosen_sensors_options_text = ``;
+                        for (let index = 0; index < response.chosen_sensors.length; index++) {
+                            chosen_sensors_options_text+=`<option value="${response.chosen_sensors[index].pk}">${response.chosen_sensors[index].name}</option>`;
+                        }
+                        $("#chosen_sensors").html(chosen_sensors_options_text)
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function (error) {
+                    $('.error-msg-txt').text(error.responseJSON != null ? error.responseJSON.detail : error.statusText);
+                }
+            });
+        }
+    }
+
+    function render_button_disablity(){
+        if ($("#available_sensors option:selected").length > 0){
+            $(".right-arrow").prop("disabled", false);
+        }
+        else{
+            console.log("AAA")
+            $(".right-arrow").prop("disabled", true);
+        }
+        if ($("#chosen_sensors option:selected").length > 0){
+            $(".left-arrow").prop("disabled", false);
+        }
+        else{
+            $(".left-arrow").prop("disabled", true);
+        }
+
+    }
+  
+    $(document).ready(function () {
+        $.ajax({
+            url: "{% url 'api:sectionList' %}?find_all=1",
+            type: 'GET',
+            data: ({}),
+            headers: {
+                'Authorization': getCookieValue("accessToken")
+            },
+            success: function (response) {
+                if (response.status == 200) {
+                    section_options_text = `<option value="">Choose...</option>`;
+                    for (let index = 0; index < response.page_items.length; index++) {
+                        section_options_text += `<option value="${response.page_items[index].pk}">${response.page_items[index].name}</option>`;
+                    }
+                    $('.section_id').html(section_options_text);
+                    $('.section_id').select2({
+                        placeholder: 'Select Section Type',
+                    });
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function (error) {
+                $('.error-msg-txt').text(error.responseJSON != null ? error.responseJSON.detail : error.statusText);
+            }
+        });
+
+        $.ajax({
+            url: "{% url 'api:sensorTypeList' %}?find_all=1",
+            type: 'GET',
+            data: ({}),
+            headers: {
+                'Authorization': getCookieValue("accessToken")
+            },
+            success: function (response) {
+                if (response.status == 200) {
+                    sensor_type_options_text = `<option value="">Choose...</option>`;
+                    for (let index = 0; index < response.page_items.length; index++) {
+                        sensor_type_options_text += `<option value="${response.page_items[index].pk}">${response.page_items[index].name}</option>`;
+                    }
+                    $('.sensor_type_id').html(sensor_type_options_text);
+                    $('.sensor_type_id').select2({
+                        placeholder: 'Select Sensor Type',
+                    });
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function (error) {
+                $('.error-msg-txt').text(error.responseJSON != null ? error.responseJSON.detail : error.statusText);
+            }
+        });
+    })
+
+    $(document).on('change', '.sensor_type_id', function (e) {
+        $(".sensor_list").removeAttr('hidden')
+        render_sensor_list()
+    })
+
+    $(document).on('change', '.section_id', function (e) {
+        render_sensor_list()
+    })
+    
+    $(document).on('keyup change', '#available_sensor_search, #chosen_sensor_search', function () {
+        let search_term=$(this).val().toLowerCase()
+        let options_jquery_objects=$(this).closest(".box").find("select").first().children("option")
+        options_jquery_objects.each(function(index, element) {
+            if ($(this).text().toLowerCase().includes(search_term)){
+                $(this).show()
+            }
+            else{
+                $(this).hide()
+            }
+        })
+    })
+
+    $(document).on('click', '#available_sensors, #chosen_sensors', function(){
+        render_button_disablity()
+    })
+
+    $(document).on('click', '.right-arrow', function(){
+        $("#chosen_sensors").append($("#available_sensors option:selected"))
+        $("#available_sensors option:selected").remove();
+        render_button_disablity()
+    })
+
+    $(document).on('click', '.left-arrow', function(){
+        $("#available_sensors").append($("#chosen_sensors option:selected"))
+        $("#chosen_sensors option:selected").remove();
+        render_button_disablity()
+    })
+
+    $(document).on('submit', '#create_form', function (e) {
+        e.preventDefault();
+        $('.submit-btn').text('Submitting...');
+        $('.submit-btn').prop('disabled', true);
+        var formData = new FormData(create_form);
+        $.ajax({
+            type: "POST",
+            evalScripts: true,
+            contentType: false,
+            processData: false,
+            url: "{% url 'api:sectionSensorMappingAdd' %}",
+            data: formData,
+            headers: {
+            },
+            success: function (response) {
+                $('.submit-btn').text('Submitting...');
+                $('.submit-btn').prop('disabled', false);
+                if (response.status == 200) {
+                    locationAfterMessageStore(response.message, 'success', "{% url 'sectionSensorMappingList' %}");
+                } else {    
+                    alert(response.message);
+                }
+            },
+            error: function (error) {
+                $('.submit-btn').text('Submitting...');
+                $('.submit-btn').prop('disabled', false);
+                // locationAfterMessageStore(error.responseJSON.detail, 'error');
+                $('.success-msg-txt').text("");
+                $('.error-msg-txt').removeClass('text-secondary').removeClass('text-info').removeClass('text-success').removeClass('text-warning').removeClass('text-danger');
+                $('.error-msg-txt').addClass('text-danger');
+                $('.error-msg-txt').text(error.responseJSON != null ? error.responseJSON.detail : error.statusText);
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,292 @@
+{% load static %}
+{% load custom_filters %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="{% static 'images/favicon.png' %}" />
+    <link href="{% static 'images/favicon.png' %}" rel="apple-touch-icon">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="{% static 'select2/select2.min.css' %}">
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <title>Compare Sensors Data</title>
+</head>
+
+<body>
+    <div class="container mt-5 mb-5">
+        <h2 class="text-center">Compare Sensors Data</h2>
+        <div class="row">
+            <div class="form-group mt-4">
+                <a href="{% url 'index' %}" class="btn btn-info float-end">Back</a>
+            </div>
+        </div>
+        {% if messages %}
+        {% for message in messages %}
+        {% if forloop.counter == 1 %}
+        {% if message.tags == 'error' %}
+        <div class="bg-danger text-white text-center">
+            <div class="{{ message.tags }}" style="height: 30px;">{{ message }}</div>
+        </div>
+        {% elif message.tags == 'success' %}
+        <div class="bg-success text-white text-center">
+            <div class="{{ message.tags }}" style="height: 30px;">{{ message }}</div>
+        </div>
+        {% else %}
+        <div class="text-center">
+            <div class="{{ message.tags }}" style="height: 30px;">{{ message }}</div>
+        </div>
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+        <form action="#" id="comparative_chart_details_form" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-6 parent_form">
+                    <div class="form-group">
+                        <label>Select Sensor Type</label>
+                        <select name="sensor_type" class="sensor_type form-control selectpicker" required>
+                            <option value="">Select One</option>
+                            {% for i in sensor_types.keys %}
+                            <option value="{{i}}">
+                                {{sensor_types.values|get_list2_value:forloop.counter0}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Select Sensor</label>
+                        <select name="method" class="method form-control selectpicker" required>
+                            <option value="">Select Sensor Type</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6 parent_form">
+                    <div class="form-group">
+                        <label>Select Sensor Type</label>
+                        <select name="sensor_type" class="sensor_type form-control selectpicker" required>
+                            <option value="">Select One</option>
+                            {% for i in sensor_types.keys %}
+                            <option value="{{i}}">
+                                {{sensor_types.values|get_list2_value:forloop.counter0}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Select Sensor</label>
+                        <select name="method" class="method form-control selectpicker" required>
+                            <option value="">Select Sensor Type</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="from_time">From Time</label>
+                        <input name="from_time" type="datetime-local" id="from_time" class="form-control" required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="to_time">To Time</label>
+                        <input name="to_time" type="datetime-local" id="to_time" class="form-control" required>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group mt-4">
+                        <button type="submit" class="btn btn-success submit_btn">Submit</button>
+                    </div>
+                </div>
+                <div class="col-md-3 reset_btn" style="display: none;">
+                    <div class="form-group mt-4">
+                        <a href="{% url 'compare' %}" class="btn btn-warning">Reset</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12">
+                <figure class="highcharts-figure">
+                    <div id="chartFirstContainer"></div>
+                </figure>
+            </div>
+            <div class="col-md-12">
+                <figure class="highcharts-figure">
+                    <div id="chartSecondContainer"></div>
+                </figure>
+            </div>
+        </form>
+    </div>
+
+
+    <script src="{% static 'select2/select2.min.js' %}"></script>
+    <script src="{% static 'js/highcharts/js/highcharts.js' %}"></script>
+
+    <script src="{% static 'js/highcharts/js/highcharts-more.js' %}"></script>
+    <script src="{% static 'js/highcharts/js/dumbbell.js' %}"></script>
+    <script src="{% static 'js/highcharts/js/lollipop.js' %}"></script>
+
+    <script src="{% static 'js/highcharts/js/exporting.js' %}"></script>
+    <script src="{% static 'js/highcharts/js/export-data.js' %}"></script>
+    <script src="{% static 'js/highcharts/js/accessibility.js' %}"></script>
+
+    <script>
+        $(document).on('change', '.sensor_type', function () {
+            let elem = $(this);
+            let sensor_type = elem.val();
+            $.ajax({
+                url: "{% url 'getSensorsByTypes' %}",
+                type: 'post',
+                data: ({ sensor_type: sensor_type }),
+                success: function (response) {
+                    if (response.code == 200) {
+                        var sensors_text = `<option value="">Select Sensor</option>`;
+                        for (const key in response.columns) {
+                            sensors_text += `<option value="${key}">${response.columns[key]}</option>`;
+                        }
+                        elem.parents('.parent_form').find('.method').html(sensors_text);
+                    } else {
+                        alert(response.message);
+                    }
+                },
+            });
+
+            let sensor_types = [];
+            $('.sensor_type').each(function () {
+                sensor_types.push($(this).val());
+            })
+
+            $.ajax({
+                url: "{% url 'getCompareTimeDetails' %}",
+                type: 'post',
+                data: ({ sensor_types: sensor_types }),
+                success: function (response) {
+                    if (response.code == 200) {
+                        // Convert the data to a JavaScript Date object
+                        // const minTime = new Date(response.min_time).toISOString().slice(0, 16);
+                        // const maxTime = new Date(response.max_time).toISOString().slice(0, 16);
+                        var minTime = response.min_time;
+                        var maxTime = response.max_time;
+
+                        // Set the min and max attributes of the input element
+                        $('#from_time').attr('min', minTime);
+                        $('#from_time').attr('max', maxTime);
+
+                        // Set the min and max attributes of the input element
+                        $('#to_time').attr('min', minTime);
+                        $('#to_time').attr('max', maxTime);
+                    } else {
+                        alert(response.message);
+                    }
+                },
+            });
+        })
+
+        $('.selectpicker').select2({
+            placeholder: ''
+        });
+
+        $(document).on('submit', '#comparative_chart_details_form', async function (e) {
+            e.preventDefault();
+            $('.submit_btn').text('Submitting...');
+            $('.submit_btn').prop('disabled', true);
+            var formData = new FormData(this);
+            await $.ajax({
+                type: "POST",
+                evalScripts: true,
+                contentType: false,
+                processData: false,
+                url: "{% url 'getCompareChartData' %}",
+                data: formData,
+                success: function (response) {
+                    $('.submit_btn').text('Submit');
+                    $('.submit_btn').prop('disabled', false);
+                    if (response.code == 200) {
+                        $('.reset_btn').css('display', 'block')
+                        result = response.result;
+                        renderFirstLineChart(result[Object.keys(result)[0]]);
+                        renderSecondLineChart(result[Object.keys(result)[1]]);
+                    } else {
+                        alert(response.message)
+                    }
+                }
+            });
+        });
+
+        function renderFirstLineChart(result) {
+            // Create the chart
+            Highcharts.chart('chartFirstContainer', {
+
+                chart: {
+                    zoomType: 'x',
+                    // height: 500
+                },
+                credits: {
+                    enabled: false
+                },
+                title: {
+                    text: 'Comparative Data Analysis'
+                },
+
+                accessibility: {
+                    screenReaderSection: {
+                        beforeChartFormat: '<{headingTagName}>{chartTitle}</{headingTagName}><div>{chartSubtitle}</div><div>{chartLongdesc}</div><div>{xAxisDescription}</div><div>{yAxisDescription}</div>'
+                    }
+                },
+
+                tooltip: {
+                    valueDecimals: 5
+                },
+
+                xAxis: {
+                    type: 'datetime'
+                },
+
+                series: result
+
+            });
+        }
+
+        function renderSecondLineChart(result) {
+            // Create the chart
+            Highcharts.chart('chartSecondContainer', {
+
+                chart: {
+                    zoomType: 'x',
+                    // height: 500
+                },
+                credits: {
+                    enabled: false
+                },
+                title: {
+                    text: 'Comparative Data Analysis'
+                },
+
+                accessibility: {
+                    screenReaderSection: {
+                        beforeChartFormat: '<{headingTagName}>{chartTitle}</{headingTagName}><div>{chartSubtitle}</div><div>{chartLongdesc}</div><div>{xAxisDescription}</div><div>{yAxisDescription}</div>'
+                    }
+                },
+
+                tooltip: {
+                    valueDecimals: 5
+                },
+
+                xAxis: {
+                    type: 'datetime'
+                },
+
+                series: result
+
+            });
+        }
+    </script>
+</body>
+
+</html>

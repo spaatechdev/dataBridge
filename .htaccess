@@ -1,0 +1,14 @@
+RewriteEngine On
+RewriteCond %{SERVER_PORT} 80
+RewriteRule ^(.*)$ https://data-bridge.spaatech.net/$1 [R,L]
+
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN
+PassengerAppRoot "/home/rxvxi23k63vl/repositories/dataBridge"
+PassengerBaseURI "/"
+PassengerPython "/home/rxvxi23k63vl/virtualenv/repositories/dataBridge/3.8/bin/python"
+PassengerAppLogFile "/home/rxvxi23k63vl/logs/data-bridge.txt"
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION END
+# DO NOT REMOVE OR MODIFY. CLOUDLINUX ENV VARS CONFIGURATION BEGIN
+<IfModule Litespeed>
+</IfModule>
+# DO NOT REMOVE OR MODIFY. CLOUDLINUX ENV VARS CONFIGURATION END

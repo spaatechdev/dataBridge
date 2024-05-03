@@ -1,0 +1,4 @@
+.idea/
+dataBridge/.env
+*/__pycache__/
+*/migrations/
